@@ -1,0 +1,35 @@
+# The "deliberate breakage" checks: each one breaks a behaviour on purpose and confirms the tests notice.
+# Slow (about an hour), so it runs weekly and on request rather than on every change.
+name: Deliberate-breakage checks
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 4 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  mutation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+      - name: Install libraries
+        run: |
+          npm ci --no-audit --no-fund
+          npm ci --no-audit --no-fund --prefix frontend
+      - name: Install a real S3 server (the storage tests are skipped without it)
+        run: pip install "moto[server]"
+      - name: Server
+        run: python3 scripts/mutation-check.py
+      - name: Web app
+        run: python3 scripts/frontend-mutation-check.py
