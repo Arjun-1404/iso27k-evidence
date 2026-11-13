@@ -1,5 +1,7 @@
 # ISO 27001 evidence portal
 
+[![Verify](https://github.com/Arjun-1404/iso27k-evidence/actions/workflows/ci.yml/badge.svg)](https://github.com/Arjun-1404/iso27k-evidence/actions/workflows/ci.yml)
+
 **[Try the live demo](https://arjun-1404.github.io/iso27k-evidence/)**: click through it as an auditor, a client or an
 administrator. Everything in it is made up, runs in your own browser, and is gone when you close the tab. Nothing is
 sent anywhere. ([How the demo works, and what it is not](#the-live-demo).)
@@ -964,7 +966,7 @@ sign-in with RFC 6238 vectors, lock-outs, the sample data against the real ISO 2
 web app contains none of it, and manual runs in real Chromium (served from a sub-folder, the way GitHub Pages serves it, at
 laptop width and an emulated 390 px phone screen, with no sideways scrolling, console errors or requests to any other
 address). Those browser runs used a throwaway Playwright script that is not part of this repository. What was not: Safari,
-Firefox, a real phone, and the Pages workflow itself, which has never run on GitHub.
+Firefox and a real phone. The Pages workflow has since run on GitHub (13 November 2026) and published the site.
 
 Also worth knowing, found while writing the demo and left as it is: a read-only client user (viewer) can start an upload on the
 real server and is only refused when the file is recorded; and the server's emails, its default storage folder name and the authenticator-app label still say
@@ -984,5 +986,7 @@ been checked. Check before relying on it.
   that speak the real protocol, but none has been run against the real thing with real credentials. This now includes
   the Drive trash call used to quarantine infected files.
 - Building and running the Docker images (see the note under Quick start).
-- Running the tests on macOS or Windows, and the GitHub workflows (they have never run on GitHub).
+- Running the tests on macOS or Windows. On GitHub's Linux machines, `npm run verify` (the Verify workflow, including the
+  S3 tests against a real moto server) and the Live demo workflow both passed on 13 November 2026; the weekly
+  deliberate-breakage workflow (`mutation.yml`) has not been run there yet.
 - A real security review / penetration test.
