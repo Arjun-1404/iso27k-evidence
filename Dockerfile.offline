@@ -1,0 +1,14 @@
+# Offline variant of the API image: it does not download anything. It uses the libraries that come inside this download
+# (the node_modules folder next to this file) instead of running npm. Switch it on with docker-compose.offline.yml
+# (see the README, "If the build stops with ..."). The libraries cover 64-bit Intel/AMD and ARM Linux.
+FROM node:22-slim
+WORKDIR /app
+ENV NODE_ENV=production
+COPY node_modules ./node_modules
+COPY package.json ./
+COPY tsconfig.json ./
+COPY src ./src
+COPY db ./db
+
+EXPOSE 3000
+CMD ["npx", "tsx", "src/server.ts"]

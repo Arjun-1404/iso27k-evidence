@@ -1,0 +1,46 @@
+{
+  "name": "iso27k-evidence",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Multi-tenant ISO 27001 evidence collection portal (mediator model: evidence stays in the auditor's own storage)",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "verify": "node scripts/verify.mjs",
+    "setup": "node scripts/init-env.mjs",
+    "db:migrate": "tsx src/db/migrate-cli.ts",
+    "db:seed": "tsx src/db/seed-cli.ts",
+    "db:bootstrap-admin": "tsx src/db/bootstrap-admin-cli.ts",
+    "db:grant-platform-owner": "tsx src/db/grant-platform-owner-cli.ts",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "start": "tsx src/server.ts"
+  },
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.1164.0",
+    "bcryptjs": "^3.0.3",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "nodemailer": "^10.3.1",
+    "pg": "^8.23.0",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/express": "^5.0.6",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/node": "^26.6.2",
+    "@types/nodemailer": "^8.0.2",
+    "@types/pg": "^8.23.1",
+    "@types/smtp-server": "^3.5.13",
+    "@types/supertest": "^7.2.1",
+    "embedded-postgres": "^18.4.0-beta.17",
+    "smtp-server": "^3.21.3",
+    "supertest": "^7.2.2",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.1",
+    "yaml": "^2.9.1"
+  }
+}

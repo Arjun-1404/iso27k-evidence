@@ -1,0 +1,9 @@
+# Optional. Serves the web app that is already built in frontend/dist instead of building it, so the frontend needs
+# no downloads at all. Use it only when the normal build cannot finish (see the README, "If the build stops with ...").
+# Switch it on by adding this line to .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.prebuilt-frontend.yml
+# The built app talks to the API at http://localhost:3000; for another address use the normal build.
+services:
+  frontend:
+    build:
+      dockerfile: Dockerfile.prebuilt

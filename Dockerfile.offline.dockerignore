@@ -1,0 +1,11 @@
+# Like .dockerignore, except that the runtime libraries in node_modules ARE wanted here.
+frontend/node_modules
+frontend/dist
+frontend/dist-demo
+tests
+.git
+*.tar.gz
+npm-debug.log
+.env
+.env.*
+!.env.example

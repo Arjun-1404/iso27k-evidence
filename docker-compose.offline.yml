@@ -1,0 +1,10 @@
+# Optional. Builds the API image from the libraries already inside this download, so it needs no npm download at all.
+# Use it, together with the prebuilt web app, when the network blocks npm (see the README, "If the build stops with ...").
+# Switch both on by adding this line to .env:
+#   COMPOSE_FILE=docker-compose.yml:docker-compose.prebuilt-frontend.yml:docker-compose.offline.yml
+# Needs the node_modules folder that comes with the offline download. The images for the database and the web server are
+# still pulled from Docker Hub (postgres and nginx), unless they are already on the machine.
+services:
+  api:
+    build:
+      dockerfile: Dockerfile.offline

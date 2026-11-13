@@ -1,0 +1,17 @@
+# Dependencies and build output
+node_modules/
+dist/
+dist-demo/
+coverage/
+
+# Secrets — the real .env holds database passwords, the JWT secret and Google credentials.
+# Only .env.example (placeholders) belongs in the repository.
+.env
+.env.*
+!.env.example
+
+# Logs and editor/OS clutter
+*.log
+.DS_Store
+.vscode/
+.idea/
