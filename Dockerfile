@@ -1,4 +1,4 @@
-FROM node:22-slim AS deps
+FROM node:25-slim AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 # Where the libraries are downloaded from. Leave it alone unless your network blocks registry.npmjs.org; then set
@@ -10,7 +10,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --omit=dev --no-audit --no-fund --registry="$NPM_REGISTRY" \
       --fetch-retries=5 --fetch-retry-mintimeout=20000 --fetch-retry-maxtimeout=120000
 
-FROM node:22-slim
+FROM node:25-slim
 WORKDIR /app
 ENV NODE_ENV=production
 COPY --from=deps /app/node_modules ./node_modules
