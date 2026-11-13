@@ -1,0 +1,32 @@
+# Runs the project's one-command check on every change, so a problem is noticed before it is merged.
+name: Verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            frontend/package-lock.json
+      - name: Install libraries
+        run: |
+          npm ci --no-audit --no-fund
+          npm ci --no-audit --no-fund --prefix frontend
+      - name: Install a real S3 server (the storage tests are skipped without it)
+        run: pip install "moto[server]"
+      - name: Verify (types, tests, build, library security check)
+        run: npm run verify
