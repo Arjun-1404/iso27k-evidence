@@ -1,0 +1,60 @@
+# Publishes the live demo (the web app running on its pretend, in-browser server with made-up data) to GitHub Pages.
+#
+# One-time setup in the repository: Settings → Pages → Build and deployment → Source: "GitHub Actions".
+# After that, every push to main that changes the web app republishes it at https://<user>.github.io/<repo>/.
+name: Live demo
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "frontend/**"
+      - "db/seed/**"
+      - "scripts/check-demo-build.mjs"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One publish at a time; a newer push waits for the one running rather than cutting it off halfway.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - name: Install libraries
+        run: npm ci --no-audit --no-fund --prefix frontend
+      - name: Test the demo (its pretend server and the screens on top of it)
+        run: npm test --prefix frontend -- src/demo
+      - name: Build the real app and the demo, and check the real one has none of the demo in it
+        run: |
+          npm run build --prefix frontend
+          npm run build:demo --prefix frontend
+          node scripts/check-demo-build.mjs
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist-demo
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
