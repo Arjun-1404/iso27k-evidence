@@ -44,7 +44,7 @@ jobs:
           npm run build --prefix frontend
           npm run build:demo --prefix frontend
           node scripts/check-demo-build.mjs
-      - uses: actions/configure-pages@v5
+      - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v3
         with:
           path: frontend/dist-demo
