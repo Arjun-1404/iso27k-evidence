@@ -1,0 +1,943 @@
+{
+ "framework": "ISO/IEC 27001:2022",
+ "version": "1",
+ "name": "ISO/IEC 27001:2022 (platform default)",
+ "controls": [
+  {
+   "kind": "clause",
+   "section": "4 Context of the organization",
+   "control_ref": "4.1",
+   "title": "Understanding the organization and its context",
+   "default_evidence": "Documented internal and external issues (e.g. context analysis) relevant to the ISMS, with review date.",
+   "sort_order": 1
+  },
+  {
+   "kind": "clause",
+   "section": "4 Context of the organization",
+   "control_ref": "4.2",
+   "title": "Understanding the needs and expectations of interested parties",
+   "default_evidence": "Register of interested parties and their requirements, including legal, regulatory and contractual ones.",
+   "sort_order": 2
+  },
+  {
+   "kind": "clause",
+   "section": "4 Context of the organization",
+   "control_ref": "4.3",
+   "title": "Determining the scope of the information security management system",
+   "default_evidence": "Approved ISMS scope statement covering boundaries, interfaces, locations and exclusions.",
+   "sort_order": 3
+  },
+  {
+   "kind": "clause",
+   "section": "4 Context of the organization",
+   "control_ref": "4.4",
+   "title": "Information security management system",
+   "default_evidence": "ISMS manual or equivalent showing the processes and how they interact.",
+   "sort_order": 4
+  },
+  {
+   "kind": "clause",
+   "section": "5 Leadership",
+   "control_ref": "5.1",
+   "title": "Leadership and commitment",
+   "default_evidence": "Evidence of management commitment: meeting minutes, resourcing decisions, policy sponsorship.",
+   "sort_order": 5
+  },
+  {
+   "kind": "clause",
+   "section": "5 Leadership",
+   "control_ref": "5.2",
+   "title": "Policy",
+   "default_evidence": "Approved information security policy, communicated to staff and relevant parties, with version history.",
+   "sort_order": 6
+  },
+  {
+   "kind": "clause",
+   "section": "5 Leadership",
+   "control_ref": "5.3",
+   "title": "Organizational roles, responsibilities and authorities",
+   "default_evidence": "Documented ISMS roles and responsibilities, org chart, appointment records.",
+   "sort_order": 7
+  },
+  {
+   "kind": "clause",
+   "section": "6 Planning",
+   "control_ref": "6.1.2",
+   "title": "Information security risk assessment",
+   "default_evidence": "Risk assessment methodology, risk criteria, and completed risk register with owners.",
+   "sort_order": 8
+  },
+  {
+   "kind": "clause",
+   "section": "6 Planning",
+   "control_ref": "6.1.3",
+   "title": "Information security risk treatment",
+   "default_evidence": "Risk treatment plan, Statement of Applicability with justifications, risk owner approval of residual risk.",
+   "sort_order": 9
+  },
+  {
+   "kind": "clause",
+   "section": "6 Planning",
+   "control_ref": "6.2",
+   "title": "Information security objectives and planning to achieve them",
+   "default_evidence": "Measurable objectives with owners, timelines and progress tracking.",
+   "sort_order": 10
+  },
+  {
+   "kind": "clause",
+   "section": "6 Planning",
+   "control_ref": "6.3",
+   "title": "Planning of changes",
+   "default_evidence": "Records showing how changes to the ISMS were planned and assessed.",
+   "sort_order": 11
+  },
+  {
+   "kind": "clause",
+   "section": "7 Support",
+   "control_ref": "7.1",
+   "title": "Resources",
+   "default_evidence": "Budget, staffing and tooling records supporting the ISMS.",
+   "sort_order": 12
+  },
+  {
+   "kind": "clause",
+   "section": "7 Support",
+   "control_ref": "7.2",
+   "title": "Competence",
+   "default_evidence": "Competence requirements, training records, qualifications and skills matrix for ISMS roles.",
+   "sort_order": 13
+  },
+  {
+   "kind": "clause",
+   "section": "7 Support",
+   "control_ref": "7.3",
+   "title": "Awareness",
+   "default_evidence": "Awareness programme materials, attendance records and policy acknowledgements.",
+   "sort_order": 14
+  },
+  {
+   "kind": "clause",
+   "section": "7 Support",
+   "control_ref": "7.4",
+   "title": "Communication",
+   "default_evidence": "Communication plan covering what, when, with whom and how for the ISMS.",
+   "sort_order": 15
+  },
+  {
+   "kind": "clause",
+   "section": "7 Support",
+   "control_ref": "7.5",
+   "title": "Documented information",
+   "default_evidence": "Document control procedure, master document list, version and approval records.",
+   "sort_order": 16
+  },
+  {
+   "kind": "clause",
+   "section": "8 Operation",
+   "control_ref": "8.1",
+   "title": "Operational planning and control",
+   "default_evidence": "Evidence planned processes are run and controlled, including outsourced processes.",
+   "sort_order": 17
+  },
+  {
+   "kind": "clause",
+   "section": "8 Operation",
+   "control_ref": "8.2",
+   "title": "Information security risk assessment",
+   "default_evidence": "Risk assessment results from planned intervals or after significant changes.",
+   "sort_order": 18
+  },
+  {
+   "kind": "clause",
+   "section": "8 Operation",
+   "control_ref": "8.3",
+   "title": "Information security risk treatment",
+   "default_evidence": "Implemented treatment plan records and updated risk treatment results.",
+   "sort_order": 19
+  },
+  {
+   "kind": "clause",
+   "section": "9 Performance evaluation",
+   "control_ref": "9.1",
+   "title": "Monitoring, measurement, analysis and evaluation",
+   "default_evidence": "Defined metrics, measurement results and analysis reports.",
+   "sort_order": 20
+  },
+  {
+   "kind": "clause",
+   "section": "9 Performance evaluation",
+   "control_ref": "9.2",
+   "title": "Internal audit",
+   "default_evidence": "Audit programme, audit plans, reports, auditor independence records and follow-up.",
+   "sort_order": 21
+  },
+  {
+   "kind": "clause",
+   "section": "9 Performance evaluation",
+   "control_ref": "9.3",
+   "title": "Management review",
+   "default_evidence": "Management review agenda, minutes, inputs, outputs and resulting decisions.",
+   "sort_order": 22
+  },
+  {
+   "kind": "clause",
+   "section": "10 Improvement",
+   "control_ref": "10.1",
+   "title": "Continual improvement",
+   "default_evidence": "Improvement log or register showing actions taken to improve the ISMS.",
+   "sort_order": 23
+  },
+  {
+   "kind": "clause",
+   "section": "10 Improvement",
+   "control_ref": "10.2",
+   "title": "Nonconformity and corrective action",
+   "default_evidence": "Nonconformity register, root cause analysis, corrective actions and effectiveness checks.",
+   "sort_order": 24
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.1",
+   "title": "Policies for information security",
+   "default_evidence": "Approved information security policy set, review dates, publication and acknowledgement records.",
+   "sort_order": 25
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.2",
+   "title": "Information security roles and responsibilities",
+   "default_evidence": "Role descriptions, RACI matrix, assignment of security responsibilities.",
+   "sort_order": 26
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.3",
+   "title": "Segregation of duties",
+   "default_evidence": "Conflicting duties matrix, access reviews showing separation, compensating controls where needed.",
+   "sort_order": 27
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.4",
+   "title": "Management responsibilities",
+   "default_evidence": "Evidence managers require staff to follow security policies, e.g. briefings, communications, reviews.",
+   "sort_order": 28
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.5",
+   "title": "Contact with authorities",
+   "default_evidence": "List of relevant authorities with contact details and escalation procedure.",
+   "sort_order": 29
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.6",
+   "title": "Contact with special interest groups",
+   "default_evidence": "Memberships or subscriptions to security forums, bulletins and industry groups.",
+   "sort_order": 30
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.7",
+   "title": "Threat intelligence",
+   "default_evidence": "Threat intelligence sources, review records and examples of resulting actions.",
+   "sort_order": 31
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.8",
+   "title": "Information security in project management",
+   "default_evidence": "Project methodology showing security requirements and risk checks; sample project records.",
+   "sort_order": 32
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.9",
+   "title": "Inventory of information and other associated assets",
+   "default_evidence": "Asset inventory with owners, classification and location, plus review evidence.",
+   "sort_order": 33
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.10",
+   "title": "Acceptable use of information and other associated assets",
+   "default_evidence": "Acceptable use policy and staff acknowledgements.",
+   "sort_order": 34
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.11",
+   "title": "Return of assets",
+   "default_evidence": "Leaver checklist and records showing assets returned.",
+   "sort_order": 35
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.12",
+   "title": "Classification of information",
+   "default_evidence": "Classification scheme and examples of classified information.",
+   "sort_order": 36
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.13",
+   "title": "Labelling of information",
+   "default_evidence": "Labelling procedure and sample labelled documents or systems.",
+   "sort_order": 37
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.14",
+   "title": "Information transfer",
+   "default_evidence": "Transfer rules, secure channel configuration, transfer agreements.",
+   "sort_order": 38
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.15",
+   "title": "Access control",
+   "default_evidence": "Access control policy and evidence it is applied to systems.",
+   "sort_order": 39
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.16",
+   "title": "Identity management",
+   "default_evidence": "Joiner-mover-leaver process, identity lifecycle records, unique ID evidence.",
+   "sort_order": 40
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.17",
+   "title": "Authentication information",
+   "default_evidence": "Credential policy, MFA enforcement settings, secure credential issuance.",
+   "sort_order": 41
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.18",
+   "title": "Access rights",
+   "default_evidence": "Access provisioning records, periodic access review results, revocation evidence.",
+   "sort_order": 42
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.19",
+   "title": "Information security in supplier relationships",
+   "default_evidence": "Supplier security policy, supplier risk assessments, supplier register.",
+   "sort_order": 43
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.20",
+   "title": "Addressing information security within supplier agreements",
+   "default_evidence": "Contract clauses or security addenda with suppliers.",
+   "sort_order": 44
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.21",
+   "title": "Managing information security in the ICT supply chain",
+   "default_evidence": "Supply chain requirements, due diligence records, sub-supplier flow-down clauses.",
+   "sort_order": 45
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.22",
+   "title": "Monitoring, review and change management of supplier services",
+   "default_evidence": "Supplier performance reviews, assurance reports (e.g. SOC 2, ISO certificates), change notifications.",
+   "sort_order": 46
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.23",
+   "title": "Information security for use of cloud services",
+   "default_evidence": "Cloud security policy, provider assessments, shared responsibility mapping, exit plans.",
+   "sort_order": 47
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.24",
+   "title": "Information security incident management planning and preparation",
+   "default_evidence": "Incident response plan, roles, contact lists, test or exercise records.",
+   "sort_order": 48
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.25",
+   "title": "Assessment and decision on information security events",
+   "default_evidence": "Event triage criteria and sample records of event classification.",
+   "sort_order": 49
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.26",
+   "title": "Response to information security incidents",
+   "default_evidence": "Sample incident records showing response, containment and closure.",
+   "sort_order": 50
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.27",
+   "title": "Learning from information security incidents",
+   "default_evidence": "Post-incident reviews and resulting improvement actions.",
+   "sort_order": 51
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.28",
+   "title": "Collection of evidence",
+   "default_evidence": "Forensic evidence handling procedure and chain-of-custody records.",
+   "sort_order": 52
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.29",
+   "title": "Information security during disruption",
+   "default_evidence": "Continuity plans showing security is maintained during disruption.",
+   "sort_order": 53
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.30",
+   "title": "ICT readiness for business continuity",
+   "default_evidence": "Business impact analysis, recovery objectives, DR and continuity test reports.",
+   "sort_order": 54
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.31",
+   "title": "Legal, statutory, regulatory and contractual requirements",
+   "default_evidence": "Legal and contractual requirements register with owners and review dates.",
+   "sort_order": 55
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.32",
+   "title": "Intellectual property rights",
+   "default_evidence": "IP and software licensing policy, licence inventory, compliance checks.",
+   "sort_order": 56
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.33",
+   "title": "Protection of records",
+   "default_evidence": "Records retention schedule and protection measures for critical records.",
+   "sort_order": 57
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.34",
+   "title": "Privacy and protection of PII",
+   "default_evidence": "Privacy policy, records of processing, DPIAs, privacy roles.",
+   "sort_order": 58
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.35",
+   "title": "Independent review of information security",
+   "default_evidence": "Independent or external audit reports and management responses.",
+   "sort_order": 59
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.36",
+   "title": "Compliance with policies, rules and standards for information security",
+   "default_evidence": "Compliance check results, technical compliance reviews, follow-ups.",
+   "sort_order": 60
+  },
+  {
+   "kind": "annex",
+   "section": "A.5 Organizational controls",
+   "control_ref": "A.5.37",
+   "title": "Documented operating procedures",
+   "default_evidence": "Operating procedures for key systems, version controlled and accessible.",
+   "sort_order": 61
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.1",
+   "title": "Screening",
+   "default_evidence": "Background check policy and completed checks for a sample of staff.",
+   "sort_order": 62
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.2",
+   "title": "Terms and conditions of employment",
+   "default_evidence": "Contracts with security responsibility clauses for a sample of staff.",
+   "sort_order": 63
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.3",
+   "title": "Information security awareness, education and training",
+   "default_evidence": "Training plan, content, completion records, phishing exercise results.",
+   "sort_order": 64
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.4",
+   "title": "Disciplinary process",
+   "default_evidence": "Documented disciplinary process covering security breaches.",
+   "sort_order": 65
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.5",
+   "title": "Responsibilities after termination or change of employment",
+   "default_evidence": "Exit procedure and reminders of continuing confidentiality duties.",
+   "sort_order": 66
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.6",
+   "title": "Confidentiality or non-disclosure agreements",
+   "default_evidence": "NDA templates and signed samples for staff and third parties.",
+   "sort_order": 67
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.7",
+   "title": "Remote working",
+   "default_evidence": "Remote working policy, VPN and endpoint controls, approved arrangements.",
+   "sort_order": 68
+  },
+  {
+   "kind": "annex",
+   "section": "A.6 People controls",
+   "control_ref": "A.6.8",
+   "title": "Information security event reporting",
+   "default_evidence": "Reporting channel, staff guidance, sample reported events.",
+   "sort_order": 69
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.1",
+   "title": "Physical security perimeters",
+   "default_evidence": "Site plans, perimeter definitions and barriers such as walls, locks and access points.",
+   "sort_order": 70
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.2",
+   "title": "Physical entry",
+   "default_evidence": "Badge and visitor logs, access lists, entry control records.",
+   "sort_order": 71
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.3",
+   "title": "Securing offices, rooms and facilities",
+   "default_evidence": "Photos or inspection records of locked rooms and restricted areas.",
+   "sort_order": 72
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.4",
+   "title": "Physical security monitoring",
+   "default_evidence": "CCTV or alarm coverage, monitoring records, retention settings.",
+   "sort_order": 73
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.5",
+   "title": "Protecting against physical and environmental threats",
+   "default_evidence": "Fire, flood and power protections with inspection and test records.",
+   "sort_order": 74
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.6",
+   "title": "Working in secure areas",
+   "default_evidence": "Secure area rules and supervision or access records.",
+   "sort_order": 75
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.7",
+   "title": "Clear desk and clear screen",
+   "default_evidence": "Policy, screen lock settings, spot check results.",
+   "sort_order": 76
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.8",
+   "title": "Equipment siting and protection",
+   "default_evidence": "Equipment placement plans, server room protections, environmental monitoring.",
+   "sort_order": 77
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.9",
+   "title": "Security of assets off-premises",
+   "default_evidence": "Off-site asset policy, device encryption, asset loan or travel records.",
+   "sort_order": 78
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.10",
+   "title": "Storage media",
+   "default_evidence": "Removable media policy, media register, encryption and disposal records.",
+   "sort_order": 79
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.11",
+   "title": "Supporting utilities",
+   "default_evidence": "UPS and generator maintenance and test records.",
+   "sort_order": 80
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.12",
+   "title": "Cabling security",
+   "default_evidence": "Cabling layout, protected cabling areas, patch panel access controls.",
+   "sort_order": 81
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.13",
+   "title": "Equipment maintenance",
+   "default_evidence": "Maintenance schedules and service records.",
+   "sort_order": 82
+  },
+  {
+   "kind": "annex",
+   "section": "A.7 Physical controls",
+   "control_ref": "A.7.14",
+   "title": "Secure disposal or re-use of equipment",
+   "default_evidence": "Data sanitisation procedure, wipe or destruction certificates.",
+   "sort_order": 83
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.1",
+   "title": "User endpoint devices",
+   "default_evidence": "Endpoint policy, MDM/EDR enrolment, encryption and configuration baselines.",
+   "sort_order": 84
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.2",
+   "title": "Privileged access rights",
+   "default_evidence": "Privileged account inventory, approval records, PAM settings, periodic reviews.",
+   "sort_order": 85
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.3",
+   "title": "Information access restriction",
+   "default_evidence": "Access restrictions in key systems, role-based permission exports.",
+   "sort_order": 86
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.4",
+   "title": "Access to source code",
+   "default_evidence": "Repository access lists, branch protections, access reviews.",
+   "sort_order": 87
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.5",
+   "title": "Secure authentication",
+   "default_evidence": "MFA settings, login controls, lockout and session configuration.",
+   "sort_order": 88
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.6",
+   "title": "Capacity management",
+   "default_evidence": "Capacity monitoring reports and forecast records.",
+   "sort_order": 89
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.7",
+   "title": "Protection against malware",
+   "default_evidence": "Anti-malware/EDR deployment coverage, update status, detection reports.",
+   "sort_order": 90
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.8",
+   "title": "Management of technical vulnerabilities",
+   "default_evidence": "Vulnerability scan reports, patching SLAs, remediation records.",
+   "sort_order": 91
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.9",
+   "title": "Configuration management",
+   "default_evidence": "Hardening baselines, configuration standards, drift or compliance reports.",
+   "sort_order": 92
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.10",
+   "title": "Information deletion",
+   "default_evidence": "Retention and deletion procedure with deletion logs or certificates.",
+   "sort_order": 93
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.11",
+   "title": "Data masking",
+   "default_evidence": "Masking or pseudonymisation rules and examples in use.",
+   "sort_order": 94
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.12",
+   "title": "Data leakage prevention",
+   "default_evidence": "DLP policies, rule configurations, alert handling samples.",
+   "sort_order": 95
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.13",
+   "title": "Information backup",
+   "default_evidence": "Backup policy, job success reports, restore test records.",
+   "sort_order": 96
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.14",
+   "title": "Redundancy of information processing facilities",
+   "default_evidence": "Architecture showing redundancy and failover test records.",
+   "sort_order": 97
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.15",
+   "title": "Logging",
+   "default_evidence": "Log sources, retention settings, protected log storage evidence.",
+   "sort_order": 98
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.16",
+   "title": "Monitoring activities",
+   "default_evidence": "Monitoring rules, alerts, SOC/SIEM review records.",
+   "sort_order": 99
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.17",
+   "title": "Clock synchronization",
+   "default_evidence": "NTP configuration on systems and log sources.",
+   "sort_order": 100
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.18",
+   "title": "Use of privileged utility programs",
+   "default_evidence": "Restricted utility list, access controls and usage logs.",
+   "sort_order": 101
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.19",
+   "title": "Installation of software on operational systems",
+   "default_evidence": "Software installation controls, approved software list, change records.",
+   "sort_order": 102
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.20",
+   "title": "Networks security",
+   "default_evidence": "Network diagrams, firewall rulesets, review records.",
+   "sort_order": 103
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.21",
+   "title": "Security of network services",
+   "default_evidence": "Network service provider agreements and security requirements.",
+   "sort_order": 104
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.22",
+   "title": "Segregation of networks",
+   "default_evidence": "Segmentation design, VLAN and firewall rules, test results.",
+   "sort_order": 105
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.23",
+   "title": "Web filtering",
+   "default_evidence": "Web filter policy, category settings, blocked-access reports.",
+   "sort_order": 106
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.24",
+   "title": "Use of cryptography",
+   "default_evidence": "Cryptography policy, approved algorithms, key management records.",
+   "sort_order": 107
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.25",
+   "title": "Secure development life cycle",
+   "default_evidence": "SDLC policy and evidence it is followed in projects.",
+   "sort_order": 108
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.26",
+   "title": "Application security requirements",
+   "default_evidence": "Security requirements documented for applications, with sample traceability.",
+   "sort_order": 109
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.27",
+   "title": "Secure system architecture and engineering principles",
+   "default_evidence": "Architecture principles and design review records.",
+   "sort_order": 110
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.28",
+   "title": "Secure coding",
+   "default_evidence": "Coding standards, code review evidence, SAST results.",
+   "sort_order": 111
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.29",
+   "title": "Security testing in development and acceptance",
+   "default_evidence": "Test plans, penetration test reports, acceptance sign-offs.",
+   "sort_order": 112
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.30",
+   "title": "Outsourced development",
+   "default_evidence": "Contracts, security requirements and oversight records for outsourced developers.",
+   "sort_order": 113
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.31",
+   "title": "Separation of development, test and production environments",
+   "default_evidence": "Environment diagrams and access separation evidence.",
+   "sort_order": 114
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.32",
+   "title": "Change management",
+   "default_evidence": "Change policy, change tickets with approvals, testing evidence.",
+   "sort_order": 115
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.33",
+   "title": "Test information",
+   "default_evidence": "Rules for test data use and evidence production data is protected or avoided.",
+   "sort_order": 116
+  },
+  {
+   "kind": "annex",
+   "section": "A.8 Technological controls",
+   "control_ref": "A.8.34",
+   "title": "Protection of information systems during audit testing",
+   "default_evidence": "Audit testing agreements, scoped access, approval records.",
+   "sort_order": 117
+  }
+ ]
+}
