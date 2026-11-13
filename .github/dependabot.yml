@@ -1,0 +1,26 @@
+# Opens a pull request when a library, a GitHub Action or the Docker base image has a new version,
+# so security fixes arrive as small, reviewable changes instead of piling up.
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: npm
+    directory: /frontend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directory: /frontend
+    schedule:
+      interval: weekly
