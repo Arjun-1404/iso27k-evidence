@@ -13,7 +13,7 @@ ARG VITE_API_BASE_URL=http://localhost:3000
 ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 RUN npm run build
 
-FROM nginx:1.27-alpine
+FROM nginx:1.29-alpine
 COPY --from=build /app/dist /usr/share/nginx/html
 # A single-page app needs every path to fall back to index.html so client-side routing (react-router)
 # works on a hard refresh of e.g. /controls, not just on in-app navigation.
