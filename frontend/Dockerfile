@@ -1,4 +1,4 @@
-FROM node:22-slim AS build
+FROM node:26-slim AS build
 WORKDIR /app
 COPY package.json package-lock.json ./
 # Registry, retries and download cache: see the backend Dockerfile.
