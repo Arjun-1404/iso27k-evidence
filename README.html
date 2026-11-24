@@ -1,0 +1,1653 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ISO 27001 evidence portal</title>
+<meta name="generator" content="scripts/build-readme-html.mjs">
+<!-- readme-sha256: 994d4db763b9b15d93a5e52948c96dcaa4bec2a4d9bb5d65991dbd752543b4e1 -->
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #ffffff; --surface: #f6f8fa; --ink: #1f2328; --muted: #59636e; --line: #d1d9e0;
+  --accent: #0b7a75; --accent-ink: #ffffff; --code-bg: #f3f5f7; --mark: #fff8c5; --quote: #0b7a75;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0f1419; --surface: #161c23; --ink: #e6edf3; --muted: #9aa6b2; --line: #2d3641;
+    --accent: #3fc1b9; --accent-ink: #0f1419; --code-bg: #1b222b; --mark: #3b3a1a; --quote: #3fc1b9;
+  }
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 1rem; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16.5px/1.65 system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; -webkit-text-size-adjust: 100%; }
+.layout { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 76rem; margin: 0 auto; }
+nav.toc { padding: 1rem 1.25rem; border-bottom: 1px solid var(--line); background: var(--surface); }
+nav.toc details { border: 0; padding: 0; margin: 0; background: none; }
+nav.toc summary { cursor: pointer; font-weight: 600; }
+nav.toc ul { list-style: none; margin: .5rem 0 0; padding: 0; font-size: .92rem; }
+nav.toc li { margin: 0; }
+nav.toc li.d3 { padding-left: 1rem; font-size: .88rem; }
+nav.toc a { display: block; padding: .18rem .5rem; border-radius: 6px; color: var(--ink); text-decoration: none; }
+nav.toc a:hover { background: var(--code-bg); }
+nav.toc a.current { color: var(--accent); font-weight: 600; background: var(--code-bg); }
+main { padding: 1.25rem 1.25rem 4rem; min-width: 0; overflow-wrap: break-word; }
+.note { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--accent); border-radius: 8px; padding: .65rem 1rem; margin: 0 0 1.5rem; color: var(--muted); font-size: .93rem; }
+@media (min-width: 64rem) {
+  .layout { grid-template-columns: 19rem minmax(0, 1fr); }
+  nav.toc { position: sticky; top: 0; align-self: start; height: 100vh; overflow-y: auto; border-bottom: 0; border-right: 1px solid var(--line); padding: 1.25rem 1rem; }
+  nav.toc details > summary { display: none; }
+  main { padding: 2rem 2.5rem 6rem; max-width: 56rem; }
+}
+h1, h2, h3, h4 { line-height: 1.25; margin: 2.2rem 0 .7rem; font-weight: 650; position: relative; }
+h1 { font-size: 2rem; margin-top: 0; letter-spacing: -.01em; }
+h2 { font-size: 1.5rem; padding-bottom: .3rem; border-bottom: 1px solid var(--line); }
+h3 { font-size: 1.2rem; }
+h4 { font-size: 1.02rem; }
+.anchor { margin-left: .4rem; color: var(--muted); text-decoration: none; opacity: 0; font-weight: 400; }
+h1:hover .anchor, h2:hover .anchor, h3:hover .anchor, h4:hover .anchor, .anchor:focus { opacity: 1; }
+p, ul, ol, blockquote, .code, .table-wrap, figure, details { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.5rem; }
+li { margin: .25rem 0; }
+li > p { margin: .25rem 0; }
+a { color: var(--accent); text-underline-offset: 2px; overflow-wrap: anywhere; }
+hr { border: 0; border-top: 1px solid var(--line); margin: 2rem 0; }
+img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid var(--line); }
+blockquote { padding: .1rem 1rem; color: var(--muted); border-left: 4px solid var(--quote); background: var(--surface); border-radius: 0 8px 8px 0; }
+code { font: .88em ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace; background: var(--code-bg); padding: .1em .3em; border-radius: 5px; overflow-wrap: anywhere; }
+.code { border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--code-bg); }
+.codebar { display: flex; justify-content: space-between; align-items: center; padding: .25rem .5rem .25rem .8rem; background: var(--surface); border-bottom: 1px solid var(--line); font-size: .78rem; color: var(--muted); text-transform: lowercase; }
+.copy { font: inherit; font-size: .78rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: .18rem .65rem; cursor: pointer; }
+.copy:hover { border-color: var(--accent); color: var(--accent); }
+.copy.done { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+.code pre { margin: 0; padding: .85rem 1rem; overflow-x: auto; }
+.code pre code { background: none; padding: 0; font-size: .86rem; line-height: 1.55; overflow-wrap: normal; white-space: pre; }
+pre:not(.code pre) { overflow-x: auto; padding: .85rem 1rem; background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; }
+pre:not(.code pre) code { background: none; padding: 0; }
+.table-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+table { border-collapse: collapse; width: 100%; font-size: .93rem; }
+th, td { text-align: left; vertical-align: top; padding: .5rem .75rem; border-bottom: 1px solid var(--line); min-width: 7rem; }
+th { background: var(--surface); font-weight: 650; position: sticky; top: 0; }
+tr:last-child td { border-bottom: 0; }
+tbody tr:nth-child(even) td { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+figure.diagram { padding: 1rem; background: #fff; border: 1px solid var(--line); border-radius: 10px; overflow-x: auto; }
+figure.diagram svg { display: block; margin: 0 auto; max-width: 100%; height: auto; }
+details { border: 1px solid var(--line); border-radius: 8px; padding: .5rem 1rem; background: var(--surface); }
+details > summary { cursor: pointer; font-weight: 600; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+@media print {
+  nav.toc, .copy, .anchor, .note { display: none; }
+  .layout { display: block; } main { max-width: none; padding: 0; }
+  a { color: inherit; } .code pre { white-space: pre-wrap; }
+  h2, h3 { break-after: avoid; } .table-wrap, .code, figure { break-inside: avoid; }
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<nav class="toc" aria-label="Contents">
+<details open>
+<summary>Contents</summary>
+<ul>
+<li class="d2"><a href="#two-ways-to-use-this-repository">Two ways to use this repository</a></li>
+<li class="d2"><a href="#installation">Installation</a></li>
+<li class="d3"><a href="#before-you-start-what-to-install">Before you start: what to install</a></li>
+<li class="d3"><a href="#1-quick-installation-windows-or-linux-no-docker">1. Quick installation (Windows or Linux, no Docker)</a></li>
+<li class="d3"><a href="#2-windows-with-docker">2. Windows (with Docker)</a></li>
+<li class="d3"><a href="#3-windows-without-docker">3. Windows (without Docker)</a></li>
+<li class="d3"><a href="#4-linux-with-docker">4. Linux (with Docker)</a></li>
+<li class="d3"><a href="#5-linux-without-docker">5. Linux (without Docker)</a></li>
+<li class="d2"><a href="#your-first-client-end-to-end">Your first client, end to end</a></li>
+<li class="d2"><a href="#the-live-demo">The live demo</a></li>
+<li class="d2"><a href="#server-settings-email-scanning-and-google-drive-from-the-web-app">Server settings: email, scanning and Google Drive, from the web app</a></li>
+<li class="d2"><a href="#the-dashboard">The dashboard</a></li>
+<li class="d2"><a href="#audit-cycles-one-audit-per-year-per-client">Audit cycles (one audit per year, per client)</a></li>
+<li class="d2"><a href="#what-applies-due-dates-and-closing-a-control-yourself">What applies, due dates, and closing a control yourself</a></li>
+<li class="d2"><a href="#closing-an-audit-cycle">Closing an audit cycle</a></li>
+<li class="d2"><a href="#who-can-do-what-roles-and-custom-roles">Who can do what: roles and custom roles</a></li>
+<li class="d2"><a href="#giving-controls-to-your-clients-people">Giving controls to your client's people</a></li>
+<li class="d2"><a href="#where-evidence-is-kept-google-drive-this-servers-disk-or-s3">Where evidence is kept: Google Drive, this server's disk, or S3</a></li>
+<li class="d3"><a href="#this-servers-disk">This server's disk</a></li>
+<li class="d3"><a href="#s3-compatible-storage">S3-compatible storage</a></li>
+<li class="d3"><a href="#downloading-evidence">Downloading evidence</a></li>
+<li class="d2"><a href="#connecting-google-drive">Connecting Google Drive</a></li>
+<li class="d2"><a href="#email-invitations-and-reminders">Email (invitations and reminders)</a></li>
+<li class="d2"><a href="#forgotten-passwords">Forgotten passwords</a></li>
+<li class="d3"><a href="#request-limits-and-reverse-proxies">Request limits and reverse proxies</a></li>
+<li class="d2"><a href="#malware-scanning-clamav">Malware scanning (ClamAV)</a></li>
+<li class="d3"><a href="#clamav-without-docker-windows-and-linux">ClamAV without Docker (Windows and Linux)</a></li>
+<li class="d2"><a href="#two-step-sign-in-authenticator-app">Two-step sign-in (authenticator app)</a></li>
+<li class="d2"><a href="#changing-your-password-and-requiring-two-step-sign-in-for-everyone">Changing your password, and requiring two-step sign-in for everyone</a></li>
+<li class="d2"><a href="#security-notice-emails">Security notice emails</a></li>
+<li class="d2"><a href="#security">Security</a></li>
+<li class="d2"><a href="#structure">Structure</a></li>
+<li class="d2"><a href="#why-its-built-this-way">Why it's built this way</a></li>
+<li class="d2"><a href="#checking-the-whole-project-npm-run-verify">Checking the whole project: npm run verify</a></li>
+<li class="d2"><a href="#running-the-tests">Running the tests</a></li>
+<li class="d2"><a href="#what-isnt-tested-here-and-why">What isn't tested here, and why</a></li>
+<li class="d2"><a href="#not-yet-built">Not yet built</a></li>
+</ul>
+</details>
+</nav>
+<main>
+<p class="note">This page is the same guide as <strong>README.md</strong>, laid out for reading on your own computer. It works without an internet connection. Every command has a <strong>Copy</strong> button.</p>
+<h1 id="iso-27001-evidence-portal">ISO 27001 evidence portal<a class="anchor" href="#iso-27001-evidence-portal" aria-label="Link to this section">#</a></h1>
+<p><strong><a href="https://arjun-1404.github.io/iso27k-evidence/" target="_blank" rel="noopener noreferrer">Try the live demo</a></strong>: click through it as an auditor, a client or an
+administrator, or press <strong>Take the 3-minute tour</strong> at the top and follow the checklist. Everything in it is made up,
+runs in your own browser, and is gone when you close the tab. Nothing is sent anywhere.
+(<a href="#the-live-demo">How the demo works, and what it is not</a>.)</p>
+<p><strong>Want to run it yourself, on Windows or Linux, with or without Docker?</strong> See <a href="#installation">Installation</a>: what to install first, then
+five step-by-step routes, starting from the GitHub download.</p>
+<p><img src="docs/walkthrough.gif" alt="A 30-second walkthrough of the demo: a client uploads evidence and submits it, the lead auditor accepts it, the dashboard's readiness figure moves from 48.2% to 49.1%, and the audit log shows each step" loading="lazy"></p>
+<p><em>The whole loop in the live demo: the client hands over evidence, the auditor accepts it, the dashboard moves, the audit log records it.</em></p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>The client&#39;s progress, as the auditor sees it</th>
+<th>Reviewing a submitted control</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><img src="docs/screenshots/dashboard.png" alt="Dashboard for a fictional client: a readiness ring at 48.2%, what needs attention, where the controls stand, and a tile for every control" loading="lazy"></td>
+<td><img src="docs/screenshots/review-evidence.png" alt="A submitted control with two files, a comment, and Accept / Reject buttons" loading="lazy"></td>
+</tr>
+</tbody></table></div>
+<p><em>Screenshots of the live demo (fictional data).</em></p>
+<p>An open-source ISO 27001 (and similar) audit-evidence portal, built on one rule: <strong>the evidence stays in your own
+storage</strong>: your own Google Drive, a folder on your own server, or an S3-compatible bucket (Amazon S3, MinIO, Wasabi,
+Backblaze B2…). SharePoint is planned. This app is a mediator: it tracks what&#39;s required, what&#39;s been submitted, and
+what&#39;s been accepted, and never keeps a copy of the evidence files in its database. Only metadata (file name, size,
+hash, provider file id) ever touches the database.</p>
+<figure class="diagram" role="img" aria-label="Diagram: how the people, the portal, the database and your storage connect"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1832.23px; background-color: white;" viewBox="0 0 1832.234375 674.6397094726562" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .cluster-label text{fill:#333;}#my-svg .cluster-label span{color:#333;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#333;color:#333;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#my-svg .arrowheadPath{fill:#333333;}#my-svg .edgePath .path{stroke:#333333;stroke-width:1px;}#my-svg .flowchart-link{stroke:#333333;fill:none;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#my-svg .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#my-svg .cluster text{fill:#333;}#my-svg .cluster span{color:#333;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].swimlane.cluster rect{filter:none;}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"><g class="cluster" id="my-svg-portal" data-look="classic"><rect style="" x="517.25" y="8" width="1306.984375" height="265.21324157714844"/><g class="cluster-label" transform="translate(1079.140625, 8)"><foreignObject width="183.203125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>The portal, on your server</p></span></div></foreignObject></g></g></g><g class="edgePaths"><path d="M249.438,91.107L273.24,91.107C297.042,91.107,344.646,91.107,389.281,91.107C433.917,91.107,475.583,91.107,506.544,96.798C537.504,102.489,557.758,113.871,567.885,119.562L578.012,125.254" id="my-svg-L_A_W_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_W_0" data-points="W3sieCI6MjQ5LjQzNzUsInkiOjkxLjEwNjYyMDc4ODU3NDIyfSx7IngiOjM5Mi4yNSwieSI6OTEuMTA2NjIwNzg4NTc0MjJ9LHsieCI6NTE3LjI1LCJ5Ijo5MS4xMDY2MjA3ODg1NzQyMn0seyJ4Ijo1ODEuNDk5MTQ4NTkwMTI3NiwieSI6MTI3LjIxMzI0MTU3NzE0ODQ0fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M218.95,303.32L247.834,289.469C276.717,275.618,334.483,247.915,384.2,234.064C433.917,220.213,475.583,220.213,499.94,219.259C524.296,218.304,531.343,216.395,534.866,215.44L538.389,214.485" id="my-svg-L_C_W_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_W_0" data-points="W3sieCI6MjE4Ljk1MDQ0Mjc2MzYxOCwieSI6MzAzLjMxOTg2MjM2NTcyMjY2fSx7IngiOjM5Mi4yNSwieSI6MjIwLjIxMzI0MTU3NzE0ODQ0fSx7IngiOjUxNy4yNSwieSI6MjIwLjIxMzI0MTU3NzE0ODQ0fSx7IngiOjU0Mi4yNSwieSI6MjEzLjQzOTA0ODAyODc2MTMzfV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M802.25,178.213L823.083,178.213C843.917,178.213,885.583,178.213,926.583,178.213C967.583,178.213,1007.917,178.213,1028.083,178.213L1048.25,178.213" id="my-svg-L_W_API_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_W_API_0" data-points="W3sieCI6ODAyLjI1LCJ5IjoxNzguMjEzMjQxNTc3MTQ4NDR9LHsieCI6OTI3LjI1LCJ5IjoxNzguMjEzMjQxNTc3MTQ4NDR9LHsieCI6MTA1Mi4yNSwieSI6MTc4LjIxMzI0MTU3NzE0ODQ0fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1293.171,156.09L1313.348,152.444C1333.525,148.798,1373.88,141.505,1417.974,137.859C1462.068,134.213,1509.901,134.213,1533.818,134.213L1557.734,134.213" id="my-svg-L_API_DB_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_API_DB_0" data-points="W3sieCI6MTI4OS4yMzQzNzUsInkiOjE1Ni44MDEyMzUyODg0NDU2NH0seyJ4IjoxNDE0LjIzNDM3NSwieSI6MTM0LjIxMzI0MTU3NzE0ODQ0fSx7IngiOjE1NjEuNzM0Mzc1LCJ5IjoxMzQuMjEzMjQxNTc3MTQ4NDR9XQ==" data-look="classic" marker-start="url(#my-svg_flowchart-v2-pointStart)" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1293.234,178.213L1313.401,178.213C1333.568,178.213,1373.901,178.213,1419.975,200.917C1466.049,223.62,1517.863,269.027,1543.77,291.731L1569.677,314.434" id="my-svg-L_API_S_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_API_S_0" data-points="W3sieCI6MTI4OS4yMzQzNzUsInkiOjE3OC4yMTMyNDE1NzcxNDg0NH0seyJ4IjoxNDE0LjIzNDM3NSwieSI6MTc4LjIxMzI0MTU3NzE0ODQ0fSx7IngiOjE1NzIuNjg1MTQ4NzE4MjM5LCJ5IjozMTcuMDcwNTI2MDY4OTY1NH1d" data-look="classic" marker-start="url(#my-svg_flowchart-v2-pointStart)" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M267.25,365.283L288.083,368.973C308.917,372.664,350.583,380.045,392.25,383.736C433.917,387.426,475.583,387.426,522.25,387.426C568.917,387.426,620.583,387.426,688.917,387.426C757.25,387.426,842.25,387.426,925.332,387.426C1008.414,387.426,1089.578,387.426,1170.742,387.426C1251.906,387.426,1333.07,387.426,1397.569,387.426C1462.068,387.426,1509.901,387.426,1533.818,387.426L1557.734,387.426" id="my-svg-L_C_S_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_S_0" data-points="W3sieCI6MjY3LjI1LCJ5IjozNjUuMjgyODMwMzM3MTI3NH0seyJ4IjozOTIuMjUsInkiOjM4Ny40MjY0ODMxNTQyOTY5fSx7IngiOjUxNy4yNSwieSI6Mzg3LjQyNjQ4MzE1NDI5Njl9LHsieCI6NjcyLjI1LCJ5IjozODcuNDI2NDgzMTU0Mjk2OX0seyJ4Ijo5MjcuMjUsInkiOjM4Ny40MjY0ODMxNTQyOTY5fSx7IngiOjExNzAuNzQyMTg3NSwieSI6Mzg3LjQyNjQ4MzE1NDI5Njl9LHsieCI6MTQxNC4yMzQzNzUsInkiOjM4Ny40MjY0ODMxNTQyOTY5fSx7IngiOjE1NjEuNzM0Mzc1LCJ5IjozODcuNDI2NDgzMTU0Mjk2OX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1289.234,209.358L1310.068,214.834C1330.901,220.31,1372.568,231.261,1426.386,281.937C1480.204,332.612,1546.174,423.01,1579.159,468.209L1612.144,513.409" id="my-svg-L_API_X_0" class="edge-thickness-normal edge-pattern-dotted edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_API_X_0" data-points="W3sieCI6MTI4OS4yMzQzNzUsInkiOjIwOS4zNTc5Nzc5OTcwNzk4fSx7IngiOjE0MTQuMjM0Mzc1LCJ5IjoyNDIuMjEzMjQxNTc3MTQ4NDR9LHsieCI6MTYxNC41MDE4MzIwNDE3Mjk0LCJ5Ijo1MTYuNjM5NzI0NzMxNDQ1M31d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(392.25, 91.10662078857422)"><g class="label" data-id="L_A_W_0" transform="translate(-100, -24)"><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="edgeLabel"><p>browser: loads the app, signs in, reviews</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(392.25, 220.21324157714844)"><g class="label" data-id="L_C_W_0" transform="translate(-100, -24)"><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="edgeLabel"><p>browser: loads the app, signs in, uploads</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_W_API_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_API_DB_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(1414.234375, 178.21324157714844)"><g class="label" data-id="L_API_S_0" transform="translate(-100, -24)"><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="edgeLabel"><p>folders, downloads, reads each file back</p></span></div></foreignObject></g></g><g class="edgeLabel" transform="translate(927.25, 387.4264831542969)"><g class="label" data-id="L_C_S_0" transform="translate(-100, -24)"><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="edgeLabel"><p>Google Drive only: the file goes straight to Drive</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_API_X_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-A-0" data-look="classic" transform="translate(137.625, 91.10662078857422)"><rect class="basic label-container" style="" x="-111.8125" y="-39" width="223.625" height="78"/><g class="label" style="" transform="translate(-81.8125, -24)"><rect/><foreignObject width="163.625" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Audit firm<br />review, accept or reject</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-1" data-look="classic" transform="translate(137.625, 342.31986236572266)"><rect class="basic label-container" style="" x="-129.625" y="-39" width="259.25" height="78"/><g class="label" style="" transform="translate(-99.625, -24)"><rect/><foreignObject width="199.25" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Client's people<br />upload and submit evidence</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-W-2" data-look="classic" transform="translate(672.25, 178.21324157714844)"><rect class="basic label-container" style="" x="-130" y="-51" width="260" height="102"/><g class="label" style="" transform="translate(-100, -36)"><rect/><foreignObject width="200" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Web app<br />the pages, served as plain files</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-API-3" data-look="classic" transform="translate(1170.7421875, 178.21324157714844)"><rect class="basic label-container" style="" x="-118.4921875" y="-51" width="236.984375" height="102"/><g class="label" style="" transform="translate(-88.4921875, -36)"><rect/><foreignObject width="176.984375" height="72"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>API<br />roles, statuses, audit log,<br />checks every upload</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-DB-4" data-look="classic" transform="translate(1669.234375, 134.21324157714844)"><path d="M0,15.808823529411764 a107.5,15.808823529411764 0,0,0 215,0 a107.5,15.808823529411764 0,0,0 -215,0 l0,150.80882352941177 a107.5,15.808823529411764 0,0,0 215,0 l0,-150.80882352941177" class="basic label-container outer-path" style="" transform="translate(-107.5, -91.21323529411765)"/><g class="label" style="" transform="translate(-100, -50)"><rect/><foreignObject width="200" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>PostgreSQL<br />row-level security keeps clients apart<br />metadata only: file name, size, hash, file id</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-S-5" data-look="classic" transform="translate(1669.234375, 387.4264831542969)"><path d="M0,15.808823529411764 a107.5,15.808823529411764 0,0,0 215,0 a107.5,15.808823529411764 0,0,0 -215,0 l0,126.80882352941177 a107.5,15.808823529411764 0,0,0 215,0 l0,-126.80882352941177" class="basic label-container outer-path" style="" transform="translate(-107.5, -79.21323529411765)"/><g class="label" style="" transform="translate(-100, -38)"><rect/><foreignObject width="200" height="96"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Your own storage<br />Google Drive, server disk or S3 bucket<br />holds the evidence files</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-X-6" data-look="classic" transform="translate(1669.234375, 591.6397247314453)"><rect class="basic label-container" style="" x="-130" y="-75" width="260" height="150"/><g class="label" style="" transform="translate(-100, -60)"><rect/><foreignObject width="200" height="120"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Optional, switched on under Server settings<br />ClamAV scans each upload<br />A mail server sends invitations and reminders</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg></figure>
+<p><em>Where things live. With Google Drive the browser sends the file straight to Drive; with the server&#39;s disk or an S3 bucket
+it passes through the API on the way. Either way the API then reads the file back from storage to check its hash and scan
+it for malware, and the database keeps only the record of the file, never its contents. Dotted lines are optional or special
+cases (the scanner and the mail server are switched on under Server settings).</em></p>
+<p>Multi-tenant by design (one instance can serve several client organisations — the typical case for an
+audit firm self-hosting this for its clients), self-hosted, MIT licensed.</p>
+<p>This repo has two parts:</p>
+<ul>
+<li>the root (<code>db/</code>, <code>src/</code>, <code>tests/</code>): the backend: database, services, HTTP API</li>
+<li><code>frontend/</code>: the React web app. See <code>frontend/README.md</code> for that half. It also contains the live demo
+(<code>frontend/src/demo/</code>), which is only an extra way of building the same web app.</li>
+</ul>
+<h2 id="two-ways-to-use-this-repository">Two ways to use this repository<a class="anchor" href="#two-ways-to-use-this-repository" aria-label="Link to this section">#</a></h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Live demo</strong></th>
+<th><strong>The real thing</strong></th>
+</tr>
+</thead>
+<tbody><tr>
+<td>What it is</td>
+<td>The web app with a pretend server inside the page and made-up data</td>
+<td>The web app, the API and a PostgreSQL database</td>
+</tr>
+<tr>
+<td>Where it runs</td>
+<td>Any static web host (GitHub Pages)</td>
+<td>Your own machine or server</td>
+</tr>
+<tr>
+<td>Data</td>
+<td>Fictional, kept only in the visitor&#39;s own browser tab</td>
+<td>Your organisation&#39;s, in PostgreSQL; the evidence files in your own storage</td>
+</tr>
+<tr>
+<td>Email, malware scanning, Drive/S3</td>
+<td>Not available (the screens say so)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>What you need</td>
+<td>A browser</td>
+<td>Docker, or Node 22 or newer + PostgreSQL (below); and a current browser (Chrome or Edge 111+, Firefox 128+, Safari 16.4+)</td>
+</tr>
+</tbody></table></div>
+<p><strong>Running your own copy from GitHub</strong> needs nothing beyond this repository. The live demo is <em>not</em> what you run: it
+contains no database and no storage. Download the repository and follow <a href="#installation">Installation</a>
+below (Windows or Linux, with or without Docker, step by step). The backend, the database migrations, the Docker files and the launcher
+scripts are all in the repository; the demo is an optional extra that a real installation never loads (a check in
+<code>npm run verify</code> proves the real build contains none of it).</p>
+<h2 id="installation">Installation<a class="anchor" href="#installation" aria-label="Link to this section">#</a></h2>
+<p>Five ways to get your own copy running. Pick the row for your computer and the column for how you want to run it; each route is
+complete on its own, from nothing installed to signed in.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Without Docker</strong> (one computer: a trial, or a small team)</th>
+<th><strong>With Docker</strong> (a server that must stay up)</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Windows</strong> 10/11 or Windows Server</td>
+<td><a href="#1-quick-installation-windows-or-linux-no-docker">1. Quick installation</a> (the short list, Windows and Linux), or <a href="#3-windows-without-docker">3. Windows (without Docker)</a> (the same with every detail and the fixes)</td>
+<td><a href="#2-windows-with-docker">2. Windows (with Docker)</a></td>
+</tr>
+<tr>
+<td><strong>Linux</strong> (Debian, Ubuntu, Kali)</td>
+<td><a href="#1-quick-installation-windows-or-linux-no-docker">1. Quick installation</a>, or <a href="#5-linux-without-docker">5. Linux (without Docker)</a></td>
+<td><a href="#4-linux-with-docker">4. Linux (with Docker)</a></td>
+</tr>
+</tbody></table></div>
+<p>New to this? Take <strong>1. Quick installation</strong>: no Docker, one list for both systems.</p>
+<p><strong>How far each route has been tried.</strong> Windows without Docker: written for Windows, <strong>not yet tried on a real Windows machine</strong> (built
+and tested on Linux). Linux without Docker: tried end to end from a GitHub-style download on Linux, including the first-client steps.
+Both Docker routes: written and checked piece by piece; the Docker images have <strong>never been built</strong> by the author.</p>
+<p>Whichever route you take, once you are signed in carry on with <a href="#your-first-client-end-to-end">Your first client, end to end</a>.</p>
+<h3 id="before-you-start-what-to-install">Before you start: what to install<a class="anchor" href="#before-you-start-what-to-install" aria-label="Link to this section">#</a></h3>
+<p>Install only what your route needs, then check each with the command shown: every one must answer with a version number.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Install this</th>
+<th>Needed for</th>
+<th>Check it</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>Node.js 22 or newer</strong>, which brings <strong>npm</strong> with it</td>
+<td>The no-Docker routes (1, 3, 5). The Docker routes only for the optional <code>npm run setup</code> shortcut</td>
+<td><code>node -v</code> shows <code>v22</code> or higher; <code>npm -v</code> (Windows PowerShell: <code>npm.cmd -v</code>)</td>
+</tr>
+<tr>
+<td><strong>PostgreSQL 16 or newer</strong></td>
+<td>The no-Docker routes (1, 3, 5). The Docker routes bring their own database</td>
+<td><code>psql --version</code></td>
+</tr>
+<tr>
+<td><strong>Docker</strong> with <strong>Compose v2</strong></td>
+<td>The Docker routes (2, 4)</td>
+<td><code>docker --version</code> and <code>docker compose version</code></td>
+</tr>
+<tr>
+<td><strong>A way to unpack the code</strong>: the ZIP download, or <code>git</code></td>
+<td>Every route</td>
+<td>Windows unpacks ZIP files itself; Linux: <code>unzip -v</code></td>
+</tr>
+<tr>
+<td><strong>A current browser</strong> (Chrome or Edge 111+, Firefox 128+, Safari 16.4+)</td>
+<td>Every route</td>
+<td>An older one shows a half-blank page, with a notice at the top</td>
+</tr>
+</tbody></table></div>
+<p>Disk: about 300 MB without Docker; a few GB for Docker&#39;s images and build cache.</p>
+<p><strong>Node.js and npm</strong> (they come together). The no-Docker routes need version 22 or newer (the current LTS is the easy choice).</p>
+<ul>
+<li><em>Windows:</em> the LTS installer from <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer">https://nodejs.org</a> (keep the defaults). Close and reopen PowerShell, then <code>node -v</code>.
+Use <code>npm.cmd</code> rather than <code>npm</code> in PowerShell, because PowerShell may refuse to run npm&#39;s script file.</li>
+<li><em>Linux:</em> install it with nvm, not with <code>sudo apt install nodejs</code>: Debian 11 and Ubuntu 20.04 provide Node 10 or 12, far too old
+(the portal&#39;s own scripts stop with <code>SyntaxError: Unexpected token &#39;?&#39;</code>). Skip this if <code>node -v</code> already shows v22 or higher.<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sudo apt update &amp;&amp; sudo apt install -y curl unzip
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# close the terminal, open a new one, then:
+nvm install 22
+node -v</code></pre></div>
+Run <code>npm</code> commands as yourself, never with <code>sudo</code>: that leaves root-owned files behind and later steps fail with &quot;permission denied&quot;.</li>
+</ul>
+<p><strong>PostgreSQL</strong> (no-Docker routes only).</p>
+<ul>
+<li><em>Windows:</em> PostgreSQL 17 from <a href="https://www.postgresql.org/download/windows/" target="_blank" rel="noopener noreferrer">https://www.postgresql.org/download/windows/</a> (EDB&#39;s installer; defaults, port 5432). When it asks for
+the <strong>password of the database superuser (postgres)</strong>, choose one (letters and digits are simplest) and write it down: the install steps need it.</li>
+<li><em>Linux:</em><div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sudo apt update &amp;&amp; sudo apt install -y postgresql
+sudo systemctl enable --now postgresql
+psql --version</code></pre></div>
+</li>
+</ul>
+<p><strong>Docker</strong> (Docker routes only).</p>
+<ul>
+<li><em>Linux:</em> follow Docker&#39;s own instructions for your system, <a href="https://docs.docker.com/engine/install/" target="_blank" rel="noopener noreferrer">https://docs.docker.com/engine/install/</a> , which install Docker Engine with
+the Compose plugin. On recent Ubuntu the distribution&#39;s packages also work (names differ between releases):
+<code>sudo apt update &amp;&amp; sudo apt install -y docker.io docker-compose-v2</code>. Then <code>sudo systemctl enable --now docker</code>, and check that
+<code>docker compose version</code> prints a version beginning <code>v2</code>: a computer that only has the old <code>docker-compose</code> command needs the Compose
+plugin from Docker&#39;s page. To run <code>docker</code> without <code>sudo</code>: <code>sudo usermod -aG docker $USER</code>, then log out and back in.</li>
+<li><em>Windows:</em> Docker Desktop, <a href="https://www.docker.com/products/docker-desktop/" target="_blank" rel="noopener noreferrer">https://www.docker.com/products/docker-desktop/</a> . What it needs, and the catch inside a virtual machine, is in
+<a href="#2-windows-with-docker">2. Windows (with Docker)</a>.</li>
+</ul>
+<p><strong>Getting the code</strong> (every route). On the repository&#39;s page press the green <strong>Code</strong> button → <strong>Download ZIP</strong> and unpack it, or with git:
+<code>git clone https://github.com/Arjun-1404/iso27k-evidence.git</code>. A ZIP unpacks to a folder named <code>iso27k-evidence-main</code>. Every command
+in this guide is run in a terminal opened <strong>in the folder that has <code>package.json</code> in it</strong>. On Windows unpack to a short path such
+as <code>C:\evidence-portal</code> (long paths hit a Windows limit), open the folder in File Explorer, click the address bar, type <code>powershell</code>
+and press Enter. On Linux: <code>unzip iso27k-evidence-main.zip &amp;&amp; cd iso27k-evidence-main</code>.</p>
+<h3 id="1-quick-installation-windows-or-linux-no-docker">1. Quick installation (Windows or Linux, no Docker)<a class="anchor" href="#1-quick-installation-windows-or-linux-no-docker" aria-label="Link to this section">#</a></h3>
+<p>The shortest route, for someone who found this repository on GitHub and wants their own copy running: no Docker, everything on one
+computer (a real one or a virtual machine), used in a browser on that same computer. It works the same on <strong>Windows</strong> and on
+<strong>Linux</strong>, with a line for each where they differ. You need no developer and nothing but this repository.</p>
+<p><strong>What you need:</strong> the programs under <a href="#before-you-start-what-to-install">Before you start</a> (steps 1 and 2 below install them if
+you have not), a connection to the internet for step 3 (npm&#39;s download server, once), about 300 MB of free disk, and a browser.
+If you would rather have each step explained at length, with the fixes for what can go wrong, use
+<a href="#3-windows-without-docker">3. Windows (without Docker)</a> or <a href="#5-linux-without-docker">5. Linux (without Docker)</a>: same steps, more detail.</p>
+<p>The steps below are the same on both systems except where a line says Windows or Linux.</p>
+<p><strong>1. Get the code.</strong> On the repository&#39;s page press the green <strong>Code</strong> button → <strong>Download ZIP</strong>, and unpack it. (Or, if you
+use git: <code>git clone https://github.com/Arjun-1404/iso27k-evidence.git</code>.) Open a terminal <strong>in the folder that has
+<code>package.json</code> in it</strong> (GitHub names it <code>iso27k-evidence-main</code>):</p>
+<ul>
+<li><em>Windows:</em> unpack to a short path such as <code>C:\evidence-portal</code> (long paths hit a Windows limit). In File Explorer open the
+folder, click the address bar, type <code>powershell</code>, press Enter.</li>
+<li><em>Linux:</em> <code>unzip iso27k-evidence-main.zip &amp;&amp; cd iso27k-evidence-main</code></li>
+</ul>
+<p><strong>2. Install Node.js and PostgreSQL</strong> (skip what you already have).</p>
+<ul>
+<li><em>Windows:</em> Node.js LTS from <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer">https://nodejs.org</a> (keep the defaults), and PostgreSQL 17 from
+<a href="https://www.postgresql.org/download/windows/" target="_blank" rel="noopener noreferrer">https://www.postgresql.org/download/windows/</a> (EDB&#39;s installer, defaults, port 5432). When the installer asks for the
+<strong>password of the database superuser (postgres)</strong>, choose one (letters and digits are simplest) and write it down: step 5
+needs it. Close and reopen PowerShell afterwards; <code>node -v</code> should print v22 or higher.</li>
+<li><em>Linux:</em><div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sudo apt update &amp;&amp; sudo apt install -y postgresql curl unzip
+sudo systemctl enable --now postgresql
+# only if `node -v` does not already print v22 or higher:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# close the terminal, open a new one, go back to the folder, then:
+nvm install 22</code></pre></div>
+</li>
+</ul>
+<p><strong>3. Install the portal&#39;s libraries and build the web app</strong> (once; a few minutes, because the web app&#39;s build tools are a
+big download). A GitHub copy has the source only, with neither.</p>
+<ul>
+<li><em>Windows</em> (<code>npm.cmd</code> rather than <code>npm</code>, because PowerShell may refuse to run npm&#39;s script file):<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm.cmd ci --omit=dev
+npm.cmd ci --prefix frontend
+npm.cmd run build --prefix frontend</code></pre></div>
+</li>
+<li><em>Linux:</em><div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm ci --omit=dev
+npm ci --prefix frontend
+npm run build --prefix frontend</code></pre></div>
+</li>
+</ul>
+<p>Run them <strong>one at a time, from the folder that has <code>package.json</code> in it</strong>, and wait for each to finish; there is no <code>cd</code>. Each
+ends without an <code>npm error</code>, and the last one prints <code>✓ built in …</code>. Lines such as <code>npm warn install-scripts … msw</code> are normal.</p>
+<p>If that stops with <code>ECONNRESET</code>, <code>ERR_SSL_WRONG_VERSION_NUMBER</code> or <code>Exit handler never called</code>, something on your network is
+blocking npm&#39;s download server: see the troubleshooting under <a href="#4-linux-with-docker">4. Linux (with Docker)</a> (it includes a mirror).</p>
+<p><strong>4. Create the settings file</strong> (fresh random secrets; keep a copy of <code>.env</code> somewhere safe, because without its
+<code>SECRET_ENCRYPTION_KEY</code> everything the portal has encrypted becomes unreadable):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/init-env.mjs</code></pre></div>
+<p><strong>5. Make the portal and PostgreSQL agree on PostgreSQL&#39;s password.</strong></p>
+<ul>
+<li><em>Windows:</em> <code>notepad .env</code>, change the line <code>POSTGRES_PASSWORD=…</code> to the password you chose in step 2 (in double quotes if it
+contains spaces or <code>#</code>), save, close. Leave the other lines alone.</li>
+<li><em>Linux:</em> give PostgreSQL&#39;s <code>postgres</code> user the password that is already in <code>.env</code>:<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sudo -u postgres psql -c &quot;ALTER USER postgres PASSWORD '$(grep '^POSTGRES_PASSWORD=' .env | cut -d= -f2-)'&quot;</code></pre></div>
+It should print <code>ALTER ROLE</code>. A <code>could not change directory … Permission denied</code> line before it is harmless. (If PostgreSQL is not on the usual port 5432, add <code>POSTGRES_PORT=&lt;port&gt;</code> to <code>.env</code>.)</li>
+</ul>
+<p><strong>6. Check the computer.</strong> It changes nothing and says what to fix (fix any <code>[FAIL]</code> line and run it again):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/local.mjs check</code></pre></div>
+<p><strong>7. Start it, with one command in one window.</strong> The first time, give the details of the first administrator; they become the
+owner of the installation. Use an email address on your own domain:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/local.mjs start --org &quot;Your Firm&quot; --domain yourfirm.example --email you@yourfirm.example</code></pre></div>
+<p>It prepares the database, creates that administrator, and runs the API and the web app together. When it is ready it prints a
+box saying <strong>The portal is running</strong>, with a link ending in <code>/accept-invite?token=…</code>. <strong>Leave the window open</strong>: closing it, or
+pressing Ctrl+C, stops the portal. (Windows may ask whether Node.js may use the network; either answer works for use on this
+computer.)</p>
+<p><strong>8. Open that link in a browser on this same computer</strong>, choose a password, and sign in. Use <code>http://localhost:5173</code>
+exactly, not <code>127.0.0.1</code>, because the API only accepts requests from the address in <code>APP_BASE_URL</code>. Use a current browser (Chrome or
+Edge 111+, Firefox 128+, Safari 16.4+): an older one cannot read the portal&#39;s colours and shows a half-blank page, with a notice at the top saying so.</p>
+<p><strong>How you know it worked:</strong> the window shows the box in step 7, the link opens a page that asks you to choose a password, and
+after that you are signed in as the owner of your firm. If something stops, the message says which step to redo; the
+Windows-specific fixes are in the <strong>If something goes wrong</strong> list in <a href="#3-windows-without-docker">3. Windows (without Docker)</a>.</p>
+<p><strong>Stopping and starting again.</strong> Ctrl+C in the window stops it. To start it again: <code>node scripts/local.mjs start</code> (no details
+needed any more), or on Windows double-click <code>start-portal.cmd</code>. Each start also applies any database changes that came with
+the version of the code you are running. It runs while that window is open; for a portal that must stay up around the clock,
+use a Linux server with Docker Compose.</p>
+<p><strong>What to back up.</strong> Three things, together: the <code>.env</code> file, the PostgreSQL database <code>evidenceportal</code>
+(<code>pg_dump</code>), and the <strong>evidence folder</strong>: <code>EvidencePortal/files</code> inside your home folder (<code>%USERPROFILE%\EvidencePortal\files</code> on
+Windows), unless you set <code>LOCAL_STORAGE_DIR</code> in <code>.env</code>. The database holds only names, sizes and checksums; the folder <em>is</em> the evidence.</p>
+<p><strong>Updating later</strong> (not yet tried across two real versions): back up those three things, unpack the new version into a new
+folder, copy your <code>.env</code> into it, repeat step 3 there, and run <code>node scripts/local.mjs start</code>.</p>
+<p><strong>Letting other people reach it over the network.</strong> This route is for one computer. To let your colleagues and clients reach it
+you have to set the portal&#39;s public addresses and put HTTPS in front of it before anyone signs in: see &quot;Opening it from
+another computer&quot; under <a href="#5-linux-without-docker">5. Linux (without Docker)</a> and <a href="#request-limits-and-reverse-proxies">Request limits and reverse proxies</a>.
+That has not been tried by the author.</p>
+<p>Next: <a href="#your-first-client-end-to-end">Your first client, end to end</a>.</p>
+<h3 id="2-windows-with-docker">2. Windows (with Docker)<a class="anchor" href="#2-windows-with-docker" aria-label="Link to this section">#</a></h3>
+<p>The Docker route works on Windows too, but it needs more than the no-Docker route — use <a href="#3-windows-without-docker">3. Windows (without Docker)</a> for a trial in a virtual
+machine. <strong>Not tried on Windows by the author, and the Docker images have not been built even on Linux (see <a href="#4-linux-with-docker">4. Linux (with Docker)</a>).</strong></p>
+<ul>
+<li><strong>Docker Desktop</strong> on Windows 10/11 (it is not available for Windows Server), with its default <em>WSL 2</em> backend. That needs
+hardware virtualisation to be switched on. <strong>Inside a virtual machine this means <em>nested virtualisation</em> must be enabled in
+the hypervisor</strong> (VMware: &quot;Virtualize Intel VT-x/EPT&quot;; Hyper-V: <code>Set-VMProcessor -VMName &lt;name&gt; -ExposeVirtualizationExtensions $true</code>;
+VirtualBox and Apple-silicon hosts often cannot do it). If Docker Desktop says virtualisation is not available, use the no-Docker route.
+Docker Desktop is free for personal use and small businesses; larger companies need a paid plan — check Docker&#39;s terms.</li>
+<li><strong>Commands are the same as in <a href="#4-linux-with-docker">4. Linux (with Docker)</a></strong>, typed one at a time. Windows PowerShell 5.1 (the one that comes with Windows) does
+not understand <code>&amp;&amp;</code>, so do not chain them. Create <code>.env</code> with <code>node scripts/init-env.mjs</code> (Node.js installed, as in the no-Docker
+route) or with Docker: <code>docker run --rm -v &quot;${PWD}:/app&quot; -w /app node:22-slim node scripts/init-env.mjs</code>.</li>
+<li><strong>Extra Compose files</strong> (the prebuilt web app, described in <a href="#4-linux-with-docker">4. Linux (with Docker)</a>) are listed in <code>COMPOSE_FILE</code> with <strong><code>;</code> between them on Windows</strong>, not <code>:</code>:
+<code>COMPOSE_FILE=docker-compose.yml;docker-compose.prebuilt-frontend.yml</code>. Add the line with <code>notepad .env</code>, not with
+<code>echo … &gt;&gt; .env</code>: Windows PowerShell 5.1 writes that as UTF-16, which Compose cannot read.</li>
+<li><strong>Do not use the offline API option (<code>docker-compose.offline.yml</code>) with the Windows download.</strong> It copies the <code>node_modules</code> folder
+into a Linux image, and the Windows download&#39;s folder holds Windows programs. The prebuilt web app option is fine (the built
+web app is the same everywhere). Without it, the images download their libraries while building, so the build needs access to
+<code>registry.npmjs.org</code> from inside Docker.</li>
+<li>The portal is then at <code>http://localhost:5173</code> in the Windows browser, as in section 4. The first administrator is created
+with the <code>docker compose run … migrate npm run db:bootstrap-admin</code> command from section 4; in PowerShell write
+<code>-e ORG_NAME=&quot;Your Firm&quot;</code> exactly like that.</li>
+</ul>
+<h3 id="3-windows-without-docker">3. Windows (without Docker)<a class="anchor" href="#3-windows-without-docker" aria-label="Link to this section">#</a></h3>
+<p><em>Starting from a GitHub download? <a href="#1-quick-installation-windows-or-linux-no-docker">1. Quick installation</a> has these steps in one list for Windows and
+Linux. This section adds the details and the list of fixes.</em></p>
+<p>Everything runs on the one Windows computer (or virtual machine): PostgreSQL as a Windows service, and the portal itself
+in one PowerShell window (or one double-click). There is no Docker, no WSL and no <code>bash</code>. The commands below are the same in PowerShell and
+in cmd. <strong>Not tried on a real Windows machine by the author</strong> (everything was built and tested on Linux; the launcher with its one-window
+start, the web server and the start-up check were tested there, including against a PostgreSQL that asks for a password with awkward
+characters in it). If a step fails, the message <code>node scripts/local.mjs check</code> prints is meant to say what to do; please
+report anything it gets wrong.</p>
+<p><strong>Which download do you have?</strong> There are two kinds, and they differ in one step (step 5):</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>You have</th>
+<th>What is in it</th>
+<th>What to do</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>A copy from GitHub</strong> (the green <strong>Code</strong> button → <strong>Download ZIP</strong>, or <code>git clone</code>)</td>
+<td>The source only: <strong>no libraries and no built web app</strong></td>
+<td>Do <strong>every</strong> step below, including <strong>step 5</strong> (installs the libraries and builds the web app: needs internet, a few minutes, once)</td>
+</tr>
+<tr>
+<td><strong>The Windows download</strong> (<code>evidence-portal-windows-….zip</code>, if you were given one)</td>
+<td>The libraries for 64-bit Windows (Intel/AMD and ARM) and the ready-built web app</td>
+<td><strong>Skip step 5</strong>: nothing is downloaded from npm and <code>npm install</code> is never run</td>
+</tr>
+</tbody></table></div>
+<p>Either way, only two programs have to be installed (steps 1 and 2):</p>
+<p><strong>1. Install Node.js</strong> from <a href="https://nodejs.org" target="_blank" rel="noopener noreferrer">https://nodejs.org</a> (the green &quot;LTS&quot; button; version 22 or newer).
+Keep the defaults. Close and reopen PowerShell afterwards, and check with <code>node -v</code>.</p>
+<p><strong>2. Install PostgreSQL 17</strong> with the Windows installer from <a href="https://www.postgresql.org/download/windows/" target="_blank" rel="noopener noreferrer">https://www.postgresql.org/download/windows/</a> (EDB&#39;s &quot;Download the
+installer&quot;). Keep the defaults (port 5432). When it asks for the <strong>password for the database superuser (postgres)</strong>, choose
+one — letters and digits are the simplest — and write it down: step 7 needs it. It installs as a service that starts with
+Windows. You do not need pgAdmin or Stack Builder.</p>
+<p><em>If this computer cannot download from those sites</em>, download the two installers on another computer and copy them over.</p>
+<p><strong>3. Unpack the portal</strong> to a short folder such as <code>C:\evidence-portal</code> (long folder names can hit Windows&#39; path-length limit).
+Before extracting, right-click the <code>.zip</code> → Properties → tick <strong>Unblock</strong> if you see it → OK; then right-click → Extract All.
+The folder you end up in has <code>package.json</code> and <code>scripts</code> in it (and <code>node_modules</code> too, if you have the Windows download).</p>
+<p><strong>4. Open PowerShell in that folder:</strong> in File Explorer, open the folder, click the address bar, type <code>powershell</code>, press Enter.
+Everything from here on is typed in that window, one command at a time. There is no <code>cd</code>: the window is already in the right folder.</p>
+<p><strong>5. A copy from GitHub only: install the libraries and build the web app</strong> (once). Skip this step if you have the Windows
+download. Run the three commands <strong>one at a time</strong>, waiting for each to finish; this needs internet access to npm and takes a few
+minutes, because the web app&#39;s build tools are a big download:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm.cmd ci --omit=dev
+npm.cmd ci --prefix frontend
+npm.cmd run build --prefix frontend</code></pre></div>
+<p>(<code>npm.cmd</code> rather than <code>npm</code>, because PowerShell may refuse to run npm&#39;s script file.) The first line installs the libraries the
+portal runs on; the other two build the web app into <code>frontend\dist</code>. Each ends without an <code>npm error</code>, and the last one prints
+<code>✓ built in …</code>; lines such as <code>npm warn install-scripts … msw</code> are normal. If one stops with <code>ECONNRESET</code>, <code>ERR_SSL_WRONG_VERSION_NUMBER</code> or
+<code>Exit handler never called</code>, something on your network is blocking npm&#39;s download server: see the troubleshooting under
+<a href="#4-linux-with-docker">4. Linux (with Docker)</a> (it includes a mirror). If you skipped this step by mistake, <code>check</code> (step 8) says
+which of the two is missing and the rest is unchanged.</p>
+<p><strong>6. Create the settings file</strong> (it fills in fresh random secrets; keep a copy of it somewhere safe):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/init-env.mjs</code></pre></div>
+<p>(Use <code>node …</code> as written rather than <code>npm run …</code>: PowerShell may refuse to run npm&#39;s script file.)</p>
+<p><strong>7. Tell the portal your PostgreSQL password.</strong> <code>init-env</code> made up a password, but PostgreSQL has the one you chose in step 2.</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>notepad .env</code></pre></div>
+<p>Change the line <code>POSTGRES_PASSWORD=…</code> to <code>POSTGRES_PASSWORD=</code> followed by your PostgreSQL password. If it contains spaces or a
+<code>#</code>, put it in double quotes. Save and close. Leave the other lines alone — they are the portal&#39;s own secrets.</p>
+<p><strong>8. Check the computer</strong> (changes nothing; fix any <code>[FAIL]</code> line it shows and run it again):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/local.mjs check</code></pre></div>
+<p>It looks at Node, the libraries, the web app, <code>.env</code>, that PostgreSQL answers and accepts the password, and that the ports are free.
+If it says the libraries or the web app are missing, you have a GitHub copy and skipped step 5.</p>
+<p><strong>9. Start it — one command, one window.</strong> The first time, give the details of the first administrator (they become the owner
+of the installation):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/local.mjs start --org &quot;Your Firm&quot; --domain yourfirm.example --email you@yourfirm.example</code></pre></div>
+<p>It prepares the database, creates that administrator, and runs the API and the web app together; their messages appear in the
+same window, marked <code>[api]</code> and <code>[web]</code>. When everything is up it prints a box that says <strong>The portal is running</strong> and shows the
+address and a link ending in <code>/accept-invite?token=…</code>. Windows may ask whether Node.js may use the network: either answer works
+for use on this computer. <strong>Leave the window open</strong> — closing it, or pressing Ctrl+C in it, stops the portal (both parts).</p>
+<p><strong>10. Open the link</strong> in a browser <em>on this same computer</em>, choose a password, and sign in. Use <code>http://localhost:5173</code> exactly —
+not <code>127.0.0.1</code> — because the API only accepts requests from the address in <code>APP_BASE_URL</code>. Use a current browser (Chrome or Edge
+111+, Firefox 128+, Safari 16.4+); an older one shows a half-blank page. Then open <strong>Server settings</strong> for
+mail, malware scanning and Google Drive.</p>
+<p><strong>Starting it again later:</strong> PostgreSQL starts with Windows. Either run <code>node scripts/local.mjs start</code> (no details needed any
+more) or <strong>double-click <code>start-portal.cmd</code></strong> in the folder; it opens a window, starts the portal, and tells you when it stops.
+To start it whenever you sign in to Windows: press Win+R, type <code>shell:startup</code>, Enter, and drop a shortcut to <code>start-portal.cmd</code>
+into the folder that opens. (This is for a trial on one computer: it runs while you are signed in. For a portal that must stay up
+around the clock, use a Linux server with Docker Compose.)</p>
+<p>One step at a time, if you prefer (or to find which step fails): <code>node scripts/local.mjs db</code> (database), <code>… admin --org … --domain … --email …</code> (first administrator), <code>… api</code> and <code>… web</code> (each in its own window).</p>
+<p>If something goes wrong:</p>
+<ul>
+<li><strong><code>&#39;node&#39; is not recognized</code></strong> — close PowerShell and open a new one (the installer only updates new windows).</li>
+<li><strong><code>check</code> says the libraries were packaged for another kind of computer</strong> — you opened the Linux download; use the Windows one.</li>
+<li><strong><code>check</code> says the libraries or the web app are missing</strong> — you have a copy from GitHub and skipped step 5; run its three <code>npm.cmd</code> commands, then <code>check</code> again.</li>
+<li><strong><code>refused the password in .env</code></strong> — step 7: the line must hold the password from the PostgreSQL installer. If you forgot it, search for &quot;reset postgres password pg_hba.conf&quot; in PostgreSQL&#39;s documentation, or reinstall PostgreSQL.</li>
+<li><strong><code>Cannot reach PostgreSQL</code></strong> — open <strong>Services</strong> (Windows key, type <em>Services</em>), find <code>postgresql-x64-17</code>, choose Start. If the installer used another port, add <code>POSTGRES_PORT=&lt;that port&gt;</code> as a line in <code>.env</code>.</li>
+<li><strong><code>esbuild.exe</code> missing or access denied</strong> — antivirus software can quarantine a file it does not know; restore it in Windows Security → Protection history, or add the folder as an exclusion.</li>
+<li><strong>Windows Firewall / other computers</strong> — for use on this computer only, nothing needs to be opened. To reach it from another computer, see &quot;Opening it from another computer&quot; under <a href="#5-linux-without-docker">5. Linux (without Docker)</a>.</li>
+<li><strong>Different PostgreSQL address or administrator</strong> — optional lines <code>POSTGRES_HOST</code>, <code>POSTGRES_PORT</code>, <code>POSTGRES_USER</code> in <code>.env</code> (they are listed, commented out, in <code>.env.example</code>).</li>
+<li><strong><code>Port 3000 … is already in use</code></strong> — an earlier copy is still running in another window (close it), or another program uses that port. To use other ports, add lines such as <code>PORT=3100</code> or <code>WEB_PORT=5200</code> to <code>.env</code> (and keep <code>APP_BASE_URL</code> pointing at the web port).</li>
+<li>The ready-made Docker route is a poor fit inside a virtual machine (Docker Desktop needs virtualisation inside the virtual machine), which is why this route exists.</li>
+</ul>
+<p><code>node scripts/local.mjs</code> with no arguments lists the commands. They read <code>.env</code> themselves, so no <code>set</code>, <code>export</code> or <code>$env:</code>
+is needed, and a password containing characters like <code>@</code>, <code>:</code>, <code>/</code> or <code>#</code> is handled for you.</p>
+<h3 id="4-linux-with-docker">4. Linux (with Docker)<a class="anchor" href="#4-linux-with-docker" aria-label="Link to this section">#</a></h3>
+<p>Docker Compose runs the database, the API and the web app for you: the right route for a Linux server that must stay up. Install
+Docker first (<a href="#before-you-start-what-to-install">Before you start</a>); this computer needs no Node.js or PostgreSQL for it. On
+Windows, see <a href="#2-windows-with-docker">2. Windows (with Docker)</a>.</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>bash scripts/preflight.sh    # optional: checks this machine and says what to fix before you start
+docker run --rm --user &quot;$(id -u):$(id -g)&quot; -v &quot;$PWD&quot;:/app -w /app node:22-slim node scripts/init-env.mjs   # creates .env with fresh random secrets
+docker compose build api     # one image at a time: two big downloads at once are what flaky networks choke on
+docker compose build frontend
+docker compose up -d
+docker compose ps            # db should say healthy; api and frontend running</code></pre></div>
+<p>That first command copies <code>.env.example</code> to <code>.env</code> and fills in the database passwords, the session-signing secret and
+the encryption key for you. It never overwrites an existing <code>.env</code>, and the new file is readable only by you. Keep a
+copy somewhere safe (a password manager): without <code>SECRET_ENCRYPTION_KEY</code>, everything the portal has encrypted
+becomes unreadable. It runs inside a throw-away container, so <strong>this computer needs no Node.js at all</strong> for the Docker route.
+<code>--user &quot;$(id -u):$(id -g)&quot;</code> makes the new <code>.env</code> yours rather than root&#39;s; without it <code>docker compose</code> cannot
+read the file (if that happened: <code>sudo chown $USER: .env</code>). On Windows PowerShell use <code>-v &quot;${PWD}:/app&quot;</code> and drop <code>--user</code>.
+If this computer has Node 22 or newer anyway, <code>npm run setup</code> does the same thing. To set the public addresses at the same time,
+add them to either form: <code>--app-url https://portal.yourfirm.example --api-url https://portal-api.yourfirm.example</code>
+(with npm, after a <code>--</code>: <code>npm run setup -- --app-url …</code>).</p>
+<p><strong>If <code>npm run setup</code> stops with <code>SyntaxError: Unexpected token &#39;?&#39;</code></strong> — the Node.js on this computer is too old (Node 12 or 10,
+which is what <code>apt install nodejs</code> gives on Debian 11 and Ubuntu 20.04; <code>node -v</code> shows it) and the copy of the portal you have
+predates the fix. Run the <code>docker run …</code> command above instead, which brings its own Node. Newer copies of the script run on
+Node 12 and later, and <code>bash scripts/preflight.sh</code> says what to do on anything older. Only the no-Docker routes need a Node of their own (22 or newer: see <a href="#before-you-start-what-to-install">Before you start</a>).</p>
+<p>Once <code>migrate</code> finishes and <code>api</code>/<code>frontend</code> are up, create the first account. This person becomes <strong>the owner of the
+installation</strong>:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker compose run --rm -e ORG_NAME=&quot;Your Org&quot; -e ORG_DOMAIN=yourorg.example \
+  -e ADMIN_EMAIL=you@yourorg.example migrate npm run db:bootstrap-admin</code></pre></div>
+<p>That prints a one-time link — open it to set your password, then sign in at the frontend URL
+(<code>http://localhost:5173</code> by default; use a current browser: Chrome or Edge 111+, Firefox 128+, Safari 16.4+). Then open <strong>Server settings</strong> in the left-hand menu to set up
+<a href="#server-settings-email-scanning-and-google-drive-from-the-web-app">email, malware scanning and Google Drive</a> —
+no files to edit and no restart.</p>
+<p><strong>What has and hasn&#39;t been verified about Docker:</strong> the sandbox this was built in has the Docker tools but
+no Docker daemon, so the images have never been built or run here. What <em>was</em> checked: <code>docker compose config</code>
+accepts the Compose file under several configurations (which caught a real bug — an unquoted colon that made the
+file unreadable); the backend image&#39;s install steps were replayed in a clean folder with a production
+environment (which caught another — <code>tsx</code> was listed as a dev-only package and so would be missing from the
+image); and the exact sequence Compose automates — <code>npm run db:setup</code> → <code>npm run db:bootstrap-admin</code> → opening
+the printed link → setting a password → logging in → an authenticated API call — was run for real over HTTP
+against a real Postgres. If <code>docker compose up</code> still doesn&#39;t work on the first try for you, please open an
+issue; the gap is most likely in the image plumbing rather than the application underneath.</p>
+<p><strong>If the build stops with <code>the --mount option requires BuildKit</code></strong> — you have an older copy of the portal&#39;s Dockerfiles, and your Docker has
+no <code>buildx</code> plugin (<code>WARN … buildx Docker CLI plugin not found: falling back to the classic builder</code>; typical of Ubuntu&#39;s <code>docker.io</code> package).
+The current Dockerfiles build with either builder, so download the latest copy. To fix the copy you have, run this in the project folder and build again:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sed -i 's|^RUN --mount=type=cache,target=/root/.npm \\|RUN \\|' Dockerfile frontend/Dockerfile</code></pre></div>
+<p>(Or install the plugin: <code>sudo apt install docker-buildx</code>, or <code>docker-buildx-plugin</code> from Docker&#39;s own apt repository.)</p>
+<p><strong>If the build stops with <code>npm error Exit handler never called!</code></strong> — that is npm itself giving up, almost always
+because the download from the npm registry was cut off (a VPN or company proxy, flaky Wi-Fi, Docker Desktop with too
+little memory). It is not a fault in the portal&#39;s code. The images retry failed downloads on their own, so
+simply running the same command again often finishes it. If it keeps happening, build the two images one after the
+other instead of at the same time, then start everything:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker compose build api
+docker compose build frontend
+docker compose up</code></pre></div>
+<p>In Docker Desktop, 4 GB of memory (Settings → Resources) is a sensible minimum; if you are behind a company proxy, Docker
+Desktop needs the proxy set in its own settings too.</p>
+<p><strong>If the build stops with <code>npm error code ECONNRESET</code>, <code>network request … failed</code> or <code>ERR_SSL_WRONG_VERSION_NUMBER</code></strong> —
+something on your network is blocking <code>registry.npmjs.org</code>, or answering for it with something that is not the real
+site (a firewall or content filter, a captive-portal or proxy, or DNS pointing somewhere else). It is not a fault in the
+portal, and the same thing stops <code>npm ci</code> in the no-Docker route. <code>bash scripts/preflight.sh</code> runs the checks below and prints
+what to do. Doing it by hand, find out which it is:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>curl -sS -I https://registry.npmjs.org/vary/-/vary-1.1.2.tgz | head -1     # should print HTTP/2 200; an error here means the machine itself is blocked
+getent hosts registry.npmjs.org                                            # normally Cloudflare addresses, starting 104.16.
+env | grep -i proxy                                                        # a proxy set here is used by npm and curl, but not by Docker builds</code></pre></div>
+<p>If curl shows an error or the addresses look different, change the machine&#39;s DNS to 1.1.1.1 and 8.8.8.8 (on Kali), or try
+another network (a phone hotspot) or a VPN:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>nmcli connection show                                     # note the NAME of your active connection
+sudo nmcli connection modify &quot;NAME&quot; ipv4.dns &quot;1.1.1.1 8.8.8.8&quot; ipv4.ignore-auto-dns yes
+sudo nmcli connection up &quot;NAME&quot; &amp;&amp; sudo systemctl restart docker</code></pre></div>
+<p>If that does not help, download the libraries from a mirror instead. Add one line to <code>.env</code>, then build again:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>NPM_REGISTRY=https://registry.yarnpkg.com</code></pre></div>
+<p>For the no-Docker route use <code>npm ci --omit=dev --registry=https://registry.yarnpkg.com</code>. If curl works with <code>-4</code> (IPv4 only)
+but not without it, IPv6 is the broken part: run <code>export NODE_OPTIONS=--dns-result-order=ipv4first</code> before <code>npm ci</code>, and for
+Docker <code>sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1</code> then restart Docker. If that address
+is blocked too, <code>https://registry.npmmirror.com</code> is another. npm still checks every download against the hashes in
+<code>package-lock.json</code>, so a mirror cannot change what is installed.</p>
+<p><strong>If Docker stops with <code>TLS handshake timeout</code> or <code>failed to resolve reference &quot;docker.io/library/…&quot;</code></strong> (for example while
+fetching <code>node:22-slim</code>, which the first <code>docker run</code> or <code>docker compose build</code> needs) — Docker cannot reach Docker Hub
+(<code>registry-1.docker.io</code>), where every base image comes from. It is not a fault in the portal. The Docker service does the
+downloading, not your shell, so a proxy or DNS change you made in your terminal does not apply to it. In this order:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker pull node:22-slim                                          # once more: timeouts are often momentary
+curl -sS -I https://registry-1.docker.io/v2/ | head -1            # should print HTTP/2 401 (that is normal: &quot;log in first&quot;); an error means the network is the problem
+sudo sysctl -w net.ipv6.conf.all.disable_ipv6=1 net.ipv6.conf.default.disable_ipv6=1 &amp;&amp; sudo systemctl restart docker   # if the same curl works with -4 but not without</code></pre></div>
+<p>If it still times out, point Docker at a mirror of Docker Hub. Google runs one for the popular images, which covers <code>node</code>,
+<code>postgres</code> and <code>nginx</code> (anything it does not have is fetched from Docker Hub as usual). Put this in <code>/etc/docker/daemon.json</code>
+(create the file if it is not there; in Docker Desktop it is Settings → Docker Engine), then restart Docker and check that
+<code>docker info</code> lists the mirror:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>{
+  &quot;registry-mirrors&quot;: [&quot;https://mirror.gcr.io&quot;]
+}</code></pre></div>
+<p>Behind a company proxy, Docker needs the proxy set for the Docker service itself (Docker&#39;s documentation, &quot;Daemon proxy
+configuration&quot;; Docker Desktop: Settings → Resources → Proxies). A phone hotspot or VPN for the one-time download also works:
+once the images are on the machine, builds do not need Docker Hub again. Creating the settings file does not need Docker: with any
+Node.js from 12 on, <code>npm run setup</code> does the same thing as the <code>docker run</code> command above.</p>
+<p><strong>If <code>docker compose up -d</code> stops with <code>service &quot;migrate&quot; didn&#39;t complete successfully</code></strong> — look at why:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker compose logs migrate | tail -5</code></pre></div>
+<p>If the last line says <code>password authentication failed for user &quot;postgres&quot;</code>, the database was created earlier with a different
+password than the one in <code>.env</code> now. PostgreSQL keeps the password it was first started with in its data volume and never reads
+<code>POSTGRES_PASSWORD</code> again, and Docker names that volume after the project folder, so a regenerated <code>.env</code>, or the project
+unzipped again into a folder of the same name, no longer matches. Either put the previous <code>.env</code> back, or, if the database holds
+nothing you need (a first trial, say), start it again from empty:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker compose down -v      # deletes the database and the evidence-files volume
+docker compose up -d</code></pre></div>
+<p>If the last line says the password <code>is still the example text from .env.example</code>, <code>.env</code> still holds the placeholder passwords.
+Move it aside (<code>mv .env .env.old</code>), run the <code>docker run … init-env.mjs</code> command above for a fresh one (it never overwrites an existing
+file), then <code>docker compose down -v</code> and <code>docker compose up -d</code>: the database was already created with the placeholder password.</p>
+<p>The web app is the bigger download (about 240 packages, 400 MB — mostly testing and build tools the running portal never
+uses), so on an unreliable connection it can fail even when the API image built. For that case the download ships the
+web app already built (<code>frontend/dist</code>) and Docker can simply serve it, with no downloads for the frontend at all
+(on Windows, see <a href="#2-windows-with-docker">2. Windows (with Docker)</a>: <code>;</code> instead of <code>:</code>, and edit <code>.env</code> with Notepad):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>echo 'COMPOSE_FILE=docker-compose.yml:docker-compose.prebuilt-frontend.yml' &gt;&gt; .env
+docker compose build frontend
+docker compose up -d</code></pre></div>
+<p>That copy talks to the API at <code>http://localhost:3000</code>, so open the portal on the machine that runs it. For another API
+address, use the normal build (and rebuild <code>frontend/dist</code> with <code>cd frontend &amp;&amp; VITE_API_BASE_URL=&lt;address&gt; npm run build</code>
+if you want to keep using this shortcut).</p>
+<p>If the API image cannot be built either (npm is blocked everywhere), the offline download also carries the API&#39;s libraries.
+Build the API image from those, with no npm download at all — put this line in <code>.env</code> (replacing the <code>COMPOSE_FILE</code> line
+above, if you added one):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>COMPOSE_FILE=docker-compose.yml:docker-compose.prebuilt-frontend.yml:docker-compose.offline.yml</code></pre></div>
+<p>then <code>docker compose build api</code>, <code>docker compose build frontend</code>, <code>docker compose up -d</code> as before. The database and web
+server images (postgres, nginx) still come from Docker Hub unless they are already on the machine.</p>
+<p>The running <code>api</code> container also needs internet access, to reach Google Drive and your mail server. Once the build works,
+check it from inside Docker (<code>container: 200</code> is good):</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>docker run --rm node:22-slim node -e 'fetch(&quot;https://www.googleapis.com/discovery/v1/apis&quot;).then(r=&gt;console.log(&quot;container:&quot;,r.status)).catch(e=&gt;console.log(&quot;container FAILED:&quot;,e.cause?.code||e.message))'</code></pre></div>
+<h3 id="5-linux-without-docker">5. Linux (without Docker)<a class="anchor" href="#5-linux-without-docker" aria-label="Link to this section">#</a></h3>
+<p><em>Starting from a GitHub download? <a href="#1-quick-installation-windows-or-linux-no-docker">1. Quick installation</a> is the short version of this section, with the
+same steps for Windows and Linux. This section does the same thing by hand, one program at a time, and adds the details.
+A GitHub copy needs <strong>step 1b</strong> before anything else works.</em></p>
+<p>Written for Kali / Debian / Ubuntu (<strong>on Windows, use <a href="#3-windows-without-docker">3. Windows (without Docker)</a></strong>); other systems differ only in how PostgreSQL is installed. You need <strong>Node.js 22 or newer</strong>
+(<code>node -v</code>) and <strong>PostgreSQL 16 or newer</strong>, running on this machine. You will use two terminal windows.</p>
+<p><strong>0. Check the machine</strong> (optional, takes a few seconds; it changes nothing and says what to fix)</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>bash scripts/preflight.sh</code></pre></div>
+<p><strong>1. Install the programs</strong></p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>sudo apt update &amp;&amp; sudo apt install -y postgresql curl
+sudo systemctl enable --now postgresql
+
+# Only if `node -v` does not already print v22 or higher:
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+# close the terminal and open a new one, then:
+nvm install 22</code></pre></div>
+<p><strong>1b. A copy from GitHub only: install the libraries and build the web app</strong> (once; terminal 1, inside the unpacked folder, one
+command at a time). A GitHub copy is the source only, with neither the libraries nor the built web app, and every later step
+needs them. It needs internet access to npm and takes a few minutes:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm ci --omit=dev
+npm ci --prefix frontend
+npm run build --prefix frontend</code></pre></div>
+<p>Do <strong>not</strong> put <code>sudo</code> in front of these (or any <code>npm</code> command here): it makes <code>node_modules</code> belong to root, and later steps run
+as you then fail with &quot;permission denied&quot;. If you already did, fix it with <code>sudo chown -R &quot;$USER&quot;: .</code> in the project folder. A closing
+line such as &quot;NN packages are looking for funding — run <code>npm fund</code>&quot; is a normal notice that npm prints when it succeeds; ignore it.</p>
+<p><strong>Skip this if the folder already has a <code>node_modules</code> folder</strong> (a ready-made download for 64-bit Intel/AMD or ARM Linux): the
+libraries and the built web app are inside, nothing needs downloading, and <code>npm ci</code> would delete them and need the internet. If it
+stops with <code>ECONNRESET</code> or <code>ERR_SSL_WRONG_VERSION_NUMBER</code>, your network is blocking npm&#39;s download server: see the troubleshooting
+section above (it has the fix, including a mirror).</p>
+<p><strong>2. Create the settings file</strong> (terminal 1, inside the unpacked folder)</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm run setup          # writes .env with fresh random secrets; back this file up</code></pre></div>
+<p><strong>3. Create the database</strong> (still terminal 1)</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>set -a; . ./.env; set +a        # loads the values from .env into this terminal
+sudo -u postgres psql -c &quot;ALTER USER postgres PASSWORD '$POSTGRES_PASSWORD';&quot;
+sudo -u postgres createdb evidenceportal
+export DATABASE_URL=&quot;postgres://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/evidenceportal&quot;
+npm run db:setup               # creates the tables, the restricted portal_app role, and the ISO 27001 control list</code></pre></div>
+<p>If <code>psql</code> cannot connect, check which port PostgreSQL is on with <code>pg_lsclusters</code> and use that number instead of 5432.
+A line such as <code>could not change directory to &quot;/home/you/Downloads/…&quot;: Permission denied</code> before <code>ALTER ROLE</code> is harmless: the
+<code>postgres</code> account is not allowed to look inside your home folder, and nothing needs it to. It appears with every <code>sudo -u postgres</code>
+command; what matters is that <code>ALTER ROLE</code> and, for <code>createdb</code>, no error follows. (If a <code>NOTICE: empty string is not a valid password</code>
+appears, the first line did not load <code>.env</code>: run it again in this terminal, then repeat the <code>ALTER USER</code> line.)</p>
+<p><strong>4. Create the first administrator</strong> (still terminal 1; they become the owner of the installation)</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>ORG_NAME=&quot;Your Firm&quot; ORG_DOMAIN=yourfirm.example ADMIN_EMAIL=you@yourfirm.example npm run db:bootstrap-admin</code></pre></div>
+<p>It prints a one-time link ending in <code>/accept-invite?token=…</code>. Keep it for step 7.</p>
+<p>This step needs the <code>DATABASE_URL</code> from step 3 (the database owner, <code>postgres</code>). Do it <strong>before</strong> step 5, whose <code>export</code> switches to the
+restricted <code>portal_app</code> role. If it stops with <code>permission denied for table orgs</code>, that switch has already happened in this terminal: it
+created nothing, so set the owner&#39;s address again (<code>export DATABASE_URL=&quot;postgres://postgres:$POSTGRES_PASSWORD@127.0.0.1:5432/evidenceportal&quot;</code>
+after <code>set -a; . ./.env; set +a</code>) and re-run the command above, then continue with step 5.</p>
+<p><strong>5. Start the API</strong> (terminal 1). From here on it connects as the restricted <code>portal_app</code> role, not as the database owner:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>export DATABASE_URL=&quot;postgres://portal_app:$APP_DB_PASSWORD@127.0.0.1:5432/evidenceportal&quot;
+npm start</code></pre></div>
+<p>Leave it running. It prints <code>Evidence portal API listening on :3000</code> when it is ready. Emails (invitations, password resets) are printed in this window
+until you set up a mail server under Server settings.</p>
+<p><strong>6. Start the web app</strong> (terminal 2, in the unpacked folder)</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>node scripts/serve-web.mjs</code></pre></div>
+<p>This needs nothing but Node: it serves the ready-built web app that comes in <code>frontend/dist</code>. (Someone changing the web app&#39;s
+code uses <code>cd frontend &amp;&amp; npm ci &amp;&amp; npm run dev</code> instead.)</p>
+<p><strong>7. Open it.</strong> In a browser <em>on the same machine</em>, paste the link from step 4 (it begins <code>http://localhost:5173/…</code>),
+choose a password, and sign in. Use the address <code>http://localhost:5173</code> exactly — not <code>127.0.0.1</code> — because the API only
+accepts requests from the address in <code>APP_BASE_URL</code>. Use a current browser (Chrome or Edge 111+, Firefox 128+, Safari 16.4+): an older one
+cannot read the portal&#39;s colours and shows a half-blank page (the sidebar looks empty), with a notice at the top saying so. Then open <strong>Server settings</strong> for mail, malware scanning and Google Drive.</p>
+<p><strong>Starting it again later:</strong> in terminal 1 run <code>set -a; . ./.env; set +a</code>, then the two lines from step 5; in terminal 2
+run <code>node scripts/serve-web.mjs</code>. Steps 2–4 are only done once.</p>
+<p><strong>Opening it from another computer</strong> (for example the VM&#39;s address from your host machine; not tried by the author): rebuild
+the web app for the API&#39;s address (<code>cd frontend &amp;&amp; npm ci &amp;&amp; VITE_API_BASE_URL=http://&lt;address&gt;:3000 npm run build</code>), start
+it with <code>WEB_HOST=0.0.0.0 node scripts/serve-web.mjs</code>, and set <code>APP_BASE_URL</code> and <code>CORS_ALLOWED_ORIGINS</code> in <code>.env</code> to the
+address people type in the browser. Doing everything inside the VM avoids all of this.</p>
+<h2 id="your-first-client-end-to-end">Your first client, end to end<a class="anchor" href="#your-first-client-end-to-end" aria-label="Link to this section">#</a></h2>
+<p>Once you are signed in, this is the order that works. (The web app calls a client a <strong>tenant</strong>.) Every step is done on screen.</p>
+<ol>
+<li><strong>Choose where the evidence goes.</strong> Left-hand menu <strong>Integrations</strong> → <strong>This server&#39;s disk</strong> → <strong>Use this server&#39;s disk</strong>
+(the folder is the one named in &quot;What to back up&quot;; the portal prints it when it starts). Google Drive and S3 are in
+<a href="#where-evidence-is-kept-google-drive-this-servers-disk-or-s3">Where evidence is kept</a>.</li>
+<li><strong>Add the client.</strong> <strong>Tenants</strong> → <em>Tenant name</em> and <em>Allowed email domain</em> (the domain its people use, for example
+<code>northwind.example</code>) → <strong>Add tenant</strong>. Only people at that domain can be invited to that client.</li>
+<li><strong>Create the client&#39;s evidence folder.</strong> Back on <strong>Integrations</strong>, press <strong>Create folder on this server&#39;s disk</strong> for that client.</li>
+<li><strong>Optional, for a real trial: set up email</strong> under <strong>Server settings</strong>. Until you do, every invitation and reset email is <strong>printed in
+the portal&#39;s window</strong> instead of being sent. Those links work like passwords, so do not run a real deployment that way.</li>
+<li><strong>Add your own people</strong> (other auditors) under <strong>Users</strong>: email, role, <strong>Invite</strong>. A person can be given one of the built-in
+roles or one of your <a href="#who-can-do-what-roles-and-custom-roles">custom roles</a>.</li>
+<li><strong>Give each auditor their clients.</strong> Only the <strong>organisation admin</strong> sees every client. A lead auditor, auditor, read-only or
+dashboard-only user sees <strong>only the clients assigned to them</strong>, and until you assign one they see none (an empty list is
+not a fault). On <strong>Tenants</strong>, press <strong>Auditors</strong> next to the client, choose the person and press <strong>Assign to</strong> (the client&#39;s name follows). The same panel
+lists who is assigned already and has a <strong>Remove</strong> button.</li>
+<li><strong>Invite the client&#39;s people.</strong> On <strong>Tenants</strong>, press <strong>People</strong> next to the client, type the person&#39;s work email, choose
+what they are and press <strong>Invite to</strong> (the client&#39;s name follows). The choices are <strong>Client lead</strong> (sees every control and hands them out),
+<strong>Contributor</strong> (only the controls assigned to them), <strong>Viewer</strong> (read-only) and <strong>Client dashboard</strong> (the dashboard only),
+and below those any <a href="#who-can-do-what-roles-and-custom-roles">custom role</a> you have made for a client&#39;s people. Their email must
+end in the domain you gave the client in step 2, or the page says the domain isn&#39;t allowed. Inviting is done by you, the audit
+firm, so you decide who from the client can sign in and what each may do; the same panel lets you change a person&#39;s access
+later (<strong>Access</strong>) or switch them off. The invitation link is printed in the portal&#39;s window (or emailed, once mail is set up);
+the person opens it, chooses a password, and lands on <strong>My controls</strong>.</li>
+</ol>
+<p>Then, as an auditor, open the client&#39;s <strong>Dashboard</strong>: the client&#39;s first audit cycle is created from the ISO 27001:2022 template
+on first open (a client&#39;s own people see &quot;not set up yet&quot; until then). From there the client&#39;s lead assigns controls to their people
+(<strong>My controls → Assign</strong>), they upload evidence, and you review it; the <a href="#the-live-demo">demo&#39;s tour</a> shows that loop.</p>
+<h2 id="the-live-demo">The live demo<a class="anchor" href="#the-live-demo" aria-label="Link to this section">#</a></h2>
+<p><code>https://arjun-1404.github.io/iso27k-evidence/</code> is this repository&#39;s own web app, built with <code>npm run build:demo</code>
+instead of <code>npm run build</code>. The difference is one switch: instead of calling the API over the network, the page
+answers its own API calls from a small pretend server written in TypeScript (<code>frontend/src/demo/</code>). The screens, the
+buttons and the rules you see are the real ones. The server behind them is not.</p>
+<ul>
+<li><strong>Sign in:</strong> one click as the lead auditor, organisation admin, auditor, client lead or client contributor of a
+fictional audit firm (&quot;Harbourview Assurance&quot;) and its fictional clients. Their password is <code>demo-password-123</code>;
+the sign-in page also has the ordinary form.</li>
+<li><strong>A guided tour (demo only):</strong> the <strong>Take the 3-minute tour</strong> button opens a checklist: the client uploads and submits
+evidence, the auditor accepts it, the dashboard moves, the audit log records it, plus a bonus step to turn on two-step
+sign-in. The steps tick themselves, and <strong>Switch to Priya Shah / Declan Walsh</strong> buttons sign you in as the right person.
+A step ticks only when the thing really happened (a refused action ticks nothing). The real app has no tour.</li>
+<li><strong>Your changes are yours alone.</strong> They live in your browser tab (session storage), survive a page reload, and are
+gone when the tab closes. <strong>Reset demo</strong> (top of the page) puts the sample data back at any time. Nobody else can
+see what you do, and nothing is stored on any server.</li>
+<li><strong>Files you upload</strong> are kept in memory for as long as the page stays open; after a reload they download as a
+placeholder PDF. The sample evidence files are placeholders too.</li>
+<li><strong>Two-step sign-in is real code, not a mock-up</strong>: it uses the same one-time-code maths as the real server (checked
+against the RFC 6238 test vectors), so an authenticator app should accept the demo&#39;s QR code (not tried with a real
+phone yet).</li>
+<li><strong>Not in the demo:</strong> email (the screens that would send one say so), the malware scanner, connecting Google Drive or
+S3 (the demo only pretends to use the server&#39;s own disk), and the server settings page.</li>
+</ul>
+<p><strong>What the demo does <em>not</em> prove.</strong> The pretend server re-implements the real server&#39;s rules (who may see and do what,
+which status changes are allowed, the lock on a closed audit cycle, sign-in limits, two-step policy) in about
+2,700 lines of TypeScript, and its tests spell those rules out. But in a real installation those rules are enforced
+by PostgreSQL itself (row-level security, constraints and triggers), and <strong>nothing in the demo exercises that</strong>. If
+you want to know how secure the real thing is, read <code>db/migrations/</code> and run <code>npm run verify</code>, not the demo. The demo&#39;s
+copy of the ISO 27001:2022 control list is checked against the real one by a test. The rest could drift from the real
+server over time; the checks that the two agree are written by hand, not generated.</p>
+<p><strong>Publishing your own copy of the demo</strong> (for example on a fork): put the repository on GitHub, then Settings → Pages
+→ Build and deployment → Source: <strong>GitHub Actions</strong>. The workflow <code>.github/workflows/pages.yml</code> runs on every push to
+<code>main</code>: it tests the demo, builds it, checks that the real app has none of it, and publishes
+<code>https://&lt;your-user&gt;.github.io/&lt;your-repo&gt;/</code>. To try it locally: <code>cd frontend &amp;&amp; npm ci &amp;&amp; npm run build:demo &amp;&amp; npx vite preview --outDir dist-demo</code>. If you rename the repository, change the &quot;Get the code&quot; address with the
+<code>VITE_DEMO_REPO_URL</code> build variable (default: <code>https://github.com/Arjun-1404/iso27k-evidence</code>), and the address that
+link previews use for the demo&#39;s picture with <code>VITE_DEMO_SITE_URL</code> (default: <code>https://arjun-1404.github.io/iso27k-evidence/</code>).</p>
+<p><strong>Link previews.</strong> The demo&#39;s page carries a picture and a line of text (<code>og:image</code>, <code>og:title</code>), so a pasted link shows a
+card on LinkedIn, Slack and in messages. The picture is <code>frontend/demo-assets/share-card.png</code> (1200 × 630) and only the
+demo build includes it; <code>docs/social-preview.png</code> (1280 × 640) is the same card for GitHub: upload it under the
+repository&#39;s Settings → General → Social preview. LinkedIn and others remember a link&#39;s card, so after changing the picture,
+refresh it with LinkedIn&#39;s <a href="https://www.linkedin.com/post-inspector/" target="_blank" rel="noopener noreferrer">Post Inspector</a>.</p>
+<h2 id="server-settings-email-scanning-and-google-drive-from-the-web-app">Server settings: email, scanning and Google Drive, from the web app<a class="anchor" href="#server-settings-email-scanning-and-google-drive-from-the-web-app" aria-label="Link to this section">#</a></h2>
+<p>The mail server, the malware scanner and the Google Drive app are set up in the web app, under <strong>Server settings</strong>,
+instead of in <code>.env</code>. One set for the whole installation (every audit firm using this server shares them), and only
+the installation&#39;s <strong>owner</strong> sees the page.</p>
+<ul>
+<li><strong>Who is the owner?</strong> The first administrator created with <code>db:bootstrap-admin</code>. There is exactly one. To hand it
+over: <code>docker compose run --rm -e ADMIN_EMAIL=new-owner@yourorg.example migrate npm run db:grant-platform-owner</code>
+(the new owner must be an active organisation admin). On an installation upgraded from an earlier version, the
+earliest-created active administrator becomes the owner automatically.</li>
+<li><strong>What is set there:</strong> the mail server (host, port, encryption, login, From address); the ClamAV scanner (host,
+port, time limit, largest file); and the Google Cloud app (client ID, client secret, redirect address) that &quot;Connect
+Google Drive&quot; signs people in through. Each card has a status — <em>Set up here</em>, <em>Not set up</em>, or <em>locked</em> — and the
+email and scanner cards have a <strong>test</strong> button.</li>
+<li><strong>Changes apply at once.</strong> The next email, upload or Google sign-in uses the new values; there is no restart. (If you
+run several copies of the API, the others pick the change up within about five seconds.)</li>
+<li><strong>What still lives in <code>.env</code>:</strong> <code>DATABASE_URL</code> and the passwords, <code>JWT_SECRET</code>, <code>SECRET_ENCRYPTION_KEY</code>, the public
+addresses, CORS and <code>TRUST_PROXY</code>. Those are needed before the database can be read, or are what unlocks the
+secrets stored in it, so they cannot be kept in it.</li>
+<li><strong><code>.env</code> wins.</strong> If a group is set in <code>.env</code> (as in older installs), the page shows its values, marks them <em>locked</em>
+and refuses to change them, so there is never a doubt about which one the server is using. Remove those lines from
+<code>.env</code> and restart once to manage that group in the web app instead.</li>
+<li><strong>Secrets are write-only.</strong> The mail password and the Google client secret are encrypted with
+<code>SECRET_ENCRYPTION_KEY</code> before they are stored and are <strong>never sent back to a browser</strong>: the page only says that
+one is saved, and leaving the field empty keeps it. Without the key, the page says so and refuses to store them
+(the scanner, which has no secret, can still be set up).</li>
+<li><strong>Saving asks for your password again</strong> (and a code, if you use two-step sign-in). Mail settings decide where
+password-reset links are sent, so a borrowed session must not be able to change them. Typing mistakes are reported
+<em>before</em> the password is checked, so they never count toward the sign-in lockout.</li>
+<li><strong>The test buttons are narrow on purpose.</strong> &quot;Send me a test email&quot; goes only to the owner&#39;s own address — nothing in
+the request can choose another recipient. &quot;Check the scanner&quot; sends the standard EICAR antivirus test string
+and passes only if the scanner reports it as a virus, so a scanner that answers but catches nothing is called out.</li>
+<li><strong>Everything is audited, without the values.</strong> The tamper-evident audit log records that the owner saved or removed a
+group and which <em>fields</em> changed (<code>host</code>, <code>password</code>...) — never what they were changed to.</li>
+<li><strong>If what was saved can&#39;t be used</strong> (the encryption key was changed, or the data is damaged), the group counts as <em>not
+set up</em> with the reason shown on the card — it is never used half-way. If the database can&#39;t be reached for a moment,
+the last values that loaded keep working.</li>
+<li><strong>Trust.</strong> The owner chooses which hosts the server connects to for mail and scanning, so the owner is fully
+trusted with respect to the server itself — that is why there is exactly one, why saving needs the password again,
+and why every change is in the audit log.</li>
+</ul>
+<h2 id="the-dashboard">The dashboard<a class="anchor" href="#the-dashboard" aria-label="Link to this section">#</a></h2>
+<p>The first page for the audit firm, and one click away for the client. It is the same screen in the real app and in the demo.</p>
+<ul>
+<li><strong>Audit readiness:</strong> how much of what applies has been accepted, as one large figure (accepted controls out of
+<em>applicable</em> ones, so a control marked not applicable never counts against anyone).</li>
+<li><strong>Needs attention:</strong> what to act on first. The audit firm sees overdue, rejected and waiting for review; the client sees
+overdue, rejected and still needing evidence. A line with nothing in it says so instead of disappearing.</li>
+<li><strong>Where the controls stand:</strong> one bar and the same numbers as a list, across the six statuses. Rejected is the only red.
+Controls marked <strong>not applicable</strong> are listed under the bar, apart from it, and are not counted in it.</li>
+<li><strong>Controls at a glance:</strong> a tile for every control, grouped by clause and Annex A theme and shaded by status. The legend
+narrows the grid to one status, hovering or focusing a tile names the control, and pressing a tile opens that control
+(the audit firm on <strong>Controls</strong>, the client&#39;s people on <strong>My controls</strong>). <strong>View as table</strong> gives the same counts as
+rows. People who are shown no controls (a role limited to the dashboard) see no grid; a contributor sees only the controls
+assigned to them, and the grid says so. A control marked not applicable has a colour of its own, a violet hatched tile
+marked ⊘ (it is not red, because red means &quot;rejected&quot;), and has its own entry in the legend.</li>
+<li><strong>Progress by section:</strong> one meter per section.</li>
+</ul>
+<p>No colour is ever the only signal: every shade has a name in the legend, in the tile&#39;s label and in the table view, and
+rejected tiles carry a mark (✕) as well as their red, and not-applicable tiles a mark (⊘) as well as their hatching. The shades come from one colour scale checked for colour-blind readers.</p>
+<h2 id="audit-cycles-one-audit-per-year-per-client">Audit cycles (one audit per year, per client)<a class="anchor" href="#audit-cycles-one-audit-per-year-per-client" aria-label="Link to this section">#</a></h2>
+<p>A client can have any number of audit cycles: the first certification audit, then a surveillance audit each year, and
+so on. Each cycle is its own complete set of controls, status and evidence, started fresh from the template; earlier
+cycles stay exactly as they were.</p>
+<ul>
+<li><strong>Starting one:</strong> a lead auditor or an organisation admin presses <strong>New audit cycle</strong> next to the cycle chooser on the
+Controls or Dashboard page, picks the template and gives it a name.</li>
+<li><strong>Switching:</strong> everyone with more than one cycle gets a chooser (<strong>Audit cycle</strong>) on Controls, Dashboard and My
+controls. The choice is remembered per client, per browser; without a choice the newest cycle is shown.</li>
+<li><strong>Where the files go:</strong> in your storage, each client&#39;s folder holds one folder per cycle, which holds one folder per
+control: <code>Client / ISO 27001 audit 2027 [1a2b3c4d] / A.8.5 / the files</code>. The short code at the end of the cycle&#39;s
+folder name comes from its id, so two cycles with the same name can never share a folder. If you rename or move these
+folders by hand in Drive, new uploads for that control keep going to the folder the portal already recorded.</li>
+</ul>
+<p>A finished cycle can be <em>closed</em> so that it stays exactly as it was signed off — see the next section.</p>
+<h2 id="what-applies-due-dates-and-closing-a-control-yourself">What applies, due dates, and closing a control yourself<a class="anchor" href="#what-applies-due-dates-and-closing-a-control-yourself" aria-label="Link to this section">#</a></h2>
+<p>These are decisions for the audit firm, made on the <strong>Controls</strong> page or in a control&#39;s panel (press its row). The client is
+never made to deal with a control that doesn&#39;t concern them.</p>
+<ul>
+<li><strong>Applicable: Yes / No.</strong> The <strong>Applicable</strong> column is a drop-down for a <strong>lead auditor</strong> or an <strong>organisation admin</strong>
+(an auditor sees the answer but can&#39;t change it). Choosing <strong>No</strong> asks <em>why it doesn&#39;t apply</em> (at least 3 characters)
+before anything changes; the reason is kept with the control. From then on the client&#39;s people no longer see that
+control on <strong>My controls</strong>, nothing is asked of them, it can&#39;t be reminded about or reviewed, and it doesn&#39;t count towards
+progress (readiness is accepted out of <em>applicable</em> controls). On the dashboard it has its own colour (see
+<a href="#the-dashboard">The dashboard</a>). Choosing <strong>Yes</strong> brings it back. Clauses 4 to 10 are mandatory and always apply: they
+have no choice. The <strong>Reason</strong> link next to a <strong>No</strong> changes the reason.</li>
+<li><strong>Due dates.</strong> Open a control: <strong>Due date</strong> → pick a day → <strong>Save</strong> (or <strong>Clear</strong>). A control that is not applicable has none.</li>
+<li><strong>Closing a control without waiting for the client.</strong> An <strong>organisation admin</strong>, <strong>lead auditor</strong> or <strong>auditor</strong> can accept a
+control the client never submitted evidence for: something seen on site, said in an interview, or already held. On the
+row press <strong>Close…</strong>, or open the control and press <strong>Close without client evidence</strong>, write the reason and
+<strong>Confirm close</strong>. The control becomes <strong>Accepted</strong> with no file, the reason is added to the control&#39;s comments (so the
+client can see why it was closed, unless the closer&#39;s role may not comment) and <code>control.close</code> is written to the audit
+log with the reason. A reason of at least 3 characters is required. It works from not started, awaiting evidence and
+rejected. It says plainly why when it can&#39;t be done: the control is marked not applicable (there is nothing to close),
+it is already accepted, the client has submitted evidence (review it and accept or reject it instead), or the audit
+cycle is closed.</li>
+<li><strong>Where the rules live:</strong> in the database (<code>db/migrations/016_firm_close_and_custom_roles.sql</code>), not only in the screens.
+Closing is allowed only when a &quot;close&quot; review with a reason has been written in the same step, so no other way of
+changing a control can skip the evidence rule.</li>
+</ul>
+<h2 id="closing-an-audit-cycle">Closing an audit cycle<a class="anchor" href="#closing-an-audit-cycle" aria-label="Link to this section">#</a></h2>
+<p>When an audit is signed off, a <strong>lead auditor</strong> or an <strong>organisation admin</strong> presses <strong>Close audit cycle</strong> on the
+Controls page. A short explanation appears first (and a count of any applicable controls that were not accepted, which
+stay as they are); <strong>Yes, close it</strong> then makes the cycle read-only.</p>
+<ul>
+<li><strong>What stops:</strong> every change to the cycle. No evidence can be uploaded or removed, no control can be reviewed,
+marked not applicable, given a different requirement or due date, reminded about, assigned or unassigned, no
+comment or finding can be added, and the cycle cannot be renamed. The screens take those buttons away and say why;
+if a page was opened before the cycle was closed, the server refuses the change in plain words
+(&quot;This audit cycle is closed, so it can no longer be changed…&quot;), the page shows that message, and (after a reminder or
+a submit) updates itself to show the closed notice; otherwise a reload does.</li>
+<li><strong>What still works:</strong> looking at everything (controls, evidence records, comments, the dashboard, the audit log), and
+the evidence integrity check. The check still <em>notices</em> a stored file that was changed or has gone missing since,
+flags the file and writes the finding to the audit log (marked as being on a closed cycle), but it leaves the
+control&#39;s status alone: the sign-off stays as it was. Reopening is how you put it back under review.</li>
+<li><strong>Reopening:</strong> the same two roles press <strong>Reopen audit cycle</strong> and must give a reason (3 to 1000 characters).
+Everything works again straight away. Other cycles of the same client, and other clients, are never affected.</li>
+<li><strong>The record:</strong> closing writes <code>audit.closed</code> (who, which cycle, how many applicable controls and how many accepted)
+and reopening writes <code>audit.reopened</code> (who, the reason, and when and by whom it had been closed) to the
+tamper-evident audit log. The database writes both entries itself, in the same step, so neither can happen unlogged.</li>
+<li><strong>Where the rule lives:</strong> in the database (<code>db/migrations/014_close_audit_cycle.sql</code>, using triggers), not only in the
+screens, so it holds however a change arrives — through the web app, a future API route or a script. The only
+way to change the status is the two functions <code>audit_close</code> and <code>audit_reopen</code>; the application&#39;s database role has no
+permission to write it directly. Uploads are refused before anything is created in your storage, and a file that was
+sent while the cycle was being closed is not recorded (it stays in your storage folder).</li>
+<li><strong>Not covered:</strong> the files themselves sit in your Google Drive, and closing does <strong>not</strong> make that folder read-only
+there. Anyone with edit rights in Drive can still change or delete a file directly; the integrity check will then
+flag it. Locking the Drive folder is not built (it could not be tested here without a real Drive).</li>
+<li><strong>An archived client:</strong> its cycles can&#39;t be closed or reopened (restore the client first), like every other change.</li>
+</ul>
+<h2 id="who-can-do-what-roles-and-custom-roles">Who can do what: roles and custom roles<a class="anchor" href="#who-can-do-what-roles-and-custom-roles" aria-label="Link to this section">#</a></h2>
+<p>Every person has one <strong>built-in role</strong>. The audit firm&#39;s side: <strong>Organisation admin</strong> (runs everything and sees every
+client), <strong>Lead auditor</strong> (runs the audits of the clients assigned to them: what applies, due dates, requirements, people,
+closing cycles), <strong>Auditor</strong> (reviews evidence and sends reminders), <strong>Read-only reviewer</strong> and <strong>Dashboard only</strong>. The
+client&#39;s side: <strong>Client lead</strong>, <strong>Contributor</strong>, <strong>Viewer</strong> and <strong>Client dashboard</strong>. The <strong>Roles</strong> page (organisation admin only)
+lists them all with a line on what each is for.</p>
+<p>When a built-in role can do too much for someone, make a <strong>custom role</strong>: the same role with some abilities taken away, and a name
+of your own. Examples: a <em>Junior auditor</em> (an auditor who can review but not send reminders), or a <em>Contributor who can only
+upload</em> (no comments).</p>
+<ul>
+<li><strong>Making one:</strong> <strong>Roles</strong> → <em>New custom role</em>: a name, the role it is based on, and the abilities as tick boxes. Everything the
+base role can do starts ticked; <strong>untick what should be taken away</strong>. Only an organisation admin makes, changes or deletes them.
+Changing one takes effect at once for everyone who has it. The base role can&#39;t be changed afterwards. A role can&#39;t be deleted
+while someone has it, and names are unique.</li>
+<li><strong>Giving one:</strong> to your own staff under <strong>Users → Access</strong>; to a client&#39;s people under <strong>Tenants → People → Access</strong>, or
+when inviting them (the role list shows the built-in roles, then your custom ones). Only the audit firm hands them out: a client
+lead can&#39;t give or lift a restriction, and nobody can change their own access. The organisation admin role can&#39;t be
+restricted or changed this way.</li>
+<li><strong>What can be taken away:</strong> <em>Review controls</em> (accept, reject, close), <em>Send reminders</em>, <em>Set applicable / not applicable</em>,
+<em>Set due dates</em>, <em>Change evidence requirements</em>, <em>Assign controls</em>, <em>Invite and manage people</em>, <em>Comment</em>, <em>Close and
+reopen audit cycles</em> and <em>Upload and submit evidence</em>. Each base role has only some of these to begin with (a contributor
+can only lose <em>Upload</em> and <em>Comment</em>); the tick boxes show just those.</li>
+<li><strong>It can only take away, never add.</strong> A custom role is a built-in role with less: the person is still that built-in role
+underneath, so every existing rule applies to them and a custom role can&#39;t be used to reach anything their built-in role
+couldn&#39;t. This is also why the organisation admin isn&#39;t customisable: a custom role able to edit custom roles could give
+itself its abilities back.</li>
+<li><strong>What the person sees:</strong> the buttons they can&#39;t use are hidden. That is courtesy only: the database refuses the action
+in any case (<code>app_allows()</code> in <code>016_firm_close_and_custom_roles.sql</code>), with a plain message.</li>
+<li><strong>A client lead can still invite contributors and viewers on their own</strong> (it is not removed, to keep working as before). If
+you would rather invite all of a client&#39;s people yourself, give the client lead a custom role without <em>Invite and manage
+people</em>.</li>
+<li>Every invitation, change of access and role change is written to the audit log (<code>user.invited</code>, <code>user.access_changed</code>,
+<code>role.created</code>, <code>role.updated</code>, <code>role.deleted</code>).</li>
+</ul>
+<h2 id="giving-controls-to-your-clients-people">Giving controls to your client&#39;s people<a class="anchor" href="#giving-controls-to-your-clients-people" aria-label="Link to this section">#</a></h2>
+<p>A client&#39;s <strong>contributor</strong> only sees the controls assigned to them, so someone has to assign them. Client leads see every
+control, and lead auditors and organisation admins can assign on a client&#39;s behalf.</p>
+<ul>
+<li><strong>Many at once:</strong> on the <strong>Controls</strong> page (lead auditor / organisation admin), the <strong>Assign controls</strong> panel gives one
+person all the applicable controls, or all those of one section (for example &quot;A.8 Technological controls&quot;), in one
+step. Up to 200 at a time, all or nothing; controls the person already has are left alone and reported (&quot;12
+controls assigned (3 already were)&quot;).</li>
+<li><strong>One at a time:</strong> open a control; <strong>Assigned to</strong> lists who has it, with a <strong>Remove</strong> button and a chooser to add
+someone. Client leads do the same from <strong>My controls → Assign</strong>.</li>
+<li><strong>Who can be chosen:</strong> contributors and client leads whose account is active or invited (not switched off). The
+database refuses anyone else, whatever the screen offers. If the client has no such people yet, invite them first on
+<strong>Tenants → People</strong>.</li>
+<li>Every assignment and removal is written to the audit log (<code>control.assigned</code> / <code>control.unassigned</code>).</li>
+</ul>
+<h2 id="where-evidence-is-kept-google-drive-this-servers-disk-or-s3">Where evidence is kept: Google Drive, this server&#39;s disk, or S3<a class="anchor" href="#where-evidence-is-kept-google-drive-this-servers-disk-or-s3" aria-label="Link to this section">#</a></h2>
+<p>Each organisation (the audit firm) chooses <strong>one</strong> place for its evidence, in the web app under <strong>Settings → Integrations</strong>.
+All three work the same for the people using the portal; what differs is where the bytes end up.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th>Google Drive</th>
+<th>This server&#39;s disk</th>
+<th>S3-compatible storage</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Where files go</td>
+<td>the firm&#39;s own Drive</td>
+<td>a folder on the machine the portal runs on</td>
+<td>a bucket on Amazon S3, MinIO, Ceph, Wasabi, Backblaze B2, Cloudflare R2…</td>
+</tr>
+<tr>
+<td>Set up by</td>
+<td>the installation owner (Google app, see below), then an org admin connects</td>
+<td>the installation owner sets <code>LOCAL_STORAGE_DIR</code>, then an org admin switches it on</td>
+<td>an org admin enters the bucket details (needs <code>SECRET_ENCRYPTION_KEY</code> on the server)</td>
+</tr>
+<tr>
+<td>Uploads travel</td>
+<td>browser → Google directly</td>
+<td>browser → the portal → the disk</td>
+<td>browser → the portal → the bucket</td>
+</tr>
+<tr>
+<td>Downloads</td>
+<td>through the portal</td>
+<td>through the portal</td>
+<td>through the portal</td>
+</tr>
+</tbody></table></div>
+<p><strong>The choice is fixed once the first evidence file exists.</strong> A recorded file only means something in the storage it was put in,
+so the database itself refuses to switch afterwards (it is not only a greyed-out button). Until then an admin can switch freely;
+switching clears the evidence folders already created for tenants (the page asks first), and they are created again in the new place.
+SharePoint appears on the page as &quot;coming later&quot;.</p>
+<h3 id="this-servers-disk">This server&#39;s disk<a class="anchor" href="#this-servers-disk" aria-label="Link to this section">#</a></h3>
+<p>For an organisation that runs the portal on its own server and wants the evidence to stay there.</p>
+<ol>
+<li>The installation owner sets <code>LOCAL_STORAGE_DIR</code> in <code>.env</code> to an <strong>absolute</strong> folder that exists and that the portal can write
+to (<code>D:/EvidenceFiles</code>, <code>/var/lib/evidence-portal/files</code>), and restarts. With Docker Compose use <code>LOCAL_STORAGE_DIR=/data/evidence</code>
+— that folder is the <code>evidence-files</code> volume. On Windows with the launcher, if nothing is set the files go to
+<code>%USERPROFILE%\EvidencePortal\files</code> (deliberately outside the portal&#39;s own folder, which a newer version replaces).
+The launcher prints the folder when it starts.</li>
+<li>An org admin opens <strong>Settings → Integrations → This server&#39;s disk → Use this server&#39;s disk</strong>, then creates each tenant&#39;s folder.</li>
+<li>Each organisation gets its own sub-folder (<code>&lt;org name&gt; [&lt;id prefix&gt;]</code>), each tenant and control a folder below that.</li>
+</ol>
+<p><strong>Back this folder up: it <em>is</em> the evidence.</strong> The database holds only names, sizes and checksums. Restoring the database without the
+folder (or the other way round) leaves records pointing at nothing. Put the folder on a disk you already back up, and restrict
+who can read it at the operating-system level — anyone who can read the folder can read the evidence.</p>
+<p>How it protects the files: names are checked so nothing can escape the folder (<code>..</code>, absolute paths, drive letters, device names,
+symlinks out of it are refused); a file is never replaced once stored (a second upload with the same name gets <code>(2)</code>);
+each file&#39;s SHA-256 is recorded at upload and checked again later, so a file edited on the disk is flagged as <em>changed since
+acceptance</em>; files the scanner flags are moved to a <code>_quarantine</code> folder rather than deleted.</p>
+<h3 id="s3-compatible-storage">S3-compatible storage<a class="anchor" href="#s3-compatible-storage" aria-label="Link to this section">#</a></h3>
+<ol>
+<li>Create a bucket and an access key that can <strong>list, read, write and delete</strong> objects in it (nothing else is needed). Use a key
+made for this portal, not an administrator&#39;s.</li>
+<li>The installation owner needs <code>SECRET_ENCRYPTION_KEY</code> in <code>.env</code> (the same key Google Drive uses; <code>node scripts/init-env.mjs</code>
+makes one). The secret access key is stored encrypted with it and is never shown again.</li>
+<li>As an org admin: <strong>Settings → Integrations → S3-compatible storage → Set up</strong>. Fill in:<ul>
+<li><em>Service address</em> — leave empty for Amazon S3; for anything else the service&#39;s URL (<code>https://minio.example.com:9000</code>).</li>
+<li><em>Region</em> — for Amazon S3 the bucket&#39;s region; many self-run services accept any value (<code>us-east-1</code> is fine).</li>
+<li><em>Bucket</em>, <em>Folder inside the bucket</em> (optional), <em>Access key ID</em>, <em>Secret access key</em>.</li>
+<li><em>Path-style addresses</em> — tick for MinIO and most services you run yourself; leave unticked for Amazon S3.
+Press <strong>Test connection</strong> first (nothing is saved), then <strong>Save and use S3 storage</strong>.</li>
+</ul>
+</li>
+<li>Create each tenant&#39;s folder on the same page.</li>
+</ol>
+<p>Things to know:</p>
+<ul>
+<li><strong>Private addresses are refused by default.</strong> A MinIO on <code>10.x.x.x</code>, <code>192.168.x.x</code> or <code>localhost</code> is rejected so that one
+organisation on a shared installation cannot point the server at things inside its network. If the installation is your own, set
+<code>STORAGE_ALLOW_PRIVATE_ADDRESSES=true</code> in <code>.env</code>. Cloud-metadata addresses (<code>169.254.x.x</code>) are refused whatever this says.</li>
+<li><strong>Once evidence exists</strong> only the access keys can be replaced; the bucket, folder and address are fixed.</li>
+<li><strong>Files up to 25 MB</strong> (the portal&#39;s upload cap) are held in memory for the length of one upload.</li>
+<li><strong>Nothing is overwritten.</strong> Each write asks the service to refuse an existing name (&quot;only if nothing is there&quot;) and the portal
+checks first as well, for services that don&#39;t support that.</li>
+<li><strong>Back up the bucket</strong> (versioning or replication) as you would any evidence store.</li>
+</ul>
+<h3 id="downloading-evidence">Downloading evidence<a class="anchor" href="#downloading-evidence" aria-label="Link to this section">#</a></h3>
+<p>Every file listed on a control has a <strong>Download</strong> button. The portal fetches the file from the storage with the person&#39;s own
+session (so the usual access rules apply) and always sends it as a download of unknown type — never as a page the browser
+might display or run, because evidence is whatever people uploaded. Each download is written to the audit log (<code>evidence.downloaded</code>).</p>
+<h2 id="connecting-google-drive">Connecting Google Drive<a class="anchor" href="#connecting-google-drive" aria-label="Link to this section">#</a></h2>
+<p>If the organisation chooses Google Drive, the evidence files live in <em>its own</em> Drive, not ours. The organisation connects its
+own account once, and from then on every upload and integrity check runs against that account. (This is one of three
+choices; see <a href="#where-evidence-is-kept-google-drive-this-servers-disk-or-s3">Where evidence is kept</a>.)</p>
+<ol>
+<li>In the <a href="https://console.cloud.google.com/apis/credentials" target="_blank" rel="noopener noreferrer">Google Cloud console</a>, enable the <strong>Google
+Drive API</strong>. Set up the <strong>OAuth consent screen</strong> (now called <em>Google Auth Platform</em>): audience <strong>External</strong>
+(or <strong>Internal</strong> if every user is in your own Google Workspace), and while the app is in <strong>Testing</strong>, add every Google
+account that will click Connect under <strong>Audience → Test users</strong> — <em>without that, Google answers &quot;Access blocked&quot;</em>.
+Then create an OAuth client of type <em>Web application</em> and add <code>&lt;API_PUBLIC_URL&gt;/oauth/google/callback</code> as an authorised
+redirect URI (for a test on one computer: <code>http://localhost:3000/oauth/google/callback</code>, character for character —
+<code>localhost</code>, not <code>127.0.0.1</code>, no trailing slash).
+An External app left in Testing also makes Google expire the saved connection after about 7 days; publish the consent
+screen (the <code>drive.file</code> permission this app asks for is a narrow one) or reconnect.</li>
+<li>As the installation&#39;s owner, open <strong>Server settings → Google Drive app</strong>, paste the client ID and secret and the
+redirect address (the card suggests the right one), and save. (The older way still works: set
+<code>GOOGLE_OAUTH_*</code> and <code>SECRET_ENCRYPTION_KEY</code> in <code>.env</code> and restart — see <a href="#server-settings-email-scanning-and-google-drive-from-the-web-app">Server settings</a>.)
+Leave them unset and Drive features simply answer &quot;not configured&quot;; the rest of the app still works.</li>
+<li>Sign in as an org admin, open <strong>Settings → Integrations</strong>, and click <strong>Connect Google Drive</strong>. Approve
+access on Google&#39;s screen; you land back on that page with the connection shown as active.</li>
+<li>For each client (tenant), press <strong>Create folder in Google Drive</strong> next to its name on the same page. The app creates a folder
+named <em>Evidence Portal – <client></em> in the connected Drive and files that client&#39;s uploads under it.</li>
+</ol>
+<p>Why step 4 exists: the app asks Google for only the narrow <code>drive.file</code> permission, which means it can
+see <strong>only files and folders it created itself</strong> — it cannot browse, read or change anything else in the
+Drive. That is a deliberate privacy choice, and the consequence is that it can&#39;t be pointed at a folder
+you made by hand; it makes its own.</p>
+<p><strong>If Google shows &quot;Access blocked&quot;:</strong> the line under it says why. <em>Error 403: access_denied</em> / &quot;developer-approved testers&quot; →
+the Google account you chose on that screen is not in <strong>Test users</strong> (above). <em>Error 400: redirect_uri_mismatch</em> → the address
+in Google&#39;s client and the one in Server settings differ by even one character, or Google has not yet applied a change you
+just saved (wait a few minutes). <em>invalid_client</em> → the client ID is wrong or from another project. <em>invalid_request</em> → the
+client is not of type <em>Web application</em>. &quot;Blocked by your administrator&quot; → a Google Workspace admin restricts which apps that
+account may use; try another account. The address bar of Google&#39;s page shows the <code>redirect_uri</code> and <code>client_id</code> this portal sent.</p>
+<p><strong>If &quot;Create folder in Google Drive&quot; answers &quot;Storage error: Drive permission denied (403)…&quot;:</strong> the rest of the message gives
+Google&#39;s reason and the fix. The usual cause is that the <strong>Google Drive API was not enabled</strong> in step 1 (signing in works
+without it; any Drive request is refused): Google Cloud console → <em>APIs &amp; Services</em> → <em>Library</em> → <em>Google Drive API</em> →
+<em>Enable</em>, wait a minute, try again. Otherwise the Drive permission was unticked on Google&#39;s screen (disconnect, connect
+again, leave it ticked), or the connected account&#39;s Drive is full.</p>
+<p>The refresh token Google hands back is encrypted (AES-256-GCM) before it is stored, and never leaves the
+server. If an admin later revokes access from their Google account, the next upload attempt notices,
+marks the connection as revoked, writes it to the audit log, and the Integrations page offers
+<strong>Reconnect</strong>.</p>
+<h2 id="email-invitations-and-reminders">Email (invitations and reminders)<a class="anchor" href="#email-invitations-and-reminders" aria-label="Link to this section">#</a></h2>
+<p>The portal sends four kinds of email: invitations (a link to set a password), evidence reminders, password-reset
+links, and <a href="#security-notice-emails">security notices</a> about changes to someone&#39;s own sign-in. It speaks
+plain SMTP, so any provider works — Microsoft 365, Google Workspace, Amazon SES, Postmark, SendGrid, or your
+own mail server. The owner enters the server, From address and, if the provider needs a login, the username and
+password under <strong>Server settings → Email</strong> (or sets <code>SMTP_HOST</code>, <code>EMAIL_FROM</code>, <code>SMTP_USER</code> / <code>SMTP_PASSWORD</code> in
+<code>.env</code> — see <code>.env.example</code>). The connection must be encrypted: STARTTLS by default, or implicit TLS
+with <code>SMTP_SECURITY=tls</code>. If the server doesn&#39;t offer encryption, nothing is sent and the password is never
+transmitted — it does not quietly fall back to plain text.</p>
+<ul>
+<li><strong>Not configured?</strong> The portal still runs, but emails are <em>not sent</em>: they are printed to the server log, and
+startup says so loudly. Invite links work like passwords, so don&#39;t run a real deployment that way.</li>
+<li><strong>Mail server down?</strong> A new invite is still saved and the page says the email didn&#39;t go out — press <strong>Resend
+invite</strong> once mail works. A <em>resend</em> or a <em>reminder</em> that can&#39;t be delivered changes nothing (the old invite
+link keeps working; the control&#39;s once-a-day reminder allowance isn&#39;t used up).</li>
+<li><strong>Safe by construction:</strong> plain text only, recipients must be simple addresses, anything that could inject
+extra headers or recipients is refused, and failure logs never contain addresses or the message body (which
+holds the sign-in link).</li>
+<li><strong>To try it without a real mail account:</strong> put <code>SMTP_HOST=mailpit</code>, <code>SMTP_PORT=1025</code>, <code>SMTP_SECURITY=none</code>
+and <code>EMAIL_FROM=noreply@portal.local</code> in <code>.env</code> and run <code>docker compose --profile dev-mail up</code>. Every email
+then appears at <a href="http://localhost:8025" target="_blank" rel="noopener noreferrer">http://localhost:8025</a>. For trying things out only.</li>
+</ul>
+<h2 id="forgotten-passwords">Forgotten passwords<a class="anchor" href="#forgotten-passwords" aria-label="Link to this section">#</a></h2>
+<p>The sign-in page has a <strong>Forgot password?</strong> link. The person enters their email and, if an account exists, gets
+a link that works <strong>once</strong> and expires after <strong>1 hour</strong>. Opening it lets them choose a new password; they are then
+sent back to sign in (holding a reset link is never by itself enough to hold a session).</p>
+<ul>
+<li><strong>Nobody can tell who has an account.</strong> The answer to &quot;send me a link&quot; is identical whether the address is
+known, unknown, disabled, still waiting on an invite, or asking too often — and it doesn&#39;t wait for the mail
+server, so the one slow step (SMTP) can&#39;t give a real account away. (The few milliseconds of database work for
+a real account are not hidden; the per-address request limit makes measuring them at scale impractical.) If the
+email can&#39;t be sent, that is written to the server log (without the address or the link) and the visitor sees
+nothing different.</li>
+<li><strong>The database enforces the rules</strong>, not just the application: 1-hour life, single use, at most <strong>3 links per
+account per hour</strong> (so the form can&#39;t be used to flood someone&#39;s inbox), and using one link voids the
+account&#39;s others. Only a hash of each link&#39;s secret is stored, and the app&#39;s database role can&#39;t read the table.</li>
+<li><strong>A reset ends old sessions.</strong> Anyone signed in before the reset — including someone who had learnt the old
+password — is signed out on their next request. A disabled account&#39;s sessions stop working immediately too. It
+also clears any login lockout. (Sessions are compared to the second, so one started in the <em>same</em> second as the
+reset can survive it.) This costs the API one small indexed lookup per request.</li>
+<li><strong>Invited but never signed up?</strong> There is no password to reset yet. They use the invite email, or an admin
+presses <strong>Resend invite</strong>; the page tells them so.</li>
+<li>Both steps are written to the tamper-evident audit log (<code>user.password_reset_requested</code>, <code>user.password_reset</code>).</li>
+</ul>
+<h3 id="request-limits-and-reverse-proxies">Request limits and reverse proxies<a class="anchor" href="#request-limits-and-reverse-proxies" aria-label="Link to this section">#</a></h3>
+<p>The signed-out endpoints (sign in, accept invite, forgot password, reset password) also limit how often one
+address can call them: 60 sign-in attempts and 10 reset requests per 15 minutes. That is flood protection;
+the real brute-force defences are the per-account lockout and the per-account reset limit above, which live in the
+database. Counters are kept in the API process&#39;s memory, so with several API replicas each counts separately.</p>
+<p>If you put a reverse proxy (nginx, Caddy, a cloud load balancer...) in front of the API, set <strong><code>TRUST_PROXY</code></strong> to
+the number of proxies in front (usually <code>1</code>). Otherwise every visitor looks like the proxy and shares one
+allowance. The portal notices an <code>X-Forwarded-For</code> header arriving while <code>TRUST_PROXY</code> is <code>0</code> and says so in the
+log. It must be a count, never &quot;true&quot;: believing every forwarded address would let a visitor pick their own.
+Leave it at <code>0</code> when browsers connect to the API directly (the default Docker Compose setup).</p>
+<h2 id="malware-scanning-clamav">Malware scanning (ClamAV)<a class="anchor" href="#malware-scanning-clamav" aria-label="Link to this section">#</a></h2>
+<p>Every uploaded file is streamed from your storage into a ClamAV daemon before it is recorded as evidence;
+infected files are refused. Only the file&#39;s bytes go to ClamAV — never its name.</p>
+<ol>
+<li>Run ClamAV: with Compose, start with <code>docker compose --profile scanning up</code> (it needs about 2 GB of memory, and
+downloads virus signatures on first start — give it a few minutes). Or use a <code>clamd</code> you already run. Without Docker,
+see <a href="#clamav-without-docker-windows-and-linux">ClamAV without Docker</a> below.</li>
+<li>As the installation&#39;s owner, open <strong>Server settings → Malware scanning</strong>, enter the host (<code>clamav</code> with Compose,
+<code>127.0.0.1</code> for a <code>clamd</code> on the same computer) and save (it asks for your password), then press <strong>Check the scanner</strong>.
+(Or set <code>CLAMD_HOST</code> / <code>CLAMD_PORT</code> in <code>.env</code> and restart.)</li>
+</ol>
+<p><strong>Check the scanner</strong> asks clamd whether it is alive and then sends it the standard EICAR antivirus test string, straight
+from memory (nothing is written to a disk, so antivirus software on the computer does not react). It says the scanner is
+working only if clamd answers <em>and</em> flags the test string.</p>
+<p><strong>Test it with a real upload.</strong> Make a text file whose only content is the EICAR line (the 68 characters on
+<a href="https://www.eicar.org/download-anti-malware-testfile/" target="_blank" rel="noopener noreferrer">https://www.eicar.org/download-anti-malware-testfile/</a>), upload it as a contributor to any control and press confirm: the
+upload is refused with &quot;flagged by malware scanning&quot;, nothing is recorded, and the audit log has an <code>evidence.infected</code>
+entry. Then upload an ordinary file: it is accepted and its scan result reads &quot;clean&quot;. Windows Defender (and most antivirus
+programs) delete the EICAR file the moment it is saved; create it in a folder you have excluded in Windows Security →
+Virus &amp; threat protection → Manage settings → Exclusions, and remove the exclusion afterwards.</p>
+<h3 id="clamav-without-docker-windows-and-linux">ClamAV without Docker (Windows and Linux)<a class="anchor" href="#clamav-without-docker-windows-and-linux" aria-label="Link to this section">#</a></h3>
+<p>The portal only needs a <code>clamd</code> it can reach over TCP (default port 3310); it does not care how it was started.</p>
+<ul>
+<li><p><em>Linux:</em> <code>sudo apt install -y clamav-daemon clamav-freshclam</code>, then in <code>/etc/clamav/clamd.conf</code> add
+<code>TCPSocket 3310</code> and <code>TCPAddr 127.0.0.1</code> and restart it (<code>sudo systemctl restart clamav-daemon</code>; on Debian and Ubuntu
+systemd may open the port itself, in which case also restart <code>clamav-daemon.socket</code>, or run
+<code>sudo dpkg-reconfigure clamav-daemon</code> and choose TCP). The first start waits until <code>freshclam</code> has downloaded the
+signatures. <em>Run by hand with <code>clamd -c &lt;config file&gt;</code> and those two lines, it worked with the portal; the systemd
+variants have not been tried.</em></p>
+</li>
+<li><p><em>Windows:</em> download the 64-bit Windows package from <a href="https://www.clamav.net/downloads" target="_blank" rel="noopener noreferrer">https://www.clamav.net/downloads</a> (the installer, or the zip) into
+e.g. <code>C:\ClamAV</code>. In PowerShell, in that folder, as administrator:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>copy conf_examples\clamd.conf.sample clamd.conf
+copy conf_examples\freshclam.conf.sample freshclam.conf
+notepad clamd.conf
+notepad freshclam.conf</code></pre></div>
+<p>In <strong>both</strong> files delete the line that says <code>Example</code>. In <code>clamd.conf</code> make sure these lines are present and not
+commented out (use <code>127.0.0.1</code>, because <code>localhost</code> can resolve to an address clamd is not listening on):
+<code>TCPSocket 3310</code>, <code>TCPAddr 127.0.0.1</code>, and a <code>LogFile</code> pointing into <code>C:\ClamAV</code>. In <code>freshclam.conf</code> make sure
+<code>DatabaseDirectory</code> points to a folder that exists (e.g. <code>C:\ClamAV\database</code>). Then download the signatures and start the
+daemon:</p>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>.\freshclam.exe
+.\clamd.exe</code></pre></div>
+<p><code>clamd.exe</code> prints a few lines and then appears to hang: that is it running; leave the window open. To have it start with
+Windows, run <code>.\clamd.exe --install</code> once as administrator and start the <strong>ClamAV ClamD</strong> service from <code>services.msc</code>;
+run <code>.\freshclam.exe</code> regularly (a scheduled task) to keep the signatures current. <em>The author has not run ClamAV on
+Windows; the settings above are ClamAV&#39;s own, and &quot;Check the scanner&quot; tells you at once whether they worked.</em></p>
+</li>
+<li><p>ClamAV needs roughly 1–2 GB of memory while it holds the signatures.</p>
+</li>
+<li><p><strong>Infected file?</strong> It is refused, never recorded as evidence, and <strong>moved out of the evidence folder</strong>, never deleted for
+good: into the <strong>trash of your Google Drive</strong>, into a <code>_quarantine</code> folder inside the server&#39;s evidence folder, or into a
+<code>_quarantine/</code> prefix in your S3 bucket, depending on where evidence is kept. The person uploading is told
+what happened, and the <strong>audit log</strong> gets an <code>evidence.infected</code> entry saying who uploaded which file to which
+control and whether it was moved. If Drive can&#39;t be reached at that moment, the upload is still refused and the
+person is told to delete the file from the folder themselves; the audit log entry says it was <em>not</em> quarantined.</p>
+</li>
+<li><p><strong>Not configured?</strong> Files are recorded as <strong>&quot;skipped&quot;</strong> — never &quot;clean&quot; — so a reviewer can see nothing checked
+them. Startup says so.</p>
+</li>
+<li><p><strong>ClamAV down?</strong> Uploads are <em>refused</em> with a retryable error (&quot;scanning is unavailable, try again in a few
+minutes&quot;) rather than recorded unchecked. The file is already in your storage, so the user simply confirms again
+once ClamAV is back.</p>
+</li>
+<li><p><strong>Files over 25 MB</strong> (ClamAV&#39;s default stream limit, and the portal&#39;s own upload cap) are recorded as
+&quot;unscannable&quot; so they get a manual look. Raise <code>StreamMaxLength</code> in <code>clamd.conf</code> and <code>CLAMD_MAX_FILE_MB</code> together
+if you need more.</p>
+</li>
+</ul>
+<h2 id="two-step-sign-in-authenticator-app">Two-step sign-in (authenticator app)<a class="anchor" href="#two-step-sign-in-authenticator-app" aria-label="Link to this section">#</a></h2>
+<p>Everyone can turn on a second step under <strong>Security</strong> in the left-hand menu: after the password, sign-in asks for
+the 6-digit code from an authenticator app (Google Authenticator, Microsoft Authenticator, 1Password, Authy...).
+Turning it on means entering the password again, scanning a QR code (or typing the key), and entering the first
+code; the portal then shows <strong>ten recovery codes, once</strong>. Each recovery code signs you in one time if the phone
+is lost.</p>
+<ul>
+<li><strong>It needs <code>SECRET_ENCRYPTION_KEY</code></strong> (the same key Google Drive uses, <code>openssl rand -hex 32</code>). The authenticator
+secret is stored encrypted with it, and the database never sees the secret in the clear. Without the key the
+Security page says two-step sign-in isn&#39;t available and nobody can turn it on. <strong>Back the key up, and don&#39;t
+change it:</strong> a different key can&#39;t decrypt the stored secrets, so every authenticator code would stop working
+(recovery codes and an admin reset still do).</li>
+<li><strong>It fails closed.</strong> If an account has it on but the server can&#39;t check codes (no key, or the wrong one), the
+answer is an error — never a way in. A recovery code is a complete second proof that needs no key, so it still works.</li>
+<li><strong>The database enforces the rules</strong>, so no application bug can weaken them: a code works <strong>once</strong> (the same code
+is refused even within its 30 seconds; a phone clock up to 30 seconds out is forgiven), <strong>five wrong codes lock
+two-step sign-in for the account for 15 minutes</strong> (wrong authenticator codes, wrong or already-used recovery
+codes, and replays all count; while locked even a correct code is refused), recovery codes are stored only as
+hashes, are single-use and belong to one account, and every change is in the tamper-evident audit log
+(<code>user.mfa_enabled</code>, <code>user.mfa_disabled</code>, <code>user.mfa_recovery_codes_regenerated</code>, <code>user.mfa_recovery_code_used</code>,
+<code>user.mfa_locked</code>, <code>user.mfa_reset</code>). Neither table can be read or written by the app&#39;s database role.</li>
+<li><strong>Taking protection away needs two proofs.</strong> Turning it off, or getting new recovery codes, asks for the password
+<em>and</em> a code — so a borrowed, still-open browser session isn&#39;t enough. Wrong passwords there count toward the
+same lock-out as the sign-in page.</li>
+<li><strong>The password step alone proves nothing.</strong> An account with it on gets back a five-minute challenge, not a
+session; the challenge is signed with a different key and issuer from sessions, so it can&#39;t be used as one (and
+the reverse). A correct password doesn&#39;t clear the failed-attempt count — only finishing the second step does.
+<strong>Resetting a password by email does not skip the second step.</strong></li>
+<li><strong>Lost phone, with recovery codes:</strong> sign in with a recovery code, then turn two-step off and on again under Security.</li>
+<li><strong>Lost phone, no recovery codes:</strong> an organisation admin presses <strong>Reset two-step</strong> next to the person on the Users
+page (it asks to confirm). That switches it off for them, signs them out everywhere, and is audited. Only org
+admins can, never for themselves, never outside their organisation. <strong>Keep at least two org admins.</strong> If the only
+admin loses both phone and codes, there&#39;s no way back inside the app; as the database owner you can run
+<code>DELETE FROM user_mfa WHERE user_id = (SELECT id FROM users WHERE email = &#39;...&#39;);</code>,
+<code>DELETE FROM mfa_recovery_codes WHERE user_id = (SELECT id FROM users WHERE email = &#39;...&#39;);</code> and
+<code>UPDATE users SET sessions_valid_after = now() WHERE email = &#39;...&#39;;</code> (the last signs them out everywhere).</li>
+<li><strong>A trade-off you should know about:</strong> because wrong codes lock the account for 15 minutes, someone who already
+knows a person&#39;s password can keep them out of two-step sign-in by deliberately guessing wrong. The lock isn&#39;t
+extended by hammering, and it needs the password first; the alternative (no lock) would let the same person
+guess the 6-digit code. Choosing safety over availability here is deliberate.</li>
+<li><strong>Single sign-on accounts</strong> (no password in this portal) are told two-step is managed by their identity provider.</li>
+<li>Admins see a <strong>Two-step on/off</strong> label next to each person on the Users page; nobody else is told who has it.</li>
+</ul>
+<h2 id="changing-your-password-and-requiring-two-step-sign-in-for-everyone">Changing your password, and requiring two-step sign-in for everyone<a class="anchor" href="#changing-your-password-and-requiring-two-step-sign-in-for-everyone" aria-label="Link to this section">#</a></h2>
+<p><strong>Changing your own password</strong> is under <strong>Security</strong> → <strong>Password</strong>. It asks for the current password (and a code,
+if two-step sign-in is on), and the new one twice. Two things happen that are worth knowing:</p>
+<ul>
+<li><strong>Every other session you have is signed out</strong> — your phone, another browser, anyone who had borrowed your
+password. The page you are on carries on without a break (the server hands it a fresh session). Sessions are
+ended by the database comparing each token&#39;s issue time with the moment of the change, to the second; a session
+started in the <em>same second</em> as a change survives it. That is a deliberate limit of the approach, not a bug.</li>
+<li><strong>The wrong current password counts toward the same five-attempts lock-out as the sign-in page</strong>, so a borrowed
+open browser can&#39;t be used to guess it. The one-time code is only spent once the cheap checks pass: a typo in the
+new password, or choosing the same password, never costs you a code.</li>
+<li>Accounts that sign in through a single sign-on provider have no password here and are told so.</li>
+<li>It is written to the audit log as <code>user.password_changed</code> (no password material).</li>
+</ul>
+<p><strong>Requiring two-step sign-in</strong> is a setting for organisation admins, under <strong>Security</strong> → <strong>Organisation policy</strong>:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Who must use two-step sign-in</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Off (default)</td>
+<td>Nobody; everyone may choose.</td>
+</tr>
+<tr>
+<td>Staff only</td>
+<td>Everyone in your organisation; your clients&#39; people are not required to.</td>
+</tr>
+<tr>
+<td>Everyone</td>
+<td>Staff and your clients&#39; people.</td>
+</tr>
+</tbody></table></div>
+<p>How it behaves, and the trade-offs you are choosing:</p>
+<ul>
+<li><strong>Someone it covers who hasn&#39;t set it up</strong> can still sign in with their password, but the server refuses
+everything except setting two-step sign-in up (<code>403 MFA_SETUP_REQUIRED</code>), and the web app keeps them on the
+Security page until they have. The rule is checked on <strong>every request</strong> by the database, so switching it on (or
+off) takes effect for people who are already signed in. The cost is one small extra query per request.</li>
+<li><strong>The server can&#39;t fail open.</strong> If that check can&#39;t reach the database, the request fails with a server error; it
+is never waved through.</li>
+<li><strong>People it covers can&#39;t turn their own two-step sign-in off.</strong> If someone loses their phone and recovery codes, an
+organisation admin presses <strong>Reset two-step</strong> on the Users page; the person then sets it up again.</li>
+<li><strong>An admin can only switch the rule on once their own two-step sign-in is on</strong>, so you can&#39;t lock yourself out by
+switching it on. Switching it <strong>off</strong> is always allowed. <strong>Keep at least two organisation admins</strong>: if the only
+admin is reset and loses the phone, only direct database access can unstick them.</li>
+<li><strong>It needs <code>SECRET_ENCRYPTION_KEY</code></strong> (as two-step sign-in itself does). The page won&#39;t let you switch the rule on
+without it. If the key is lost later, anyone who hasn&#39;t set up yet is blocked until it is restored, and anyone
+who has can still sign in with a recovery code; an admin who is already enrolled can switch the rule off that way.</li>
+<li><strong>Single sign-on accounts and disabled accounts are never covered</strong> (the provider handles it for the former), and
+the &quot;X of Y have set it up&quot; counts leave them out. The counts are numbers only; nobody is named.</li>
+<li>Every change is written to the audit log as <code>org.mfa_policy_changed</code> (with the old and new setting).</li>
+</ul>
+<h2 id="security-notice-emails">Security notice emails<a class="anchor" href="#security-notice-emails" aria-label="Link to this section">#</a></h2>
+<p>When something happens to someone&#39;s own sign-in that could be the first sign of a takeover, the portal emails <strong>the
+address on their account</strong>, so the real owner finds out even if the person who did it wasn&#39;t them. A notice is sent
+when:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Event</th>
+<th>Subject</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>The password is changed (Security page)</td>
+<td>Your Evidence Portal password was changed</td>
+</tr>
+<tr>
+<td>The password is reset with an emailed link</td>
+<td>Your Evidence Portal password was reset</td>
+</tr>
+<tr>
+<td>Two-step sign-in is turned on</td>
+<td>Two-step sign-in was turned on for your Evidence Portal account</td>
+</tr>
+<tr>
+<td>Two-step sign-in is turned off</td>
+<td>Two-step sign-in was turned off for your Evidence Portal account</td>
+</tr>
+<tr>
+<td>A new set of recovery codes is created</td>
+<td>New recovery codes were created for your Evidence Portal account</td>
+</tr>
+<tr>
+<td>A recovery code is used (to sign in, or to confirm a change)</td>
+<td>A recovery code was used on your Evidence Portal account</td>
+</tr>
+<tr>
+<td>An administrator resets someone&#39;s two-step sign-in</td>
+<td>Your Evidence Portal two-step sign-in was reset</td>
+</tr>
+</tbody></table></div>
+<p>Each says what happened and when (in UTC, spelled out), what to do if it wasn&#39;t them (a link to reset the password,
+and &quot;tell the administrator of your organisation&quot;), and that the portal will never ask for a password or code by
+email. A recovery-code notice also says how many codes are left, and suggests a new set when three or fewer remain.</p>
+<p>The rules these keep, each pinned down by <code>tests/44-security-notices-http.test.ts</code>:</p>
+<ul>
+<li><strong>They never contain a secret.</strong> No password, link token, authenticator secret, recovery code, password hash or
+internal account id, and no other person&#39;s name: an administrator&#39;s reset says &quot;an administrator&quot;, not which one.</li>
+<li><strong>Only after the change really happened.</strong> A wrong password, a wrong or already-used code, a weak or unchanged
+password, a refused request (not signed in, not an admin, the organisation requires two-step), or an administrator
+resetting someone who had nothing to reset, sends nothing. Starting to set up two-step sign-in sends nothing
+either; finishing it does.</li>
+<li><strong>Only to the address on file, and only for an active account.</strong> Disabled and not-yet-accepted accounts get none.
+Only the person it happened to is told; the administrator who did a reset is not mailed.</li>
+<li><strong>A mail problem never reaches the person.</strong> Notices are sent in the background after the answer is already on its
+way: a mail server that is down, slow or rejecting the message never slows, fails or changes the response, and the
+change is not undone. A failure is logged as <code>[email] security notice (&lt;kind&gt;): …</code>, never with the address.
+On shutdown the server waits up to five seconds for notices still in flight.</li>
+</ul>
+<p>Trade-offs worth knowing:</p>
+<ul>
+<li><strong>Best-effort, not guaranteed.</strong> If the server crashes in the instant after a change, or the mail server is down,
+that notice is lost. The change itself is still in the audit log, which is the record of truth.</li>
+<li><strong>No notice for lock-outs or failed sign-ins.</strong> Anyone can type wrong passwords for someone else&#39;s address, so
+mailing on those would let a stranger flood a person&#39;s inbox.</li>
+<li><strong>Without SMTP configured, notices are printed to the server log</strong> like every other email. They hold nothing
+secret, but they do name the account&#39;s address in the &quot;to&quot; line the log prints; configure SMTP on a real deployment.</li>
+<li><strong>Admins are not told when the organisation&#39;s two-step rule is switched</strong> (it is in the audit log), and a notice
+goes only to the one address on file: if an attacker already controls that mailbox, a notice reaches them too.
+Reset links already have that property; use a mailbox with its own two-step sign-in.</li>
+</ul>
+<h2 id="security">Security<a class="anchor" href="#security" aria-label="Link to this section">#</a></h2>
+<p><strong>Reporting a problem.</strong> Please report a vulnerability privately, not as a public issue: see <a href="SECURITY.md">SECURITY.md</a>
+(GitHub&#39;s <em>Report a vulnerability</em> button on the repository&#39;s Security tab).</p>
+<p><strong>What has been checked.</strong> In November 2026 the author reviewed the code for weaknesses, scanned it for secrets, and
+tried the running server from the outside, with the OWASP Top 10 as the checklist. It is a thorough self-review, <strong>not
+an independent penetration test</strong>: before holding a client&#39;s real evidence, have someone else test your installation.
+The review found, and this version fixes:</p>
+<ul>
+<li>The API and the web app sent no security headers. Both now send a strict Content-Security-Policy, no-framing,
+no-sniffing, no-referrer and no-cache headers (the API) and HSTS when the request came over HTTPS. The Docker web app
+(<code>frontend/nginx/</code>) and <code>scripts/serve-web.mjs</code> send the same ones, and a test keeps them identical.</li>
+<li>Malformed or oversized JSON, and an id that was not an id, gave a 500. They now give a 400 or 413 with a fixed message.</li>
+<li>Sign-in revealed which addresses have accounts: an unknown address answered in 2 ms instead of about 250 ms, and only
+real accounts were ever locked. Unknown addresses now cost the same time and lock in the same way.</li>
+<li>Passwords like <code>password1234</code>, <code>Password1234!</code> or twelve <code>a</code>s were accepted. A password built on a common word, a keyboard or
+alphabet run, or a few repeated characters is now refused, and so is one over 72 characters (what bcrypt can use).</li>
+<li>The portal started happily with the example secrets from <code>.env.example</code>. It now refuses to start with the example or a
+short <code>JWT_SECRET</code>, or with the example database password, and the migration command refuses the example
+<code>POSTGRES_PASSWORD</code> / <code>APP_DB_PASSWORD</code>.</li>
+<li>Only HS256 is accepted for session tokens (the algorithm is pinned instead of left to the token), and <code>.env</code> files
+are kept out of the web app&#39;s Docker build.</li>
+</ul>
+<p><strong>What was looked for and not found:</strong> SQL built from user input (every query is parameterised; the few that assemble SQL
+only join fixed column names), HTML injection (the web app never inserts raw HTML), path traversal in the disk storage and
+the web server, forged or <code>alg=none</code> tokens, cross-site request forgery (sign-in uses a header token, not cookies), server-side
+request forgery through the S3 address (private, link-local and metadata addresses are refused, again at connect time),
+secrets in the code, the logs or the web app, and known-vulnerable libraries in what the portal ships (<code>npm audit</code>).</p>
+<p><strong>Known limits, left as they are</strong></p>
+<ul>
+<li>The session token is kept in the browser&#39;s local storage, so a script injected into the page could read it. The web app
+inserts no raw HTML and its Content-Security-Policy blocks inline and outside scripts, which is what stands in the way.
+The token lasts 12 hours and stops working when the account is disabled or its password is reset.</li>
+<li>A person who knows an address can lock that account for 15 minutes by typing wrong passwords. That is the price of lockout.</li>
+<li>Request limits and the unknown-address lock are kept in the API&#39;s memory: several API copies count separately, and a restart forgets them.</li>
+<li>Without <code>SMTP_HOST</code>, invitation and reset links are printed to the server log (the startup log says so). Never run that way
+for real use: anyone who can read the log can use the links.</li>
+<li>The Docker images run their programs as the image&#39;s default user (root in the API image). A bug in the portal would
+therefore have more reach than it needs; running containers read-only and as an unprivileged user is a good hardening step.</li>
+<li>A <code>dev</code> dependency (<code>picomatch</code>, used only by the test tools) has a published advisory with no patched version. It is not
+in the shipped portal.</li>
+</ul>
+<p><strong>Before real use</strong></p>
+<ol>
+<li>Generate the secrets with <code>npm run setup</code> (or the Docker command in <a href="#installation">Installation</a>).</li>
+<li>Serve it over HTTPS and set <code>APP_BASE_URL</code> and <code>CORS_ALLOWED_ORIGINS</code> to the real address.</li>
+<li>Behind a reverse proxy, set <code>TRUST_PROXY</code>; otherwise the per-address limits see only the proxy.</li>
+<li>Set up email (<code>SMTP_HOST</code>) and, if evidence comes from outside your organisation, malware scanning.</li>
+<li>Turn on <a href="#two-step-sign-in-authenticator-app">two-step sign-in</a> for staff at least, and back up the database, the evidence
+storage and the <code>SECRET_ENCRYPTION_KEY</code>.</li>
+<li>Keep the portal, Node, PostgreSQL and the container images up to date.</li>
+</ol>
+<h2 id="structure">Structure<a class="anchor" href="#structure" aria-label="Link to this section">#</a></h2>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>db/migrations/        SQL migrations (schema, RLS policies, triggers). Numbered, additive, never edited
+                       after being applied — a schema change is a new migration file.
+db/seed/               The ISO 27001:2022 control catalogue, as JSON.
+src/storage/           StorageProvider interface + three real providers: GoogleDriveProvider, LocalDiskProvider
+                       (localDisk.ts) and S3Provider (s3.ts), plus two test doubles, the Google OAuth client,
+                       encrypted token handling, and the per-organisation resolver (resolver.ts) that turns &quot;this
+                       user's org&quot; into a ready-to-use provider. safeNames.ts keeps file and folder names safe,
+                       addressGuard.ts refuses S3 addresses inside a private network (unless allowed),
+                       uploadTokens.ts signs the short-lived link used to upload through the portal.
+src/services/storageSettings.ts  Choosing and connecting a storage (disk, S3), and the lock once evidence exists.
+src/email/, src/scan/, src/auth/
+                       Same pattern: one interface (types.ts), real implementations, fakes for tests.
+                       email: SmtpEmailSender (real) + a log-only fallback. scan: ClamAvScanner (real, clamd's
+                       TCP protocol) + FakeClamd, a strict stand-in daemon. auth: JwtTokenVerifier for the
+                       built-in login, alongside the documented-but-untestable Auth0/OIDC option.
+src/wiring.ts          Chooses the real email sender / scanner when configured, and a clearly-labelled
+                       fallback when not.
+src/http/middleware/   CORS, auth, camelCase, the per-address request limiter (rateLimit.ts) and the security headers
+                       every API answer carries (securityHeaders.ts).
+src/secretsCheck.ts    Refuses the example secrets from .env.example and weak ones at start-up.
+src/auth/phantomLockout.ts
+                       Makes an address with no account cost the same time and lock the same way as a real one.
+frontend/nginx/        The web app's nginx settings and security headers (the Docker route).
+SECURITY.md            How to report a vulnerability privately, what is in scope, and how to run it safely.
+src/auth/totp.ts, mfaToken.ts
+                       Authenticator codes (RFC 6238, written against node:crypto alone and checked against the
+                       RFC's own test vectors), recovery codes, and the five-minute &quot;password accepted&quot; challenge.
+src/auth/sessionCheck.ts  Asks the database whether a still-unexpired session token is still good (account
+                       disabled, or password reset/changed since it was issued).
+src/http/middleware/mfaPolicy.ts
+                       Enforces the organisation's two-step policy on every signed-in request (fails closed).
+src/services/folderNames.ts  Names of the per-audit-cycle folders in the firm's storage.
+src/services/roles.ts  Custom roles: a built-in role with some permissions taken away (never added).
+src/services/platformSettings.ts, driveConnect.ts, oauthState.ts
+                       The Server settings page's storage, and connecting an organisation's Google Drive (the signed
+                       state that ties the Google redirect back to the person who started it).
+src/services/audits.ts  Starting, closing and reopening audit cycles. The rules themselves (who may, the
+                       lock on a closed cycle) are in db/migrations/014_close_audit_cycle.sql.
+src/services/users.ts  Inviting people, and assigning controls (one, or many at once) with plain-language refusals.
+src/settings/          Server settings stored in the database (mail, scanner, Google): runtime lookup with caching,
+                       the live wrappers that pick up a change without a restart, and validation.
+scripts/verify.mjs     `npm run verify`, the one-command check. scripts/init-env.mjs is `npm run setup`.
+scripts/check-demo-build.mjs
+                       Checks the real web app contains none of the live demo, and the demo is complete and can be
+                       served from any folder (part of `npm run verify`).
+frontend/src/demo/     The live demo's pretend server and its sample data (see &quot;The live demo&quot;). Loaded only by
+                       `npm run build:demo`.
+.github/               CI workflow, weekly deliberate-breakage workflow, the GitHub Pages workflow that publishes
+                       the live demo (pages.yml), Dependabot.
+src/services/account.ts  Changing your own password (ends your other sessions, hands back a fresh one).
+src/services/notices.ts  Security notice emails: the wording (pure, tested directly) and the background notifier
+                       the services call after a change has been made.
+src/services/          Business logic as plain functions (pool, userId, ...args) =&gt; result. No HTTP
+                       here — usable from the Express app, a worker, or a CLI equally.
+src/http/               Express routes. Thin: parse input, call a service, return it. All error
+                       handling goes through one mapper (src/errors.ts) so the database's own rules
+                       (role checks, status transitions, domain restrictions) come back as clean HTTP
+                       responses without any route needing to know about them individually.
+src/db/*-cli.ts         Command-line entrypoints: db:migrate, db:seed, db:bootstrap-admin (creates the
+                        very first org and admin, since there's no public sign-up by design).
+src/index.ts            Public exports — import from here, not from internal file paths.
+src/server.ts           Real wiring for a deployment. Built-in auth, password reset, the Google Drive
+                        connection, per-organisation storage access, SMTP email and ClamAV scanning are
+                        live (the last two switch on when configured); external OIDC and SharePoint are
+                        the remaining optional pieces, each behind a small interface.
+tests/                  See below.</code></pre></div>
+<h2 id="why-its-built-this-way">Why it&#39;s built this way<a class="anchor" href="#why-its-built-this-way" aria-label="Link to this section">#</a></h2>
+<p>Every external dependency (storage provider, email, malware scanner, auth) is an interface in its own
+<code>types.ts</code>, with at least one real implementation and one fake. Nothing in <code>src/services</code> or <code>src/http</code>
+imports a concrete implementation directly — they take the interface as a parameter. That&#39;s what makes
+each piece replaceable on its own:</p>
+<ul>
+<li>Add SharePoint by writing a <code>SharePointProvider</code> that implements <code>StorageProvider</code> (as the disk and S3 providers do) and
+adding it to the resolver and the Integrations page. Google Drive, the disk and S3 were each added that way.</li>
+<li>Use a different scanner or mail API by writing a <code>Scanner</code> / <code>EmailSender</code> implementation. Same.</li>
+<li>Add Auth0/OIDC by writing a <code>TokenVerifier</code> implementation and swapping it in <code>server.ts</code>. The
+built-in email+password login keeps working for anyone who doesn&#39;t need that.</li>
+<li>The database enforces every security and business rule that matters (tenant isolation, roles, status
+transitions, account lockout) — see <code>db/migrations/</code>. The service layer above it is deliberately
+thin, so a bug in application code can&#39;t bypass a rule the database already guarantees.</li>
+</ul>
+<h2 id="checking-the-whole-project-npm-run-verify">Checking the whole project: <code>npm run verify</code><a class="anchor" href="#checking-the-whole-project-npm-run-verify" aria-label="Link to this section">#</a></h2>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm run verify                 # about 7 minutes (nine checks)
+npm run verify -- --mutation   # also the deliberate-breakage checks (about an hour)</code></pre></div>
+<p>One command that runs everything that can be checked automatically: the types, every server test, every web app test,
+the web app&#39;s production build, the live demo&#39;s build (plus a check that the real web app contains none of the demo and that
+the demo can be served from any folder), and a security check of the libraries the project depends on (<code>npm audit</code>; skipped with
+a clear note if you&#39;re offline). Each check prints one line; a failing check shows the end of its output and the others
+still run, so one go shows everything that&#39;s wrong. The exit code is 0 only if nothing failed. It installs the libraries
+first if they are missing.</p>
+<p>The same command runs in GitHub on every change (<code>.github/workflows/ci.yml</code>), the deliberate-breakage checks run there
+weekly (<code>mutation.yml</code>), and Dependabot (<code>.github/dependabot.yml</code>) opens a pull request when a library, a GitHub Action or
+the Docker base image has a new version. Both need the project to be on GitHub; if you only keep it on your own computer,
+<code>npm run verify</code> is all you need.</p>
+<p>The tests start their own throwaway database, using the <code>embedded-postgres</code> package for your computer. That was only
+run on Linux; macOS and Windows should work (the package has builds for both and the test setup picks the right one) but
+that hasn&#39;t been confirmed. If it doesn&#39;t start on your machine, run <code>npm run verify</code> in Docker or on a Linux machine.</p>
+<h2 id="running-the-tests">Running the tests<a class="anchor" href="#running-the-tests" aria-label="Link to this section">#</a></h2>
+<div class="code"><div class="codebar"><span>text</span><button type="button" class="copy" aria-label="Copy this code">Copy</button></div><pre><code>npm test</code></pre></div>
+<p>Starts a real, throwaway PostgreSQL instance (via the <code>embedded-postgres</code> dev dependency — nothing
+external, no Docker needed), runs every migration against it, and runs all tests against that real
+database. Nothing here is mocked at the database layer.</p>
+<p><code>scripts/mutation-check.py</code> is a second layer: it deliberately breaks one security rule at a time — a database
+rule in a copy of the migrations, or application code in a throwaway copy of the project — and confirms the test
+suite notices. Run it with <code>python3 scripts/mutation-check.py</code> after changing any RLS policy, trigger, constraint
+or security-relevant code, or pass some text to run only the breakages that mention it (e.g.
+<code>python3 scripts/mutation-check.py rateLimit</code>). A breakage only counts as caught if tests actually ran and failed;
+a run that never got as far as running tests is reported as broken, not as a success. It takes a while (it runs
+the tests once per breakage), so don&#39;t run it alongside the normal test suite. The frontend has its own,
+quicker one: <code>python3 scripts/frontend-mutation-check.py</code>.</p>
+<h2 id="what-isnt-tested-here-and-why">What isn&#39;t tested here, and why<a class="anchor" href="#what-isnt-tested-here-and-why" aria-label="Link to this section">#</a></h2>
+<p>The environment this was built in had no network access to Google, Microsoft, or any external identity provider.
+<code>GoogleDriveProvider</code> is tested against <code>FakeDriveApi</code>, and the OAuth handshake and token refresh against
+<code>FakeGoogleOAuthApi</code>; both speak the real request/response shapes, so the adapters&#39; own logic (folder
+caching, retries, pagination, error mapping, the code exchange, refresh and revocation handling) is
+genuinely exercised. What isn&#39;t and can&#39;t be tested here is an actual round trip to <code>googleapis.com</code> with
+real credentials — do one by hand (steps above) before relying on it. The built-in auth path (password hashing, invite tokens,
+JWT issuance and verification, account lockout, password reset and session revocation) has no such excuse and is
+fully tested end to end, including over real HTTP against a real server process — see <code>tests/16-auth-service.test.ts</code>,
+<code>tests/17-auth-http.test.ts</code>, <code>tests/34-password-reset-db.test.ts</code>, <code>tests/36-password-reset-http.test.ts</code>,
+<code>tests/38-mfa-db.test.ts</code>, <code>tests/39-totp.test.ts</code>, <code>tests/40-mfa-http.test.ts</code>,
+<code>tests/41-security-policy-db.test.ts</code>, <code>tests/42-change-password-http.test.ts</code>, <code>tests/43-mfa-policy-http.test.ts</code>,
+<code>tests/44-security-notices-http.test.ts</code>, <code>tests/70-security-hardening.test.ts</code> (the fixes from the <a href="#security">security review</a>) and
+<code>tests/33-real-server-email-and-scan.test.ts</code>.</p>
+<p><strong>Disk and S3 storage</strong> are tested for real, not against fakes: the disk provider on a real filesystem (path escapes, symlinks,
+exclusive create, integrity, quarantine) and the S3 provider against a real S3 server (moto) over HTTP, through the whole path
+from signed upload link to download and audit log. What that cannot show:</p>
+<ul>
+<li><strong>Amazon S3 itself, MinIO, Wasabi, Backblaze B2, Cloudflare R2…</strong> — moto speaks the S3 protocol, but each service has its own
+quirks (permissions, region names, support for &quot;write only if absent&quot;). Press <strong>Test connection</strong> against yours, upload a file,
+and download it again before relying on it. Messages for a wrong key or bucket name are tested against error shapes, not every service.</li>
+<li><strong>Browser upload to Google Drive</strong> — the portal now tells Google which page the upload comes from, which Google needs for
+browser uploads; only the fake Drive checks that. Do one real upload through the browser after connecting Drive.</li>
+<li><strong>The Docker volume for <code>evidence-files</code></strong> and the Windows default folder have not been run on real Docker / Windows.</li>
+<li><strong>Very slow or stalled uploads</strong> to the portal&#39;s <code>/uploads</code> address are not specially timed out; put a reverse proxy with a
+request timeout in front of a public installation.</li>
+</ul>
+<p>Two-step sign-in is tested with the RFC 6238 published test vectors, and the QR code is decoded back with a real QR
+decoder to prove it holds exactly the address an authenticator app needs. What isn&#39;t tested here is a <em>real phone
+app</em> scanning it — after deploying, turn two-step on for your own account and sign in once with your own phone.</p>
+<p>Email is tested against a real SMTP server running locally (so STARTTLS, AUTH and the SMTP conversation are
+real, including the refusal to send without TLS); malware scanning against <code>FakeClamd</code>, which speaks clamd&#39;s
+real protocol over a real socket and rejects malformed streams. The scanner client was also run once, by hand, against a
+<em>real</em> ClamAV 1.5.4 daemon on Linux (loaded with a one-line signature for the EICAR test string): it answered the ping, flagged
+the EICAR string, passed ordinary files, reported a file over the size cap as unscannable, and refused to guess when no daemon
+was listening. What the tests cannot show is how a <em>particular</em> provider (Microsoft 365, SES, ...) or ClamAV with the
+full signature set on <em>your</em> machine behaves — after deploying, send yourself an invite and use <strong>Check the scanner</strong>
+and the EICAR upload test above to confirm both ends.</p>
+<p><strong>The live demo</strong> (see <a href="#the-live-demo">The live demo</a>) is a separate, simulated implementation of the server&#39;s rules, so it
+is not evidence about the real server, and it can drift from it. What was checked: its own tests (about 170, including the guided tour, driving the real
+web app&#39;s screens and its real API client against it: every role, review, upload and download, closing a cycle, two-step
+sign-in with RFC 6238 vectors, lock-outs, the sample data against the real ISO 27001:2022 list), a build check that the real
+web app contains none of it, and manual runs in real Chromium (served from a sub-folder, the way GitHub Pages serves it, at
+laptop width and an emulated 390 px phone screen, with no sideways scrolling, console errors or requests to any other
+address). Those browser runs used a throwaway Playwright script that is not part of this repository. The redesigned dashboard, the controls grid and the tour were checked the same way (14 November 2026) as the lead auditor, the client lead and a client contributor, with the tour&#39;s two person-switching buttons and a tile opening its control. What was not: Safari,
+Firefox and a real phone. The Pages workflow has since run on GitHub (13 November 2026) and published the site.</p>
+<p>Also worth knowing, found while writing the demo and left as it is: a read-only client user (viewer) can start an upload on the
+real server and is only refused when the file is recorded; and the server&#39;s emails, its default storage folder name and the authenticator-app label still say
+&quot;Evidence Portal&quot; rather than the repository&#39;s new name.</p>
+<p><strong>The name.</strong> <code>iso27k-evidence</code> is the name of the GitHub repository; whether it is free on npm or as a domain has not
+been checked. Check before relying on it.</p>
+<h2 id="not-yet-built">Not yet built<a class="anchor" href="#not-yet-built" aria-label="Link to this section">#</a></h2>
+<ul>
+<li><strong>The evidence integrity check has no screen.</strong> The server can run it (<code>POST /audits/:id/integrity-check</code>), but there is no
+button for it in the web app yet and nothing runs it on a schedule.</li>
+<li><strong>A rejected control&#39;s reason isn&#39;t shown to the client</strong> on <strong>My controls</strong>. It is recorded with the rejection and the
+auditor can also comment on the control, which the client does see.</li>
+<li>Passkeys / security keys. (Text-message codes are deliberately not offered: they are the weakest option.)</li>
+<li>A per-person &quot;trusted device&quot; memory for two-step sign-in (every sign-in asks for the code).</li>
+<li>Making a closed audit cycle&#39;s folder read-only in Google Drive itself (see
+<a href="#closing-an-audit-cycle">Closing an audit cycle</a>). The portal-side lock is built and tested.</li>
+<li>SharePoint (planned next), and real external OIDC (Auth0 etc.) — OIDC has a tested fake standing in.</li>
+<li>Live round trips to Google and a real mail provider: each is tested against fakes that speak the real protocol, but
+neither has been run against the real thing with real credentials. This includes the Drive trash call used to quarantine
+infected files. The ClamAV client has been run once against a real daemon on Linux (see Testing), not on Windows.</li>
+<li>Building and running the Docker images (see the note under <a href="#4-linux-with-docker">4. Linux (with Docker)</a>).</li>
+<li>Running the tests on macOS or Windows. On GitHub&#39;s Linux machines, <code>npm run verify</code> (the Verify workflow, including the
+S3 tests against a real moto server) and the Live demo workflow both passed on 13 November 2026; the weekly
+deliberate-breakage workflow (<code>mutation.yml</code>) has not been run there yet.</li>
+<li>An independent security review / penetration test. The author&#39;s own review is described under <a href="#security">Security</a>.</li>
+</ul>
+
+<footer>Made from README.md by <code>npm run docs</code>. If this page and README.md ever disagree, README.md is the one to trust.</footer>
+</main>
+</div>
+<script>
+(function () {
+  // Copy buttons.
+  document.addEventListener("click", function (e) {
+    var b = e.target.closest && e.target.closest("button.copy");
+    if (!b) return;
+    var code = b.closest(".code").querySelector("code");
+    var text = code ? code.textContent : "";
+    function done(ok) { b.textContent = ok ? "Copied" : "Press Ctrl+C"; b.classList.toggle("done", ok); setTimeout(function () { b.textContent = "Copy"; b.classList.remove("done"); }, 1600); }
+    function fallback() {
+      var t = document.createElement("textarea"); t.value = text; t.setAttribute("readonly", ""); t.style.position = "fixed"; t.style.opacity = "0";
+      document.body.appendChild(t); t.select(); var ok = false; try { ok = document.execCommand("copy"); } catch (x) {} document.body.removeChild(t);
+      if (!ok && window.getSelection) { var r = document.createRange(); r.selectNodeContents(code); var s = window.getSelection(); s.removeAllRanges(); s.addRange(r); }
+      done(ok);
+    }
+    if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); else fallback();
+  });
+  // On a narrow screen the contents list starts closed.
+  if (window.matchMedia && !window.matchMedia("(min-width: 64rem)").matches) { var d = document.querySelector("nav.toc details"); if (d) d.removeAttribute("open"); }
+  // Highlight the section being read.
+  if ("IntersectionObserver" in window) {
+    var links = {}; document.querySelectorAll("nav.toc a").forEach(function (a) { links[a.getAttribute("href").slice(1)] = a; });
+    var current = null;
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting && links[en.target.id]) { if (current) current.classList.remove("current"); current = links[en.target.id]; current.classList.add("current"); } });
+    }, { rootMargin: "0px 0px -75% 0px" });
+    document.querySelectorAll("main h2[id], main h3[id]").forEach(function (h) { io.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

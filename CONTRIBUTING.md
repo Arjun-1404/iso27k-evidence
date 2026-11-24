@@ -8,8 +8,8 @@ the UI) — read those first.
 
 ## Getting a dev environment running
 
-The fastest path is Docker Compose — see the Quick Start in `README.md`. For working directly on the
-code without Docker, follow **"Manual setup (no Docker)"** in `README.md` (**"Windows (no Docker)"** on Windows — `node scripts/local.mjs` does the database, administrator and start-up steps there): it takes you from a fresh machine to the API
+The fastest path is Docker Compose — see **"4. Linux (with Docker)"** under Installation in `README.md`. For working directly on the
+code without Docker, follow **"5. Linux (without Docker)"** in `README.md` (**"3. Windows (without Docker)"** on Windows — `node scripts/local.mjs` does the database, administrator and start-up steps there): it takes you from a fresh machine to the API
 (`npm start`) and the web app (`cd frontend && npm run dev`) running against your own local PostgreSQL. While you are changing
 code, `npm run typecheck` and `npx vitest run <test file>` check one thing quickly; `npm run verify` (below) checks everything.
 
@@ -112,3 +112,12 @@ part of `npm run verify`). The server has no linter configured yet — contribut
 
 Please don't open a public issue for a security vulnerability. Email the maintainers directly (see the
 repo's About section for contact details) and give us a chance to fix it before it's public.
+
+## Changing the README
+
+`README.md` is written for GitHub. `README.html` is the same guide made readable when it is opened on a computer (Notepad and code
+editors show Markdown as raw text), and it is **built from README.md**: after editing the README, run `npm run docs` and commit
+both files. A test fails when they disagree. If you change the diagram in the README, redraw its picture too with
+`npm run docs -- --render-diagram` (it needs the Mermaid command-line tool: `npm install -g @mermaid-js/mermaid-cli`).
+
+**Found a security problem?** Please don't open a public issue: report it privately as described in [SECURITY.md](SECURITY.md).

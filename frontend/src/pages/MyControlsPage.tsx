@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useApi } from "../api/ApiProvider";
 import { useApiQuery } from "../api/useApiQuery";
+import { useLinkedControl } from "../api/useLinkedControl";
 import { useCurrentAudit } from "../api/useCurrentAudit";
+import { useAccess } from "../api/AccessProvider";
 import { useAuth } from "../auth/AuthProvider";
 import { AppShell } from "../components/AppShell";
 import { StatusBadge } from "../components/StatusBadge";
@@ -22,12 +24,27 @@ export function MyControlsPage() {
   );
   const [uploading, setUploading] = useState<ControlSummary | null>(null);
   const [submittingId, setSubmittingId] = useState<string | null>(null);
-  const [detail, setDetail] = useState<ControlSummary | null>(null);
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = detailId ? (controls ?? []).find((c) => c.id === detailId) ?? null : null;
+  const setDetail = (c: ControlSummary | null) => setDetailId(c ? c.id : null);
+  // The control the dashboard's tiles pointed at: scrolled to and outlined for a moment (a lead gets its details instead).
+  const [flashId, setFlashId] = useState<string | null>(null);
+  useEffect(() => {
+    if (!flashId) return;
+    document.getElementById(`control-${flashId}`)?.scrollIntoView?.({ block: "center", behavior: "smooth" });
+    const t = setTimeout(() => setFlashId(null), 3000);
+    return () => clearTimeout(t);
+  }, [flashId]);
   // A client lead sees every control and decides who does which; a contributor sees only their own.
+  const { can } = useAccess();
   const isLead = user?.role === "tenant_lead";
+  // Anything the person's custom role takes away is hidden here (the server refuses it either way).
+  const mayUpload = can("upload");
+  const mayAssign = can("assign_controls");
   // A closed audit cycle can be looked at but not changed.
   const closed = audit?.status === "closed";
   const [submitError, setSubmitError] = useState<string | null>(null);
+  useLinkedControl(controls, (c) => (isLead ? setDetail(c) : setFlashId(c.id)));
 
   async function submit(c: ControlSummary) {
     setSubmittingId(c.id);
@@ -64,10 +81,10 @@ export function MyControlsPage() {
 
         <ul className="space-y-3">
           {visible.map((c) => {
-            const canUpload = !closed && (c.status === "not_started" || c.status === "awaiting_evidence" || c.status === "rejected");
+            const canUpload = mayUpload && !closed && (c.status === "not_started" || c.status === "awaiting_evidence" || c.status === "rejected");
             const canSubmit = c.fileCount > 0 && canUpload;
             return (
-              <li key={c.id} className="rounded-xl border border-gray-200 bg-white p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4">
+              <li key={c.id} id={`control-${c.id}`} className={`rounded-xl border bg-white p-4 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 sm:gap-4 ${flashId === c.id ? "border-teal-600 ring-2 ring-teal-600/40" : "border-gray-200"}`}>
                 <div className="min-w-0">
                   <div className="font-semibold text-sm">{c.controlRef} {c.title}</div>
                   <div className="text-xs text-gray-500 mt-0.5">{c.effectiveEvidence}</div>
@@ -82,7 +99,7 @@ export function MyControlsPage() {
                   )}
                   {isLead && (
                     <button onClick={() => setDetail(c)} aria-label={`Details and assignment for ${c.controlRef}`} className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-semibold">
-                      {closed ? "View" : "Assign"}
+                      {closed || !mayAssign ? "View" : "Assign"}
                     </button>
                   )}
                   {canSubmit && (
@@ -98,7 +115,7 @@ export function MyControlsPage() {
       </div>
 
       {detail && user?.tenantId && (
-        <ControlDetailDrawer control={detail} canReview={false} readOnly={closed} assignTenantId={user.tenantId} onClose={() => setDetail(null)} onChanged={refetch} />
+        <ControlDetailDrawer control={detail} canReview={false} readOnly={closed} assignTenantId={mayAssign ? user.tenantId : null} onClose={() => setDetail(null)} onChanged={refetch} />
       )}
       {uploading && (
         <UploadModal

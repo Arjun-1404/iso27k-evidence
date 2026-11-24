@@ -5,6 +5,7 @@ import { logAudit } from "./auditLog.ts";
 import { generateInviteToken } from "../auth/inviteToken.ts";
 import type { EmailSender } from "../email/types.ts";
 import { deliver, EMAIL_FAILED } from "./emailDelivery.ts";
+import { isBaseRole } from "./roles.ts";
 
 export interface InviteDelivery { email: EmailSender; appBaseUrl: string }
 
@@ -35,7 +36,25 @@ export const TENANT_ROLES = ["tenant_lead", "contributor", "viewer", "tenant_das
 export type AuditorRole = (typeof AUDITOR_ROLES)[number];
 export type TenantRole = (typeof TENANT_ROLES)[number];
 
-export interface NewUser { email: string; fullName?: string; role: string }
+/** Give `role` (a built-in role) or `customRoleId` (a custom role: its base role becomes the person's role). */
+export interface NewUser { email: string; fullName?: string; role?: string; customRoleId?: string }
+
+/** Works out the built-in role (and the custom role, if any) an invite or a change of access asks for, with plain
+ *  errors. `side` is which kind of person it is for. The database enforces the same rules whatever this does. */
+async function resolveRole(c: PoolClient, side: "auditor" | "tenant", role: string | undefined, customRoleId: string | undefined | null): Promise<{ role: string; customRoleId: string | null }> {
+  if (customRoleId) {
+    const cr = await c.query("SELECT base_role FROM custom_roles WHERE id = $1", [customRoleId]);
+    if (cr.rowCount === 0) throw new AppError("That custom role was not found.", 404, "NOT_FOUND");
+    const base = cr.rows[0].base_role as string;
+    if (!isBaseRole(base) || (side === "auditor") !== (base === "lead_auditor" || base === "auditor")) {
+      throw new AppError(side === "auditor" ? "That custom role is for a client's people, not for your own staff." : "That custom role is for your own staff, not for a client's people.", 400, "INVALID_CUSTOM_ROLE");
+    }
+    if (role && role !== base) throw new AppError("That custom role is based on a different role than the one chosen.", 400, "INVALID_CUSTOM_ROLE");
+    return { role: base, customRoleId };
+  }
+  if (!role) throw new AppError("Choose a role.", 400, "VALIDATION");
+  return { role, customRoleId: null };
+}
 
 /** `emailSent` is present only when an email delivery was attempted: true if it went out, false if the
  *  invite was saved but the email could not be sent (the caller should offer "Resend"). */
@@ -57,14 +76,15 @@ async function run<T>(fn: () => Promise<T>): Promise<T> {
 export async function inviteAuditorUser(pool: Pool, userId: string, u: NewUser, delivery?: InviteDelivery): Promise<InvitedUser> {
   const invite = generateInviteToken();
   const result = await withUser(pool, userId, (c) => run(async () => {
+    const want = await resolveRole(c, "auditor", u.role, u.customRoleId);
     const r = await c.query(
-      `INSERT INTO users (org_id, email, full_name, role, invite_token_hash, invite_token_expires_at)
-       SELECT org_id, $2, $3, $4, $5, $6 FROM users WHERE id = $1 RETURNING id, org_id, email, role, status`,
-      [userId, u.email, u.fullName ?? null, u.role, invite.tokenHash, invite.expiresAt],
+      `INSERT INTO users (org_id, email, full_name, role, custom_role_id, invite_token_hash, invite_token_expires_at)
+       SELECT org_id, $2, $3, $4, $7::uuid, $5, $6 FROM users WHERE id = $1 RETURNING id, org_id, email, role, status`,
+      [userId, u.email, u.fullName ?? null, want.role, invite.tokenHash, invite.expiresAt, want.customRoleId],
     );
     if (r.rowCount === 0) throw new AppError("Could not resolve your organisation.", 403, "FORBIDDEN");
     const row = r.rows[0];
-    await logAudit(c, { orgId: row.org_id, actorId: userId, action: "user.invited", entity: "user", entityId: row.id, change: { role: u.role, side: "auditor" } });
+    await logAudit(c, { orgId: row.org_id, actorId: userId, action: "user.invited", entity: "user", entityId: row.id, change: { role: want.role, customRoleId: want.customRoleId, side: "auditor" } });
     return { id: row.id, email: row.email, role: row.role, status: row.status };
   }));
   const emailSent = await tryInviteEmail(delivery, result.email, invite.token);
@@ -77,14 +97,15 @@ export async function inviteAuditorUser(pool: Pool, userId: string, u: NewUser, 
 export async function inviteTenantUser(pool: Pool, userId: string, tenantId: string, u: NewUser, delivery?: InviteDelivery): Promise<InvitedUser> {
   const invite = generateInviteToken();
   const result = await withUser(pool, userId, (c) => run(async () => {
+    const want = await resolveRole(c, "tenant", u.role, u.customRoleId);
     const r = await c.query(
-      `INSERT INTO users (org_id, tenant_id, email, full_name, role, invite_token_hash, invite_token_expires_at)
-       SELECT t.org_id, t.id, $2, $3, $4, $5, $6 FROM tenants t WHERE t.id = $1 RETURNING id, org_id, tenant_id, email, role, status`,
-      [tenantId, u.email, u.fullName ?? null, u.role, invite.tokenHash, invite.expiresAt],
+      `INSERT INTO users (org_id, tenant_id, email, full_name, role, custom_role_id, invite_token_hash, invite_token_expires_at)
+       SELECT t.org_id, t.id, $2, $3, $4, $7::uuid, $5, $6 FROM tenants t WHERE t.id = $1 RETURNING id, org_id, tenant_id, email, role, status`,
+      [tenantId, u.email, u.fullName ?? null, want.role, invite.tokenHash, invite.expiresAt, want.customRoleId],
     );
     if (r.rowCount === 0) throw new AppError("Tenant not found or not visible to you.", 404, "NOT_FOUND");
     const row = r.rows[0];
-    await logAudit(c, { orgId: row.org_id, tenantId: row.tenant_id, actorId: userId, action: "user.invited", entity: "user", entityId: row.id, change: { role: u.role, side: "tenant" } });
+    await logAudit(c, { orgId: row.org_id, tenantId: row.tenant_id, actorId: userId, action: "user.invited", entity: "user", entityId: row.id, change: { role: want.role, customRoleId: want.customRoleId, side: "tenant" } });
     return { id: row.id, email: row.email, role: row.role, status: row.status };
   }));
   const emailSent = await tryInviteEmail(delivery, result.email, invite.token);
@@ -115,14 +136,68 @@ async function withMfaFlag<T extends { id: string }>(c: PoolClient, rows: T[]): 
   return flags.size === 0 ? rows : rows.map((row) => ({ ...row, mfa_enabled: flags.get(row.id) ?? false }));
 }
 
+// The custom role's name is only readable by the firm's staff (the client's people are not shown the firm's roles).
+const USER_COLUMNS = "u.id, u.email, u.full_name, u.role, u.status, u.custom_role_id, cr.name AS custom_role_name";
+const USER_FROM = "FROM users u LEFT JOIN custom_roles cr ON cr.id = u.custom_role_id AND cr.org_id = u.org_id";
+
 export async function listOrgUsers(pool: Pool, userId: string) {
   return withUser(pool, userId, async (c) =>
-    withMfaFlag(c, (await c.query("SELECT id, email, full_name, role, status FROM users WHERE tenant_id IS NULL ORDER BY email")).rows));
+    withMfaFlag(c, (await c.query(`SELECT ${USER_COLUMNS} ${USER_FROM} WHERE u.tenant_id IS NULL ORDER BY u.email`)).rows));
 }
 
 export async function listTenantUsers(pool: Pool, userId: string, tenantId: string) {
   return withUser(pool, userId, async (c) =>
-    withMfaFlag(c, (await c.query("SELECT id, email, full_name, role, status FROM users WHERE tenant_id = $1 ORDER BY email", [tenantId])).rows));
+    withMfaFlag(c, (await c.query(`SELECT ${USER_COLUMNS} ${USER_FROM} WHERE u.tenant_id = $1 ORDER BY u.email`, [tenantId])).rows));
+}
+
+/** The firm's staff assigned to a client (the organisation admin is the only one who can see this list; everyone else
+ *  sees at most themselves). Organisation admins see every client without being assigned, so they are not listed. */
+export async function listTenantAuditors(pool: Pool, userId: string, tenantId: string) {
+  return withUser(pool, userId, (c) => run(async () => {
+    const t = await c.query("SELECT 1 FROM tenants WHERE id = $1", [tenantId]);
+    if (t.rowCount === 0) throw new AppError("Tenant not found or not visible to you.", 404, "NOT_FOUND");
+    return (await c.query(
+      `SELECT ${USER_COLUMNS} ${USER_FROM} JOIN auditor_assignments aa ON aa.user_id = u.id WHERE aa.tenant_id = $1 ORDER BY u.email`, [tenantId])).rows;
+  }));
+}
+
+/**
+ * Changes a person's built-in role and/or custom role (what the firm needs to restrict a client's people, or to give a
+ * member of staff a narrower role). `role` and `customRoleId` describe how the person should end up: leave one out to
+ * keep it as it is. A custom role carries its own base role, so giving one sets the role too.
+ *
+ * Not allowed here, by design: changing yourself (so nobody locks themselves out or lifts their own restriction), and
+ * anything to do with the organisation admin role. The database enforces who may change whom (users_update) and who may
+ * hand out custom roles (the firm only).
+ */
+export async function setUserAccess(pool: Pool, userId: string, targetUserId: string, change: { role?: string; customRoleId?: string | null }) {
+  return withUser(pool, userId, (c) => run(async () => {
+    if (targetUserId === userId) throw new AppError("You can't change your own access. Ask another administrator.", 403, "SELF_CHANGE");
+    const t = await c.query("SELECT org_id, tenant_id, role, custom_role_id FROM users WHERE id = $1", [targetUserId]);
+    if (t.rowCount === 0) throw new AppError("User not found or not visible to you.", 404, "NOT_FOUND");
+    const cur = t.rows[0];
+    const side = cur.tenant_id ? "tenant" : "auditor";
+    const allowed: readonly string[] = side === "tenant" ? TENANT_ROLES : AUDITOR_ROLES.filter((r) => r !== "org_admin");
+    if (cur.role === "org_admin" || change.role === "org_admin") throw new AppError("The organisation admin role can't be changed here.", 403, "ORG_ADMIN_LOCKED");
+    if (change.role && !allowed.includes(change.role)) throw new AppError("That role is not for this kind of person.", 400, "VALIDATION");
+
+    let want: { role: string; customRoleId: string | null };
+    if (change.customRoleId) want = await resolveRole(c, side, change.role, change.customRoleId);
+    else {
+      const role = change.role ?? cur.role;
+      // Keeping the current custom role only makes sense while its base role is still the person's role.
+      const keep = change.customRoleId === undefined ? cur.custom_role_id as string | null : null;
+      if (keep && role !== cur.role) throw new AppError("This person has a custom role. Choose the new role together with a custom role, or remove the custom role first.", 400, "INVALID_CUSTOM_ROLE");
+      want = { role, customRoleId: keep };
+    }
+
+    const r = await c.query("UPDATE users SET role = $2, custom_role_id = $3 WHERE id = $1 RETURNING id, org_id, tenant_id, role, custom_role_id", [targetUserId, want.role, want.customRoleId]);
+    if (r.rowCount === 0) throw new AppError("You don't have access to do that.", 403, "FORBIDDEN");
+    const row = r.rows[0];
+    await logAudit(c, { orgId: row.org_id, tenantId: row.tenant_id, actorId: userId, action: "user.access_changed", entity: "user", entityId: row.id,
+      change: { from: { role: cur.role, customRoleId: cur.custom_role_id }, to: { role: row.role, customRoleId: row.custom_role_id } } });
+    return { id: row.id as string, role: row.role as string, customRoleId: row.custom_role_id as string | null };
+  }));
 }
 
 async function setUserStatus(pool: Pool, userId: string, targetUserId: string, status: "active" | "disabled") {
@@ -139,6 +214,11 @@ export const reactivateUser = (pool: Pool, userId: string, targetUserId: string)
 
 export async function assignAuditorToTenant(pool: Pool, userId: string, auditorUserId: string, tenantId: string) {
   return withUser(pool, userId, (c) => run(async () => {
+    // Plain-language reasons first; the database's own rules (only an organisation admin may assign) still apply.
+    const t = await c.query("SELECT tenant_id, role, status FROM users WHERE id = $1", [auditorUserId]);
+    if (t.rowCount === 0) throw new AppError("That person was not found.", 404, "NOT_FOUND");
+    if (t.rows[0].tenant_id) throw new AppError("That person works for a client, not for your firm.", 400, "ASSIGNEE_ROLE");
+    if (t.rows[0].role === "org_admin") throw new AppError("Organisation admins already see every client.", 400, "ASSIGNEE_ROLE");
     const r = await c.query(
       "INSERT INTO auditor_assignments (org_id, user_id, tenant_id) SELECT org_id, $2, $3 FROM users WHERE id = $1 ON CONFLICT DO NOTHING RETURNING org_id",
       [userId, auditorUserId, tenantId],

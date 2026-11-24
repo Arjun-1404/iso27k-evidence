@@ -2,6 +2,7 @@ import path from "node:path";
 import { normalizeOrigin } from "./http/middleware/cors.ts";
 import type { SmtpSettings, SmtpSecurity } from "./email/smtp.ts";
 import type { ClamAvSettings } from "./scan/clamav.ts";
+import { assertNotPlaceholderPassword, assertUsableJwtSecret, passwordInDatabaseUrl } from "./secretsCheck.ts";
 
 export interface GoogleOAuthSettings {
   clientId: string;
@@ -160,10 +161,15 @@ export function loadConfig(): Config {
     });
   }
 
+  const databaseUrl = required("DATABASE_URL");
+  const jwtSecret = required("JWT_SECRET");
+  assertUsableJwtSecret(jwtSecret);
+  assertNotPlaceholderPassword("The password in DATABASE_URL", passwordInDatabaseUrl(databaseUrl));
+
   return {
-    databaseUrl: required("DATABASE_URL"),
+    databaseUrl,
     port: Number(process.env.PORT ?? "3000"),
-    jwtSecret: required("JWT_SECRET"),
+    jwtSecret,
     appBaseUrl,
     corsAllowedOrigins,
     secretEncryptionKey: process.env.SECRET_ENCRYPTION_KEY || undefined,

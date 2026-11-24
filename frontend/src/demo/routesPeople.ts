@@ -4,7 +4,7 @@
 import type { ChoosableStorage, OrgUser, StorageOptions, Tenant } from "../api/types";
 import type { DemoBackend, Route } from "./backend";
 import { asObject, enumField, fail, FORBIDDEN, stringList, textField } from "./http";
-import { AUDITOR_SIDE_ROLES, TENANT_SIDE_ROLES } from "./rules";
+import { AUDITOR_SIDE_ROLES, TENANT_SIDE_ROLES, isAuditorSide, isBaseRole, isFirmBase } from "./rules";
 import type { DemoTenant, DemoUser } from "./state";
 
 const slug = (text: string) => text.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "").slice(0, 48);
@@ -22,18 +22,22 @@ const toTenant = (t: DemoTenant): Tenant => ({ id: t.id, name: t.name, status: t
 function toUsers(api: DemoBackend, viewer: DemoUser, list: DemoUser[]): OrgUser[] {
   return [...list].sort((a, b) => a.email.localeCompare(b.email)).map((u) => ({
     id: u.id, email: u.email, fullName: u.fullName, role: u.role, status: u.status,
+    // Everyone is told that a person has a custom role; only the firm's staff are told its name (they are the only ones who can read the firm's roles).
+    customRoleId: u.customRoleId ?? null,
+    customRoleName: isAuditorSide(viewer.role) && u.customRoleId ? api.customRole(u.customRoleId)?.name ?? null : null,
     ...(viewer.role === "org_admin" ? { mfaEnabled: api.mfaEnabled(u) } : {}),
   }));
 }
 
 /** Can this person see `target` at all? (001_core: users_select) */
-function canSeeUser(api: DemoBackend, viewer: DemoUser, target: DemoUser): boolean {
+export function canSeeUser(api: DemoBackend, viewer: DemoUser, target: DemoUser): boolean {
   if (target.id === viewer.id) return true;
   return target.tenantId ? api.canSeeTenant(viewer, target.tenantId) : AUDITOR_SIDE_ROLES.includes(viewer.role);
 }
 
 /** May this person create or change `target`'s account? (001_core: users_insert / users_update) */
 function canManageUser(api: DemoBackend, actor: DemoUser, tenantId: string | null, role: string): boolean {
+  if (!api.allows(actor, "manage_people")) return false; // a custom role may have taken this ability away (016)
   if (actor.role === "org_admin") return true;
   if (tenantId === null) return false;
   if (!api.canSeeTenant(actor, tenantId)) return false;
@@ -50,12 +54,44 @@ function checkDomain(email: string, domains: string[]): string {
   return clean;
 }
 
-function newUser(api: DemoBackend, actor: DemoUser, email: string, fullName: string | undefined, role: DemoUser["role"], tenantId: string | null): DemoUser {
+function newUser(api: DemoBackend, actor: DemoUser, email: string, fullName: string | undefined, role: DemoUser["role"], customRoleId: string | null, tenantId: string | null): DemoUser {
   if (api.userByEmail(email)) fail(409, "DUPLICATE", "That value is already in use.");
-  const u: DemoUser = { id: api.newId(), email, fullName: fullName ?? null, role, status: "invited", tenantId, password: "", failedLogins: 0, lockedUntil: null, sessionEpoch: 0, mfa: null };
+  const u: DemoUser = { id: api.newId(), email, fullName: fullName ?? null, role, customRoleId, status: "invited", tenantId, password: "", failedLogins: 0, lockedUntil: null, sessionEpoch: 0, mfa: null };
   api.state.users.push(u);
-  api.log(actor, "user.invited", tenantId, "user", u.id, { role, side: tenantId ? "tenant" : "auditor" });
+  api.log(actor, "user.invited", tenantId, "user", u.id, { role, customRoleId, side: tenantId ? "tenant" : "auditor" });
   return u;
+}
+
+/**
+ * What an invite or a change of access asks for, with plain errors (services/users.ts resolveRole): a built-in role, or a
+ * custom role (whose base role then becomes the person's role). `side` is which kind of person it is for.
+ */
+function resolveRole(api: DemoBackend, actor: DemoUser, side: "auditor" | "tenant", role: string | undefined, customRoleId: string | null | undefined): { role: DemoUser["role"]; customRoleId: string | null } {
+  if (customRoleId) {
+    // The firm's roles are only readable by the firm's staff: to anyone else the role simply isn't there.
+    const cr = isAuditorSide(actor.role) ? api.customRole(customRoleId) : undefined;
+    if (!cr) fail(404, "NOT_FOUND", "That custom role was not found.");
+    if (!isBaseRole(cr!.baseRole) || (side === "auditor") !== isFirmBase(cr!.baseRole)) {
+      fail(400, "INVALID_CUSTOM_ROLE", side === "auditor" ? "That custom role is for a client's people, not for your own staff." : "That custom role is for your own staff, not for a client's people.");
+    }
+    if (role && role !== cr!.baseRole) fail(400, "INVALID_CUSTOM_ROLE", "That custom role is based on a different role than the one chosen.");
+    return { role: cr!.baseRole, customRoleId };
+  }
+  if (!role) fail(400, "VALIDATION", "role: Choose a role.");
+  return { role: role as DemoUser["role"], customRoleId: null };
+}
+
+/** Only the audit firm hands out custom roles (users_custom_role_who): otherwise a client lead could clear a restriction the firm set. */
+function requireFirmToGiveCustomRole(actor: DemoUser): void {
+  if (actor.role !== "org_admin" && actor.role !== "lead_auditor") fail(403, "FORBIDDEN_ROLE", "only the audit firm can give someone a custom role");
+}
+
+/** The role or custom role an invite names: both optional in the request, but one of the two must be there. */
+function roleChoice(b: Record<string, unknown>, allowed: readonly string[]): { role: string | undefined; customRoleId: string | undefined } {
+  const role = b.role === undefined ? undefined : enumField(b, "role", allowed);
+  const customRoleId = b.customRoleId === undefined ? undefined : textField(b, "customRoleId", { max: 100 });
+  if (!role && !customRoleId) fail(400, "VALIDATION", "role: Choose a role.");
+  return { role, customRoleId };
 }
 
 function storageOptions(api: DemoBackend): StorageOptions {
@@ -130,11 +166,30 @@ export function peopleRoutes(): Route[] {
       },
     },
     {
+      // The firm's staff assigned to a client. Only the organisation admin sees them all; everyone else sees at most themselves
+      // (RLS on auditor_assignments); organisation admins see every client without being assigned, so they are not listed.
+      method: "GET", path: "/tenants/:id/auditors",
+      handle: ({ api, user, params }) => {
+        if (!api.canSeeTenant(user, params.id)) fail(404, "NOT_FOUND", "Tenant not found or not visible to you.");
+        const rows = api.state.auditorAssignments
+          .filter((a) => a.tenantId === params.id && (user.role === "org_admin" || a.userId === user.id))
+          .map((a) => api.user(a.userId))
+          .filter((u): u is DemoUser => !!u && canSeeUser(api, user, u));
+        return { json: toUsers(api, user, rows) };
+      },
+    },
+    {
       method: "PUT", path: "/tenants/:id/auditors/:userId",
       handle: ({ api, user, params }) => {
+        // Plain-language reasons first; then the database's own rule (only an organisation admin may assign).
+        const target = api.user(params.userId);
+        if (!target || !canSeeUser(api, user, target)) fail(404, "NOT_FOUND", "That person was not found.");
+        if (target!.tenantId) fail(400, "ASSIGNEE_ROLE", "That person works for a client, not for your firm.");
+        if (target!.role === "org_admin") fail(400, "ASSIGNEE_ROLE", "Organisation admins already see every client.");
         if (user.role !== "org_admin") FORBIDDEN();
+        if (!api.tenant(params.id)) fail(404, "NOT_FOUND", "Tenant not found or not visible to you.");
         const exists = api.state.auditorAssignments.some((a) => a.userId === params.userId && a.tenantId === params.id);
-        if (!exists && api.user(params.userId) && api.tenant(params.id)) {
+        if (!exists) {
           api.state.auditorAssignments.push({ userId: params.userId, tenantId: params.id });
           api.log(user, "auditor.assigned", params.id, "user", params.userId);
         }
@@ -162,10 +217,12 @@ export function peopleRoutes(): Route[] {
         const b = asObject(req.body);
         const email = textField(b, "email", { max: 254 });
         const fullName = textField(b, "fullName", { max: 200, optional: true });
-        const role = enumField(b, "role", AUDITOR_SIDE_ROLES);
+        const choice = roleChoice(b, AUDITOR_SIDE_ROLES);
+        const want = resolveRole(api, user, "auditor", choice.role, choice.customRoleId);
+        if (want.customRoleId) requireFirmToGiveCustomRole(user);
         const clean = checkDomain(email, api.state.org.allowedDomains);
-        if (!canManageUser(api, user, null, role)) FORBIDDEN();
-        const u = newUser(api, user, clean, fullName, role, null);
+        if (!canManageUser(api, user, null, want.role)) FORBIDDEN();
+        const u = newUser(api, user, clean, fullName, want.role, want.customRoleId, null);
         return { status: 201, json: { id: u.id, email: u.email, role: u.role, status: u.status } };
       },
     },
@@ -181,13 +238,56 @@ export function peopleRoutes(): Route[] {
         const b = asObject(req.body);
         const email = textField(b, "email", { max: 254 });
         const fullName = textField(b, "fullName", { max: 200, optional: true });
-        const role = enumField(b, "role", TENANT_SIDE_ROLES);
+        const choice = roleChoice(b, TENANT_SIDE_ROLES);
+        const want = resolveRole(api, user, "tenant", choice.role, choice.customRoleId);
         const t = api.tenant(params.id);
         if (!t || !api.canSeeTenant(user, t.id)) fail(404, "NOT_FOUND", "Tenant not found or not visible to you.");
+        if (want.customRoleId) requireFirmToGiveCustomRole(user);
         const clean = checkDomain(email, t!.allowedDomains);
-        if (!canManageUser(api, user, t!.id, role)) FORBIDDEN();
-        const u = newUser(api, user, clean, fullName, role, t!.id);
+        if (!canManageUser(api, user, t!.id, want.role)) FORBIDDEN();
+        const u = newUser(api, user, clean, fullName, want.role, want.customRoleId, t!.id);
         return { status: 201, json: { id: u.id, email: u.email, role: u.role, status: u.status } };
+      },
+    },
+    {
+      // Changes a person's built-in role and/or custom role. Never your own, and never anything to do with the organisation admin role.
+      method: "PATCH", path: "/users/:id/access",
+      handle: ({ api, user, params, req }) => {
+        const b = asObject(req.body);
+        const role = b.role === undefined ? undefined : enumField(b, "role", [...AUDITOR_SIDE_ROLES, ...TENANT_SIDE_ROLES]);
+        let customRoleId: string | null | undefined;
+        if (b.customRoleId === null) customRoleId = null;
+        else if (b.customRoleId !== undefined) customRoleId = textField(b, "customRoleId", { max: 100 });
+        if (role === undefined && customRoleId === undefined) fail(400, "VALIDATION", "role: Say what to change.");
+
+        if (params.id === user.id) fail(403, "SELF_CHANGE", "You can't change your own access. Ask another administrator.");
+        const target = api.user(params.id);
+        if (!target || !canSeeUser(api, user, target)) fail(404, "NOT_FOUND", "User not found or not visible to you.");
+        const side = target!.tenantId ? "tenant" : "auditor";
+        const allowed: readonly string[] = side === "tenant" ? TENANT_SIDE_ROLES : AUDITOR_SIDE_ROLES.filter((r) => r !== "org_admin");
+        if (target!.role === "org_admin" || role === "org_admin") fail(403, "ORG_ADMIN_LOCKED", "The organisation admin role can't be changed here.");
+        if (role && !allowed.includes(role)) fail(400, "VALIDATION", "That role is not for this kind of person.");
+
+        let want: { role: DemoUser["role"]; customRoleId: string | null };
+        if (customRoleId) want = resolveRole(api, user, side, role, customRoleId);
+        else {
+          const next = (role ?? target!.role) as DemoUser["role"];
+          // Keeping the current custom role only makes sense while its base role is still the person's role.
+          const keep = customRoleId === undefined ? target!.customRoleId ?? null : null;
+          if (keep && next !== target!.role) fail(400, "INVALID_CUSTOM_ROLE", "This person has a custom role. Choose the new role together with a custom role, or remove the custom role first.");
+          want = { role: next, customRoleId: keep };
+        }
+
+        // users_update: the person must be one this caller may manage, before and after the change.
+        if (!canManageUser(api, user, target!.tenantId, target!.role)) FORBIDDEN();
+        if (want.customRoleId !== (target!.customRoleId ?? null)) requireFirmToGiveCustomRole(user);
+        if (!canManageUser(api, user, target!.tenantId, want.role)) FORBIDDEN();
+
+        const from = { role: target!.role, customRoleId: target!.customRoleId ?? null };
+        target!.role = want.role;
+        target!.customRoleId = want.customRoleId;
+        api.log(user, "user.access_changed", target!.tenantId, "user", target!.id, { from, to: { role: want.role, customRoleId: want.customRoleId } });
+        return { json: { id: target!.id, role: target!.role, customRoleId: target!.customRoleId } };
       },
     },
     ...(["disable", "reactivate"] as const).map((verb): Route => ({

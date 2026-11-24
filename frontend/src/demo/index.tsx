@@ -55,7 +55,7 @@ export function startDemo(opts: StartOptions = {}): RunningDemo {
   return {
     apiBaseUrl: DEMO_API_BASE_URL,
     mode: { signInPanel: <DemoSignInPanel /> },
-    banner: <DemoBanner onReset={reset} repoUrl={repoUrl} />,
+    banner: <DemoBanner onReset={reset} repoUrl={repoUrl} backend={backend} />,
     backend,
     stop,
   };

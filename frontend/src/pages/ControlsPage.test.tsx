@@ -423,4 +423,19 @@ describe("ControlsPage", () => {
       expect(screen.queryByRole("heading", { name: /Close “/ })).not.toBeInTheDocument();
     });
   });
+
+  describe("a link from the dashboard (?control=<id>)", () => {
+    it("opens that control's details once the controls have loaded, and takes the link out of the address", async () => {
+      mockBaseline();
+      renderApp(<ControlsPage />, { user: AUDITOR_USER, route: "/controls?control=c-85" });
+      expect(await screen.findByRole("heading", { name: "A.8.5 Secure authentication", level: 2 })).toBeInTheDocument();
+    });
+
+    it("an id that is not in this audit opens nothing and does no harm", async () => {
+      mockBaseline();
+      renderApp(<ControlsPage />, { user: AUDITOR_USER, route: "/controls?control=somewhere-else" });
+      expect(await screen.findByText("A.8.5")).toBeInTheDocument();
+      expect(screen.queryByRole("heading", { name: "A.8.5 Secure authentication", level: 2 })).not.toBeInTheDocument();
+    });
+  });
 });

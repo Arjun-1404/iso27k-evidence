@@ -152,7 +152,7 @@ describe("through the real app", () => {
 describe("loadConfig — CORS_ALLOWED_ORIGINS", () => {
   const saved = { ...process.env };
   afterEach(() => { process.env = { ...saved }; });
-  const base = () => { process.env.DATABASE_URL = "postgres://x"; process.env.JWT_SECRET = "s".repeat(32); delete process.env.CORS_ALLOWED_ORIGINS; };
+  const base = () => { process.env.DATABASE_URL = "postgres://x"; process.env.JWT_SECRET = "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70c4a58f3e"; delete process.env.CORS_ALLOWED_ORIGINS; };
 
   it("defaults to the frontend's own origin (from APP_BASE_URL)", () => {
     base(); process.env.APP_BASE_URL = "https://portal.example/";

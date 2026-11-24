@@ -5,7 +5,7 @@
 // (see api/types.ts). Instead, demo/rules.test.ts spells out every rule as a test, and the real server's own tests
 // spell out the same rules against a real database, so a drift on either side shows up as a failing test.
 
-import type { ControlStatus, Dashboard, FileSpec, Role } from "../api/types";
+import type { BaseRole, ControlStatus, Dashboard, FileSpec, Permission, Role, RoleCatalog } from "../api/types";
 
 export const AUDITOR_SIDE_ROLES: readonly Role[] = ["org_admin", "lead_auditor", "auditor", "read_only", "dashboard_only"];
 export const TENANT_SIDE_ROLES: readonly Role[] = ["tenant_lead", "contributor", "viewer", "tenant_dashboard"];
@@ -28,6 +28,49 @@ export function statusTransitionOk(oldStatus: ControlStatus, newStatus: ControlS
   }
   return false;
 }
+
+// ---- custom roles (016_firm_close_and_custom_roles.sql; services/roles.ts) ---------------------------------------------
+
+/** The abilities a custom role can take away from the built-in role it is based on. */
+export const PERMISSIONS: readonly Permission[] = ["review", "remind", "applicability", "due_dates", "requirements", "assign_controls", "manage_people", "comment", "close_cycle", "upload"];
+/** The built-in roles a custom role can be based on. The organisation admin is deliberately left out. */
+export const BASE_ROLES: readonly BaseRole[] = ["lead_auditor", "auditor", "tenant_lead", "contributor"];
+
+/** What each base role can do to start with (custom_roles_denied_fit_base). */
+export const BASE_ROLE_PERMISSIONS: Record<BaseRole, readonly Permission[]> = {
+  lead_auditor: ["review", "remind", "applicability", "due_dates", "requirements", "assign_controls", "manage_people", "comment", "close_cycle"],
+  auditor: ["review", "remind", "comment"],
+  tenant_lead: ["upload", "assign_controls", "manage_people", "comment"],
+  contributor: ["upload", "comment"],
+};
+
+export const PERMISSION_INFO: Record<Permission, { label: string; hint: string }> = {
+  review: { label: "Review controls", hint: "Accept, reject or close a control." },
+  remind: { label: "Send reminders", hint: "Email the client that evidence is still needed." },
+  applicability: { label: "Set applicable / not applicable", hint: "Decide whether a control applies to the client." },
+  due_dates: { label: "Set due dates", hint: "Set or clear when a control's evidence is due." },
+  requirements: { label: "Change evidence requirements", hint: "Change what evidence a control asks for." },
+  assign_controls: { label: "Assign controls", hint: "Hand a control to one of the client's people." },
+  manage_people: { label: "Invite and manage people", hint: "Invite, switch off or switch on people, and change their access." },
+  comment: { label: "Comment", hint: "Add comments to a control." },
+  close_cycle: { label: "Close and reopen audit cycles", hint: "Make a whole audit cycle read-only, or open it again." },
+  upload: { label: "Upload and submit evidence", hint: "Add evidence files and submit a control for review." },
+};
+
+export const isBaseRole = (r: string): r is BaseRole => (BASE_ROLES as readonly string[]).includes(r);
+export const isFirmBase = (r: BaseRole): boolean => r === "lead_auditor" || r === "auditor";
+
+export function roleCatalog(): RoleCatalog {
+  return {
+    permissions: PERMISSIONS.map((key) => ({ key, ...PERMISSION_INFO[key] })),
+    baseRoles: BASE_ROLES.map((role) => ({ role, side: isFirmBase(role) ? "firm" : "client", allowed: [...BASE_ROLE_PERMISSIONS[role]] })),
+  };
+}
+
+/** The people who review: the ones a status change to under review / accepted / rejected is checked against. */
+export const REVIEW_ROLES: readonly Role[] = ["org_admin", "lead_auditor", "auditor"];
+/** Statuses from which the firm may close a control without client evidence. */
+export const CLOSABLE_FROM: readonly ControlStatus[] = ["not_started", "awaiting_evidence", "rejected", "under_review"];
 
 /** Statuses in which a reminder makes sense: evidence is still outstanding (001_core: REMINDER_NOT_ALLOWED). */
 export const OUTSTANDING: readonly ControlStatus[] = ["not_started", "awaiting_evidence", "rejected"];

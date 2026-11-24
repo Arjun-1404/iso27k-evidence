@@ -94,6 +94,10 @@ export interface OrgUser {
   email: string;
   fullName: string | null;
   role: Role;
+  /** The firm's custom role this person has (a built-in role with some abilities taken away), if any. */
+  customRoleId?: string | null;
+  /** Its name. Only the firm's staff are told it; the client's own people see just that a restriction exists. */
+  customRoleName?: string | null;
   status: "invited" | "active" | "disabled";
   /** Only present on the response to an invite: false means the invite was saved but the email did not go out. */
   emailSent?: boolean;
@@ -249,4 +253,39 @@ export interface PlatformSettingsView {
   /** True when the owner uses two-step sign-in, so saving also needs a code. */
   needsCode: boolean;
   groups: SettingsGroupView[];
+}
+
+// ---- custom roles ------------------------------------------------------------------------------------------------
+
+/** What a role can be stopped from doing. A custom role is a built-in role with some of these taken away. */
+export type Permission =
+  | "review" | "remind" | "applicability" | "due_dates" | "requirements"
+  | "assign_controls" | "manage_people" | "comment" | "close_cycle" | "upload";
+/** The built-in roles a custom role can be based on. */
+export type BaseRole = "lead_auditor" | "auditor" | "tenant_lead" | "contributor";
+
+export interface CustomRole {
+  id: string;
+  name: string;
+  description: string | null;
+  baseRole: BaseRole;
+  /** What is taken away from the base role. */
+  denied: Permission[];
+  /** How many people have this role. */
+  memberCount: number;
+}
+
+export interface RoleCatalog {
+  permissions: Array<{ key: Permission; label: string; hint: string }>;
+  /** What each base role can do before anything is taken away. */
+  baseRoles: Array<{ role: BaseRole; side: "firm" | "client"; allowed: Permission[] }>;
+}
+
+export interface RoleList { custom: CustomRole[]; catalog: RoleCatalog }
+
+/** What the signed-in person's custom role takes away from them (the server enforces it; this lets the page hide the buttons). */
+export interface Access {
+  role: Role;
+  customRole: { id: string; name: string } | null;
+  denied: Permission[];
 }

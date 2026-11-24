@@ -77,7 +77,7 @@ describe("the evidence life cycle", () => {
     const rejected = (await declan.listControls(audit.id)).find((x) => x.status === "rejected")!;
     const priya = await kit.as(PEOPLE.priya);
     expect(await priya.submitControl(rejected.id)).toMatchObject({ status: "submitted" });
-    expect(await refusal(declan.review(rejected.id, "reject"))).toMatchObject({ status: 400, code: "reject_needs_reason" });
+    expect(await refusal(declan.review(rejected.id, "reject"))).toMatchObject({ status: 400, code: "VALIDATION" });
     expect(await declan.review(rejected.id, "reject", "Still the old version.")).toMatchObject({ status: "rejected" });
   });
 

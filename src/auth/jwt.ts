@@ -29,7 +29,7 @@ export class JwtTokenVerifier implements TokenVerifier {
   async verify(token: string): Promise<Session | null> {
     let userId: string; let iat: unknown;
     try {
-      const payload = jwt.verify(token, this.secret, { issuer: ISSUER });
+      const payload = jwt.verify(token, this.secret, { issuer: ISSUER, algorithms: ["HS256"] });
       if (typeof payload === "string" || typeof payload.sub !== "string") return null;
       userId = payload.sub; iat = payload.iat;
     } catch {

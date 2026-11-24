@@ -11,6 +11,7 @@ const AUDITOR_NAV: NavItem[] = [
   { to: "/controls", label: "Controls" },
   { to: "/audit-log", label: "Audit log" },
   { to: "/users", label: "Users" },
+  { to: "/roles", label: "Roles", roles: ["org_admin"] },
   { to: "/settings/integrations", label: "Integrations", roles: ["org_admin"] },
   { to: "/settings/server", label: "Server settings", ownerOnly: true },
   { to: "/settings/security", label: "Security" },

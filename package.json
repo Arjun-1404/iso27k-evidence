@@ -1,9 +1,15 @@
 {
   "name": "iso27k-evidence",
   "version": "0.1.0",
+  "description": "Multi-tenant ISO 27001 evidence collection portal (mediator model: evidence stays in the auditor's own storage)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Arjun-1404/iso27k-evidence.git"
+  },
+  "homepage": "https://github.com/Arjun-1404/iso27k-evidence#readme",
   "private": true,
   "type": "module",
-  "description": "Multi-tenant ISO 27001 evidence collection portal (mediator model: evidence stays in the auditor's own storage)",
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
@@ -15,7 +21,8 @@
     "db:bootstrap-admin": "tsx src/db/bootstrap-admin-cli.ts",
     "db:grant-platform-owner": "tsx src/db/grant-platform-owner-cli.ts",
     "db:setup": "npm run db:migrate && npm run db:seed",
-    "start": "tsx src/server.ts"
+    "start": "tsx src/server.ts",
+    "docs": "node scripts/build-readme-html.mjs"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1164.0",
@@ -37,6 +44,7 @@
     "@types/smtp-server": "^3.5.13",
     "@types/supertest": "^7.2.1",
     "embedded-postgres": "^18.4.0-beta.17",
+    "marked": "^18.2.0",
     "smtp-server": "^3.21.3",
     "supertest": "^7.2.2",
     "typescript": "^7.0.2",

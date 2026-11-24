@@ -79,3 +79,18 @@ describe("AppShell on a small screen", () => {
     expect(screen.getAllByRole("link").map((l) => l.textContent)).toEqual(["My controls", "Dashboard", "Security"]);
   });
 });
+
+describe("AppShell navigation: Roles", () => {
+  beforeEach(() => { server.use(http.get(`${API_BASE}/tenants`, () => json([]))); });
+
+  it("only an organisation admin is offered the Roles page", () => {
+    const admin = renderApp(<AppShell>x</AppShell>, { user: ADMIN });
+    expect(screen.getByRole("link", { name: "Roles" })).toHaveAttribute("href", "/roles");
+    admin.unmount();
+    const lead = renderApp(<AppShell>x</AppShell>, { user: AUDITOR_USER });
+    expect(screen.queryByRole("link", { name: "Roles" })).not.toBeInTheDocument();
+    lead.unmount();
+    renderApp(<AppShell>x</AppShell>, { user: TENANT_USER });
+    expect(screen.queryByRole("link", { name: "Roles" })).not.toBeInTheDocument();
+  });
+});

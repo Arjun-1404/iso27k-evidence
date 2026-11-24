@@ -4,11 +4,13 @@ import userEvent from "@testing-library/user-event";
 import { server, http, json, apiError, API_BASE } from "../test/mswServer";
 import { renderApp, TENANT_USER } from "../test/renderApp";
 import { MyControlsPage } from "./MyControlsPage";
+import { AccessProvider } from "../api/AccessProvider";
+import type { Permission } from "../api/types";
 
 const control = {
   id: "c-85", kind: "annex" as const, section: "A.8 Technological controls", controlRef: "A.8.5",
   title: "Secure authentication", effectiveEvidence: "MFA settings, login controls", effectiveFileSpec: {},
-  isOverridden: false, applicable: true, naJustification: null, status: "awaiting_evidence" as const,
+  isOverridden: false, applicable: true, naJustification: null as string | null, status: "awaiting_evidence" as const,
   dueDate: "2026-09-30", requirementChangedAt: null, fileCount: 0,
 };
 
@@ -220,5 +222,70 @@ describe("MyControlsPage", () => {
       expect(await screen.findByRole("alert")).toBeInTheDocument();
       expect(screen.queryByRole("region", { name: "Audit cycle closed" })).not.toBeInTheDocument();
     });
+  });
+
+  describe("a link from the dashboard (?control=<id>)", () => {
+    const other = { ...control, id: "c-86", controlRef: "A.8.6", title: "Capacity management" };
+    const LEAD = { ...TENANT_USER, role: "tenant_lead" as const };
+
+    it("a contributor is taken to that control, which is outlined for a moment", async () => {
+      mockAudit([control, other]);
+      renderApp(<MyControlsPage />, { user: TENANT_USER, route: "/my-controls?control=c-86" });
+      await screen.findByText("A.8.6 Capacity management");
+      const row = document.getElementById("control-c-86")!;
+      await waitFor(() => expect(row.className).toMatch(/ring-2/));
+      expect(document.getElementById("control-c-85")!.className).not.toMatch(/ring-2/);
+    });
+
+    it("a client lead gets that control's details and assignment, as they would from the button", async () => {
+      mockAudit([control, other]);
+      renderApp(<MyControlsPage />, { user: LEAD, route: "/my-controls?control=c-86" });
+      expect(await screen.findByRole("heading", { name: "A.8.6 Capacity management", level: 2 })).toBeInTheDocument();
+    });
+
+    it("an id that is not in the list outlines and opens nothing", async () => {
+      mockAudit([control]);
+      renderApp(<MyControlsPage />, { user: TENANT_USER, route: "/my-controls?control=gone" });
+      await screen.findByText("A.8.5 Secure authentication");
+      expect(document.querySelector(".ring-2")).toBeNull();
+    });
+  });
+});
+
+describe("MyControlsPage: what a custom role takes away", () => {
+  const takeAway = (...denied: Permission[]) =>
+    server.use(http.get(`${API_BASE}/me/access`, () => json({ role: "contributor", customRole: { id: "r", name: "Restricted" }, denied })));
+  const show = (user = TENANT_USER) => renderApp(<AccessProvider><MyControlsPage /></AccessProvider>, { user });
+
+  it("with nothing taken away a contributor can upload and submit", async () => {
+    mockAudit([{ ...control, fileCount: 1 }]);
+    show();
+    expect(await screen.findByRole("button", { name: "Upload" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Submit" })).toBeInTheDocument();
+  });
+
+  it("a contributor whose role took away 'upload' still sees the control, but can neither upload nor submit", async () => {
+    takeAway("upload");
+    mockAudit([{ ...control, fileCount: 1 }]);
+    show();
+    await screen.findByText("A.8.5 Secure authentication");
+    await waitFor(() => expect(screen.queryByRole("button", { name: "Upload" })).not.toBeInTheDocument());
+    expect(screen.queryByRole("button", { name: "Submit" })).not.toBeInTheDocument();
+  });
+
+  it("a client lead whose role took away 'assign controls' is offered View instead of Assign", async () => {
+    server.use(http.get(`${API_BASE}/me/access`, () => json({ role: "tenant_lead", customRole: { id: "r", name: "Restricted" }, denied: ["assign_controls"] })));
+    mockAudit();
+    show({ ...TENANT_USER, role: "tenant_lead" });
+    const button = await screen.findByRole("button", { name: "Details and assignment for A.8.5" });
+    await waitFor(() => expect(button).toHaveTextContent("View"));
+  });
+
+  it("a client never sees a control that doesn't apply to them, so they are not bound to look after it", async () => {
+    mockAudit([control, { ...control, id: "c-na", controlRef: "A.7.4", title: "Physical security monitoring", applicable: false, naJustification: "No premises" }]);
+    show();
+    await screen.findByText("A.8.5 Secure authentication");
+    expect(screen.queryByText(/A\.7\.4/)).not.toBeInTheDocument();
+    expect(screen.queryByText("No premises")).not.toBeInTheDocument();
   });
 });

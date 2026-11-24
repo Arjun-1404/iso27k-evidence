@@ -1,12 +1,17 @@
-// The strip across the top of the live demo: says what this is, and offers the way back to the start.
+// The strip across the top of the live demo: says what this is, offers the guided tour, and the way back to the start.
+
+import type { DemoBackend } from "./backend";
+import { DemoTour } from "./DemoTour";
 
 export interface DemoBannerProps {
   onReset: () => void;
   /** Where the real project lives, for people who want to run it themselves. */
   repoUrl: string;
+  /** The pretend server, which the tour watches to tick its steps. */
+  backend: DemoBackend;
 }
 
-export function DemoBanner({ onReset, repoUrl }: DemoBannerProps) {
+export function DemoBanner({ onReset, repoUrl, backend }: DemoBannerProps) {
   return (
     <div role="region" aria-label="About this demo" className="sticky top-0 z-30 flex flex-wrap items-center justify-between gap-x-4 gap-y-1 bg-amber-100 px-4 py-2 text-xs text-amber-900 border-b border-amber-300">
       <p>
@@ -14,6 +19,7 @@ export function DemoBanner({ onReset, repoUrl }: DemoBannerProps) {
         Everything here is made up and runs in your browser: nothing is sent anywhere, and it is gone when you close the tab.
       </p>
       <div className="flex items-center gap-3">
+        <DemoTour backend={backend} />
         <button type="button" onClick={onReset} className="rounded-md border border-amber-400 bg-white/70 px-2 py-0.5 font-semibold hover:bg-white">Reset demo</button>
         <a href={repoUrl} target="_blank" rel="noreferrer" className="font-semibold underline">Get the code</a>
       </div>

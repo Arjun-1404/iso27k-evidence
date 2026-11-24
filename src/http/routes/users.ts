@@ -4,8 +4,13 @@ import type { AppDeps } from "../app.ts";
 import { h, parse, pid } from "./shared.ts";
 import * as users from "../../services/users.ts";
 
-const newAuditorUserSchema = z.object({ email: z.string().email(), fullName: z.string().min(1).max(200).optional(), role: z.enum(users.AUDITOR_ROLES) });
-const newTenantUserSchema = z.object({ email: z.string().email(), fullName: z.string().min(1).max(200).optional(), role: z.enum(users.TENANT_ROLES) });
+// A person is given a built-in role, or a custom role (whose base role then becomes their role): one of the two.
+const roleOrCustom = (b: { role?: string; customRoleId?: string }) => !!b.role || !!b.customRoleId;
+const ROLE_OR_CUSTOM = { message: "Choose a role.", path: ["role"] };
+const newAuditorUserSchema = z.object({ email: z.string().email(), fullName: z.string().min(1).max(200).optional(), role: z.enum(users.AUDITOR_ROLES).optional(), customRoleId: z.string().uuid().optional() }).refine(roleOrCustom, ROLE_OR_CUSTOM);
+const newTenantUserSchema = z.object({ email: z.string().email(), fullName: z.string().min(1).max(200).optional(), role: z.enum(users.TENANT_ROLES).optional(), customRoleId: z.string().uuid().optional() }).refine(roleOrCustom, ROLE_OR_CUSTOM);
+const accessSchema = z.object({ role: z.enum([...users.AUDITOR_ROLES, ...users.TENANT_ROLES]).optional(), customRoleId: z.string().uuid().nullable().optional() })
+  .refine((b) => b.role !== undefined || b.customRoleId !== undefined, { message: "Say what to change.", path: ["role"] });
 
 export function usersRouter(deps: AppDeps): Router {
   const r = Router();
@@ -32,6 +37,10 @@ export function usersRouter(deps: AppDeps): Router {
     res.json(await users.resendInvite(deps.pool, req.userId!, pid(req, "id"), delivery));
   }));
 
+  r.patch("/users/:id/access", h(async (req, res) => {
+    res.json(await users.setUserAccess(deps.pool, req.userId!, pid(req, "id"), parse(accessSchema, req.body)));
+  }));
+
   r.get("/tenants/:id/users", h(async (req, res) => {
     res.json(await users.listTenantUsers(deps.pool, req.userId!, pid(req, "id")));
   }));
@@ -39,6 +48,10 @@ export function usersRouter(deps: AppDeps): Router {
   r.post("/tenants/:id/users", h(async (req, res) => {
     const delivery = { email: deps.email, appBaseUrl: deps.appBaseUrl };
     res.status(201).json(await users.inviteTenantUser(deps.pool, req.userId!, pid(req, "id"), parse(newTenantUserSchema, req.body), delivery));
+  }));
+
+  r.get("/tenants/:id/auditors", h(async (req, res) => {
+    res.json(await users.listTenantAuditors(deps.pool, req.userId!, pid(req, "id")));
   }));
 
   r.put("/tenants/:id/auditors/:userId", h(async (req, res) => {

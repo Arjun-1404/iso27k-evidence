@@ -1,8 +1,11 @@
 import { describe, it, expect, beforeAll, afterAll } from "vitest";
-import { spawnSync } from "node:child_process";
+import { spawn, spawnSync } from "node:child_process";
+import net from "node:net";
+import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { adminPool, appPool, as, makeWorld, type World } from "./helpers.ts";
 import { setPlatformOwner } from "../src/db/platformOwner.ts";
+import { databaseHint } from "../src/db/failureHints.ts";
 
 /**
  * Who becomes the owner of an installation, and how it is handed over. These run as the database owner (like
@@ -72,6 +75,17 @@ describe("handing over the ownership of the installation", () => {
 });
 
 describe("the command-line tools", () => {
+  it("bootstrap-admin, run as the restricted portal_app role by mistake, creates nothing and says to use the database owner", async () => {
+    const before = (await adminPool.query("SELECT count(*)::int AS n FROM orgs")).rows[0].n as number;
+    const r = run(BOOTSTRAP, { DATABASE_URL: "postgres://portal_app@127.0.0.1:54329/portal_test", ORG_NAME: "Wrong Role Org", ORG_DOMAIN: "wrong-role.example", ADMIN_EMAIL: "wrong-role@wrong-role.example" });
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/Bootstrap failed: permission denied for table orgs/);
+    expect(r.stderr).toContain("must connect as the database owner");
+    expect(r.stderr).toContain("postgres://postgres:");
+    expect((await adminPool.query("SELECT count(*)::int AS n FROM orgs")).rows[0].n).toBe(before);
+    expect((await adminPool.query("SELECT 1 FROM users WHERE email='wrong-role@wrong-role.example'")).rowCount).toBe(0);
+  });
+
   it("grant-platform-owner hands the ownership over and says so", async () => {
     await setPlatformOwner(adminPool, await emailOf(w.admin));
     const target = await emailOf(w.adminB);
@@ -114,5 +128,64 @@ describe("the command-line tools", () => {
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(/already exists/);
     expect(await owners()).toEqual(before);
+  });
+});
+
+/**
+ * "password authentication failed" is what a Docker user sees when .env was regenerated after the database volume
+ * already existed (PostgreSQL keeps the password it was first started with). The commands say what that means and what to do.
+ */
+describe("a database that refuses the password", () => {
+  it("the hint names the cause and both ways out, for Docker and without it; other errors get none", () => {
+    const hint = databaseHint({ code: "28P01" })!;
+    expect(hint).toMatch(/keeps the password it was first created with/);
+    expect(hint).toContain("docker compose down -v");
+    expect(hint).toContain("docker compose up -d");
+    expect(hint).toContain("ALTER USER postgres PASSWORD");
+    expect(databaseHint({ code: "42501" })).toBeNull();
+    expect(databaseHint(new Error("boom"))).toBeNull();
+    expect(databaseHint(null)).toBeNull();
+  });
+
+  /** A stand-in for PostgreSQL that answers every connection the way a server with a different password does. */
+  function refusingServer(): Promise<{ port: number; close: () => void }> {
+    const field = (tag: string, v: string) => Buffer.concat([Buffer.from(tag), Buffer.from(v + "\0")]);
+    const body = Buffer.concat([field("S", "FATAL"), field("V", "FATAL"), field("C", "28P01"), field("M", 'password authentication failed for user "postgres"'), Buffer.from("\0")]);
+    const msg = Buffer.concat([Buffer.from("E"), Buffer.alloc(4), body]);
+    msg.writeInt32BE(body.length + 4, 1);
+    return new Promise((ok) => {
+      const srv = net.createServer((sock) => { sock.once("data", () => { sock.end(msg); }); sock.on("error", () => {}); });
+      srv.listen(0, "127.0.0.1", () => ok({ port: (srv.address() as net.AddressInfo).port, close: () => srv.close() }));
+    });
+  }
+
+  it("db:migrate, db:bootstrap-admin and db:grant-platform-owner print it under the raw error, and exit non-zero", async () => {
+    const srv = await refusingServer();
+    try {
+      const url = `postgres://postgres:0a1b2c3d4e5f60718293a4b5c6d7e8f9a0b1c2d3e4f50617@127.0.0.1:${srv.port}/x`;
+      const env = { DATABASE_URL: url, APP_DB_PASSWORD: "9f8e7d6c5b4a39281706f5e4d3c2b1a09f8e7d6c5b4a3928", ORG_NAME: "X", ORG_DOMAIN: "x.example", ADMIN_EMAIL: "a@x.example" };
+      for (const [script, label] of [[resolve(__dirname, "../src/db/migrate-cli.ts"), "Migration failed"], [BOOTSTRAP, "Bootstrap failed"], [GRANT, "Failed"]]) {
+        // Not spawnSync: that would freeze this process, and the stand-in server lives in it.
+        const r = await new Promise<{ status: number | null; stderr: string }>((done) => {
+          const child = spawn(TSX, [script], { env: { PATH: process.env.PATH ?? "", ...env } });
+          let stderr = ""; child.stderr.on("data", (d) => { stderr += d; });
+          const timer = setTimeout(() => child.kill(), 60_000);
+          child.on("close", (status) => { clearTimeout(timer); done({ status, stderr }); });
+        });
+        expect(r.status, script).toBe(1);
+        expect(r.stderr, script).toContain(`${label}: password authentication failed for user "postgres"`);
+        expect(r.stderr, script).toContain("docker compose down -v");
+      }
+    } finally { srv.close(); }
+  });
+
+  it("the README tells a Docker user what to do when migrate fails, inside the Linux (with Docker) section", () => {
+    const readme = readFileSync(resolve(__dirname, "../README.md"), "utf8");
+    const section = readme.slice(readme.indexOf("### 4. Linux (with Docker)"), readme.indexOf("### 5. Linux (without Docker)"));
+    expect(section).toContain("service \"migrate\" didn't complete successfully");
+    expect(section).toContain("docker compose logs migrate | tail -5");
+    expect(section).toContain("password authentication failed for user \"postgres\"");
+    expect(section).toContain("docker compose down -v");
+    expect(section).toMatch(/is still the example text from \.env\.example/);
   });
 });

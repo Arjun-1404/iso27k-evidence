@@ -31,6 +31,11 @@ src/components/  Shared UI: AppShell (nav), StatusBadge, RequirementEditor, Cont
                 "closed" notice, and the Close / Reopen-with-a-reason buttons for lead auditors and org
                 admins; every page takes its edit buttons away on a closed cycle). assignment.ts holds the
                 rules for who may be offered as an assignee (the database enforces them regardless).
+src/components/dashboard/  The dashboard's pieces: ReadinessRing (the headline figure), NeedsAttention, StatusBar,
+                ControlHeatmap (a tile per control; legend filter, table view, tiles link to the control) and
+                SectionMeters. statusStyle.ts holds the one colour scale for the six statuses (checked for colour-blind
+                readers); every colour is also named in words, so none carries meaning alone. A tile links to
+                `/controls?control=<id>` or `/my-controls?control=<id>`, which api/useLinkedControl.ts reads.
 src/pages/       One file per route: Login, AcceptInvite, ForgotPassword and ResetPassword (all public),
                 Dashboard, Controls (auditor side), MyControls (tenant side), TenantsUsers (admin),
                 Integrations, ServerSettings (the install owner's mail / scanner / Google settings),
@@ -40,7 +45,8 @@ src/pages/       One file per route: Login, AcceptInvite, ForgotPassword and Res
 src/demo/        The live demo's pretend server: a TypeScript class that answers the app's API calls from fictional sample
                 data kept in the browser tab (sessionStorage), plus a sign-in panel and a banner. Loaded ONLY when
                 the app is built with `npm run build:demo`; main.tsx imports it behind a build-time switch, and
-                `npm run verify` checks the normal build contains none of it. It re-implements the real server's rules
+                `npm run verify` checks the normal build contains none of it. It also holds the guided tour (tour.ts says
+                which request ticks which step; DemoTour.tsx is the checklist in the banner). It re-implements the real server's rules
                 (it is not the real server): rules.test.ts spells each one out, and seed.test.ts compares the sample
                 ISO 27001:2022 control list with the real one in ../db/seed/. See "The live demo" in ../README.md.
 src/test/        Shared test setup: an MSW server (mocks the API at the HTTP layer, not per-function),
@@ -55,7 +61,8 @@ npm run build:demo                      # writes dist-demo/ (relative links, so 
 npx vite preview --outDir dist-demo     # look at it locally
 ```
 
-`npm run build` is the real app and never contains the demo. The demo build uses hash addresses (`#/controls`) so a plain
+`npm run build` is the real app and never contains the demo, nor the share picture and link-preview tags
+(`demo-assets/share-card.png`, added to the demo build by vite.config.ts). The demo build uses hash addresses (`#/controls`) so a plain
 static host such as GitHub Pages needs no server settings. Changing the real API's behaviour? Change `src/demo/` to match
 (or say in the pull request that it no longer does) and run the tests there: `npx vitest run src/demo`.
 

@@ -309,6 +309,10 @@ export function buildSeed({ now, newId }: SeedOptions): DemoState {
     org,
     storageConnections: [{ id: newId(), provider: "local", label: "This server's disk", status: "active" }],
     templates: [{ id: templateId, framework: template.framework, version: template.version, name: template.name, isPlatformDefault: true }],
+    customRoles: [{
+      id: newId(), name: "Junior auditor", baseRole: "auditor", denied: ["remind"],
+      description: "An auditor who can review evidence and comment, but cannot send clients reminders.",
+    }],
     tenants, users, auditorAssignments, audits, controls, assignments, files, comments, reviews,
     log: numbered,
     nextLogSeq: numbered.length + 1,

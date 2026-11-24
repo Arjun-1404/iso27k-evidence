@@ -22,6 +22,11 @@ function renderLogin() {
 }
 
 describe("LoginPage", () => {
+  it("in the real app, puts the cursor in the email field so a person can start typing at once", () => {
+    renderLogin();
+    expect(screen.getByLabelText("Work email")).toHaveFocus();
+  });
+
   it("shows the real backend message for the wrong password, not a generic one", async () => {
     server.use(http.post(`${API_BASE}/auth/login`, () => apiError(401, "INVALID_CREDENTIALS", "Incorrect email or password.")));
     renderLogin();

@@ -4,9 +4,13 @@ import { useAuth } from "../auth/AuthProvider";
 import { ApiError } from "../api/client";
 import { useApiQuery } from "../api/useApiQuery";
 import { AppShell } from "../components/AppShell";
-import type { Role } from "../api/types";
+import { TenantPeoplePanel } from "../components/TenantPeoplePanel";
+import { TenantAuditorsPanel } from "../components/TenantAuditorsPanel";
+import { RoleSelect, builtInValue, parseRoleValue, valueOfUser } from "../components/RoleSelect";
+import { FIRM_ROLES, isFirmBase } from "../components/roleLabels";
 
-const AUDITOR_ROLES: Role[] = ["org_admin", "lead_auditor", "auditor", "read_only", "dashboard_only"];
+/** The roles a member of staff can be changed to here (the organisation admin role is never changed from a screen). */
+const CHANGEABLE_FIRM_ROLES = FIRM_ROLES.filter((r) => r !== "org_admin");
 
 export function TenantsUsersPage() {
   const api = useApi();
@@ -16,7 +20,12 @@ export function TenantsUsersPage() {
   const [newTenantName, setNewTenantName] = useState("");
   const [newTenantDomain, setNewTenantDomain] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserRole, setNewUserRole] = useState<Role>("auditor");
+  const roles = useApiQuery((signal) => api.listRoles(signal), []);
+  const firmCustom = (roles.data?.custom ?? []).filter((r) => isFirmBase(r.baseRole));
+  const [newUserChoice, setNewUserChoice] = useState(builtInValue("auditor"));
+  /** The tenant whose People or Auditors panel is open (one at a time keeps the page short). */
+  const [openPanel, setOpenPanel] = useState<{ tenantId: string; kind: "people" | "auditors" } | null>(null);
+  const [editingStaff, setEditingStaff] = useState<{ id: string; value: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ text: string; tone: "ok" | "warn" } | null>(null);
   /** The person whose two-step reset is waiting for a second click to confirm. */
@@ -54,7 +63,8 @@ export function TenantsUsersPage() {
     setNotice(null);
     try {
       const email = newUserEmail.trim();
-      const invited = await api.inviteAuditorUser(email, newUserRole);
+      const { role, customRoleId } = parseRoleValue(newUserChoice);
+      const invited = await api.inviteAuditorUser(email, role, customRoleId);
       setNewUserEmail("");
       refetchUsers();
       setNotice(invited.emailSent === false
@@ -75,14 +85,26 @@ export function TenantsUsersPage() {
           <h1 className="text-xl font-semibold mb-4">Tenants</h1>
           <ul className="space-y-2 mb-4">
             {(tenants ?? []).map((t) => (
-              <li key={t.id} className="rounded-lg border border-gray-200 bg-white p-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-                <span>{t.name}</span>
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className={`text-xs font-semibold ${t.status === "active" ? "text-green-700" : "text-gray-400"}`}>{t.status}</span>
-                  {t.status === "active"
-                    ? <button onClick={() => runAction(() => api.archiveTenant(t.id).then(refetchTenants), "Could not archive that tenant.")} className="text-xs text-gray-500">Archive</button>
-                    : <button onClick={() => runAction(() => api.reactivateTenant(t.id).then(refetchTenants), "Could not reactivate that tenant.")} className="text-xs text-gray-500">Reactivate</button>}
+              <li key={t.id} className="rounded-lg border border-gray-200 bg-white p-3 text-sm">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span>{t.name}</span>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`text-xs font-semibold ${t.status === "active" ? "text-green-700" : "text-gray-400"}`}>{t.status}</span>
+                    <button type="button" aria-expanded={openPanel?.tenantId === t.id && openPanel.kind === "people"} aria-label={`People at ${t.name}`}
+                      onClick={() => setOpenPanel(openPanel?.tenantId === t.id && openPanel.kind === "people" ? null : { tenantId: t.id, kind: "people" })}
+                      className="text-xs font-semibold text-teal-700">People</button>
+                    {me?.role === "org_admin" && (
+                      <button type="button" aria-expanded={openPanel?.tenantId === t.id && openPanel.kind === "auditors"} aria-label={`Auditors assigned to ${t.name}`}
+                        onClick={() => setOpenPanel(openPanel?.tenantId === t.id && openPanel.kind === "auditors" ? null : { tenantId: t.id, kind: "auditors" })}
+                        className="text-xs font-semibold text-teal-700">Auditors</button>
+                    )}
+                    {t.status === "active"
+                      ? <button onClick={() => runAction(() => api.archiveTenant(t.id).then(refetchTenants), "Could not archive that tenant.")} className="text-xs text-gray-500">Archive</button>
+                      : <button onClick={() => runAction(() => api.reactivateTenant(t.id).then(refetchTenants), "Could not reactivate that tenant.")} className="text-xs text-gray-500">Reactivate</button>}
+                  </div>
                 </div>
+                {openPanel?.tenantId === t.id && openPanel.kind === "people" && <TenantPeoplePanel tenant={t} />}
+                {openPanel?.tenantId === t.id && openPanel.kind === "auditors" && <TenantAuditorsPanel tenant={t} />}
               </li>
             ))}
           </ul>
@@ -99,9 +121,15 @@ export function TenantsUsersPage() {
           <h2 className="text-lg font-semibold mb-4">Auditor-side users</h2>
           <ul className="space-y-2 mb-4">
             {(users ?? []).map((u) => (
-              <li key={u.id} className="rounded-lg border border-gray-200 bg-white p-3 flex flex-wrap items-center justify-between gap-2 text-sm">
-                <span>{u.email} <span className="text-gray-400 ml-1">{u.role}</span></span>
+              <li key={u.id} className="rounded-lg border border-gray-200 bg-white p-3 text-sm">
+               <div className="flex flex-wrap items-center justify-between gap-2">
+                <span>{u.email} <span className="text-gray-400 ml-1">{u.role}</span>
+                  {u.customRoleId && <span className="ml-2 rounded-full border border-teal-300 bg-teal-50 px-2 py-0.5 text-[11px] font-semibold text-teal-800">{u.customRoleName ?? "Restricted"}</span>}
+                </span>
                 <div className="flex flex-wrap items-center gap-2">
+                  {me?.role === "org_admin" && u.role !== "org_admin" && u.id !== me.userId && (
+                    <button type="button" onClick={() => setEditingStaff(editingStaff?.id === u.id ? null : { id: u.id, value: valueOfUser(u) })} aria-label={`Change access for ${u.email}`} className="text-xs text-teal-700">Access</button>
+                  )}
                   {u.mfaEnabled !== undefined && (
                     <span className={`text-xs ${u.mfaEnabled ? "text-green-700" : "text-gray-400"}`}>{u.mfaEnabled ? "Two-step on" : "Two-step off"}</span>
                   )}
@@ -129,14 +157,29 @@ export function TenantsUsersPage() {
                     ? <button onClick={() => runAction(() => api.reactivateUser(u.id).then(refetchUsers), "Could not reactivate that user.")} className="text-xs text-gray-500">Reactivate</button>
                     : u.status === "active" && <button onClick={() => runAction(() => api.disableUser(u.id).then(refetchUsers), "Could not disable that user.")} className="text-xs text-gray-500">Disable</button>}
                 </div>
+               </div>
+               {editingStaff?.id === u.id && (
+                 <div className="mt-2 flex flex-wrap items-start gap-2 border-t border-gray-100 pt-2">
+                   <RoleSelect label={`Role for ${u.email}`} value={editingStaff.value} onChange={(value) => setEditingStaff({ id: u.id, value })}
+                     builtIn={CHANGEABLE_FIRM_ROLES} custom={firmCustom} />
+                   <button type="button" disabled={editingStaff.value === valueOfUser(u)}
+                     onClick={() => runAction(async () => {
+                       const { role, customRoleId } = parseRoleValue(editingStaff.value);
+                       await api.setUserAccess(u.id, customRoleId ? { customRoleId } : { role, customRoleId: null });
+                       setEditingStaff(null);
+                       refetchUsers();
+                       setNotice({ tone: "ok", text: `${u.email}'s access was changed.` });
+                     }, "Could not change that person's access.")}
+                     className="rounded-lg bg-teal-600 text-white px-3 py-1.5 text-sm font-semibold disabled:opacity-50">Save</button>
+                   <button type="button" onClick={() => setEditingStaff(null)} className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm">Cancel</button>
+                 </div>
+               )}
               </li>
             ))}
           </ul>
           <div className="flex flex-wrap gap-2">
             <input value={newUserEmail} onChange={(e) => setNewUserEmail(e.target.value)} placeholder="Work email" className="rounded-lg border border-gray-300 px-3 py-1.5 text-sm flex-1 min-w-[10rem]" />
-            <select value={newUserRole} onChange={(e) => setNewUserRole(e.target.value as Role)} className="rounded-lg border border-gray-300 px-2 py-1.5 text-sm">
-              {AUDITOR_ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
-            </select>
+            <RoleSelect label="Role" value={newUserChoice} onChange={setNewUserChoice} builtIn={FIRM_ROLES} custom={firmCustom} />
             <button onClick={inviteUser} disabled={!newUserEmail} className="rounded-lg bg-teal-600 text-white px-4 py-1.5 text-sm font-semibold disabled:opacity-50">
               Invite
             </button>

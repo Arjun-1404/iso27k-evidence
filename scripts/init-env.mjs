@@ -13,13 +13,16 @@
  * Mail, malware scanning and Google Drive are NOT asked for here: the first administrator enters them in the web app,
  * under Server settings, after signing in.
  *
- * No Node on this machine? Run it with Docker instead:
- *   docker run --rm -v "$PWD":/app -w /app node:22-slim node scripts/init-env.mjs
+ * No Node on this machine, or an old one? Run it with Docker instead (--user keeps the new .env yours, not root's):
+ *   docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app node:22-slim node scripts/init-env.mjs
  */
-import { randomBytes } from "node:crypto";
-import { readFileSync, writeFileSync, existsSync, realpathSync } from "node:fs";
-import { dirname, resolve } from "node:path";
-import { fileURLToPath, pathToFileURL } from "node:url";
+// Written in plain, older JavaScript on purpose (no "nullish" or "optional chaining" operators, no "node:" prefixes): this is
+// the one step of the Docker install that runs on the computer itself, and that computer may have an old Node. Node 12 or
+// newer runs it; tests/48-init-env-script.test.ts fails if newer syntax creeps in.
+import { randomBytes } from "crypto";
+import { readFileSync, writeFileSync, existsSync, realpathSync } from "fs";
+import { dirname, resolve } from "path";
+import { fileURLToPath, pathToFileURL } from "url";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -55,7 +58,7 @@ function replaceLine(text, pattern, replacement, what) {
  * The text of a new .env, made from the template. `random` is injectable so tests can see that distinct secrets are used.
  */
 export function buildEnv(template, opts = {}) {
-  const random = opts.random ?? hex;
+  const random = opts.random !== undefined ? opts.random : hex;
   let out = template;
   out = replaceLine(out, /^POSTGRES_PASSWORD=.*$/m, `POSTGRES_PASSWORD=${random(24)}`, "POSTGRES_PASSWORD");
   out = replaceLine(out, /^APP_DB_PASSWORD=.*$/m, `APP_DB_PASSWORD=${random(24)}`, "APP_DB_PASSWORD");
@@ -85,7 +88,7 @@ export function main(argv, io = { log: console.log, error: console.error }) {
   try {
     const opts = parseArgs(argv);
     if (opts.help) { io.log(USAGE); return 0; }
-    const target = resolve(opts.out ?? resolve(ROOT, ".env"));
+    const target = resolve(opts.out !== undefined ? opts.out : resolve(ROOT, ".env"));
     if (existsSync(target)) {
       io.error(`${target} already exists, so it was left alone. If you really want a new one, move or delete the old file first — but keep a copy: it holds the key that unlocks everything the portal has encrypted.`);
       return 1;
@@ -106,7 +109,7 @@ export function main(argv, io = { log: console.log, error: console.error }) {
     io.log("       docker compose run --rm -e ORG_NAME=\"Your Firm\" -e ORG_DOMAIN=yourfirm.example -e ADMIN_EMAIL=you@yourfirm.example migrate npm run db:bootstrap-admin");
     io.log("  3. Open the link it prints to choose a password, sign in, and open Server settings to set up email,");
     io.log("     malware scanning and Google Drive. No restart is needed after that.");
-    io.log("\nNot using Docker? On Windows, follow \"Windows (no Docker)\" in README.md; on Linux, \"Manual setup (no Docker)\".");
+    io.log("\nNot using Docker? Follow \"1. Quick installation\" in README.md (Windows or Linux).");
     io.log("Either way, this command looks at the computer and says what is missing:  node scripts/local.mjs check");
     io.log("and once that is clean, one command starts everything:  node scripts/local.mjs start --org \"Your Firm\" --domain yourfirm.example --email you@yourfirm.example");
     return 0;

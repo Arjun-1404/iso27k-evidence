@@ -38,9 +38,13 @@ function clean() {
 }
 
 describe(".env.example", () => {
-  it("is loadable exactly as shipped (Google Drive off, nothing half-configured)", () => {
+  // The example's secrets are placeholders, and the portal refuses to start on them (see test 70). `npm run setup` replaces
+  // them; this stands in for that, and leaves every other line of the example exactly as shipped.
+  const GENERATED = "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70c4a58f3e5b7c";
+
+  it("is loadable as shipped once the generated secrets are in (Google Drive off, nothing half-configured)", () => {
     clean();
-    Object.assign(process.env, exampleVars(), { DATABASE_URL: "postgres://x@localhost/x" });
+    Object.assign(process.env, exampleVars(), { DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: GENERATED });
     const c = loadConfig();
     expect(c.googleOAuth).toBeUndefined();
     expect(c.secretEncryptionKey).toBeUndefined();
@@ -57,7 +61,7 @@ describe(".env.example", () => {
   it("works with Google Drive switched on once the commented lines are filled in", () => {
     clean();
     Object.assign(process.env, exampleVars(), {
-      DATABASE_URL: "postgres://x@localhost/x",
+      DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: GENERATED,
       GOOGLE_OAUTH_CLIENT_ID: "id", GOOGLE_OAUTH_CLIENT_SECRET: "secret",
       GOOGLE_OAUTH_REDIRECT_URI: "http://localhost:3000/oauth/google/callback",
       SECRET_ENCRYPTION_KEY: "0".repeat(64),
@@ -72,7 +76,7 @@ describe("what docker compose passes when the Google variables are left unset", 
     // Compose substitutes ${VAR:-} with an empty string, so process.env sees "" rather than undefined.
     clean();
     Object.assign(process.env, {
-      DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "j",
+      DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70c4a58f3e",
       GOOGLE_OAUTH_CLIENT_ID: "", GOOGLE_OAUTH_CLIENT_SECRET: "", GOOGLE_OAUTH_REDIRECT_URI: "", SECRET_ENCRYPTION_KEY: "",
     });
     const c = loadConfig();
@@ -137,6 +141,20 @@ describe("deployment files stay consistent with the code", () => {
     }
     for (const name of ["smtp-server", "vitest", "yaml", "supertest", "embedded-postgres"]) {
       expect(Object.keys(dependencies), `${name} is test-only and shouldn't ship in the image`).not.toContain(name);
+    }
+  });
+
+  it("no Dockerfile needs BuildKit: a Docker without the buildx plugin (Ubuntu's docker.io) builds with the classic builder, which stops at these", () => {
+    // A real report: "the --mount option requires BuildKit" on `docker compose build api`.
+    const root = resolve(__dirname, "..");
+    const files = ["Dockerfile", "Dockerfile.offline", "frontend/Dockerfile", "frontend/Dockerfile.prebuilt"];
+    for (const f of files) {
+      const text = readFileSync(resolve(root, f), "utf8");
+      const code = text.split("\n").filter((l) => !l.trim().startsWith("#")).join("\n");
+      expect(code, `${f} uses RUN --mount`).not.toMatch(/--mount\b/);
+      expect(code, `${f} uses COPY/ADD --link or --chmod`).not.toMatch(/\b(COPY|ADD)\s+[^\n]*--(link|chmod|checksum|parents|exclude)\b/);
+      expect(code, `${f} uses a heredoc`).not.toMatch(/<<-?\s*["']?[A-Z]+/);
+      expect(text, `${f} asks for a BuildKit frontend`).not.toMatch(/^#\s*syntax\s*=/im);
     }
   });
 

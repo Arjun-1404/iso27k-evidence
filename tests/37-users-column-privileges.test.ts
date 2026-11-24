@@ -8,7 +8,7 @@ afterAll(async () => { await adminPool.end(); await appPool.end(); });
  * acting for. (Login, invites, password reset and the like reach them only through SECURITY DEFINER functions.)
  */
 const SECRET_COLUMNS = ["password_hash", "invite_token_hash", "invite_token_expires_at", "failed_login_count", "locked_until", "sessions_valid_after"];
-const PROFILE_COLUMNS = ["id", "org_id", "tenant_id", "email", "full_name", "role", "status", "created_at"];
+const PROFILE_COLUMNS = ["id", "org_id", "tenant_id", "email", "full_name", "role", "status", "created_at", "custom_role_id"];
 
 describe("what the app role can see of a user row", () => {
   let w: World;

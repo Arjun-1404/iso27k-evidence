@@ -19,7 +19,7 @@ export function signMfaToken(userId: string, secret: string, ttlSeconds: number 
 /** The user id the token was issued for, or null if it is invalid, expired, tampered with or the wrong kind. */
 export function verifyMfaToken(token: string, secret: string): string | null {
   try {
-    const p = jwt.verify(token, key(secret), { issuer: ISSUER });
+    const p = jwt.verify(token, key(secret), { issuer: ISSUER, algorithms: ["HS256"] });
     if (typeof p === "string" || p.typ !== "mfa" || typeof p.sub !== "string") return null;
     return p.sub;
   } catch {

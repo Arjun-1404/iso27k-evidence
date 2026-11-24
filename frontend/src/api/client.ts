@@ -1,6 +1,6 @@
 import type {
   AuditLogEntry, AuditSummary, Comment, CommentType, ControlSummary, Dashboard, EvidenceFile, FileSpec,
-  ControlAssignee, OrgUser, Role, MfaStatus, MfaEnrollment, MfaPolicy, OrgMfaPolicy, PlatformSettingsView, SessionResult, SettingsGroup, StorageConnection, StorageOptions, ChoosableStorage, S3Form, Tenant, TemplateSummary, UploadSessionResponse, ApiErrorBody,
+  ControlAssignee, OrgUser, Role, Access, CustomRole, RoleList, Permission, MfaStatus, MfaEnrollment, MfaPolicy, OrgMfaPolicy, PlatformSettingsView, SessionResult, SettingsGroup, StorageConnection, StorageOptions, ChoosableStorage, S3Form, Tenant, TemplateSummary, UploadSessionResponse, ApiErrorBody,
 } from "./types";
 
 export class ApiError extends Error {
@@ -91,7 +91,8 @@ export class ApiClient {
   listFiles(controlId: string, signal?: AbortSignal) { return this.request<EvidenceFile[]>("GET", `/controls/${controlId}/files`, undefined, signal); }
   submitControl(controlId: string) { return this.request<{ id: string; status: string }>("POST", `/controls/${controlId}/submit`); }
   remind(controlId: string) { return this.request<{ remindedCount: number }>("POST", `/controls/${controlId}/remind`); }
-  review(controlId: string, decision: "accept" | "reject", reason?: string) {
+  /** "close" is the firm accepting a control with no evidence from the client; it needs a reason, like "reject". */
+  review(controlId: string, decision: "accept" | "reject" | "close", reason?: string) {
     return this.request<{ id: string; status: string }>("POST", `/controls/${controlId}/reviews`, { decision, reason });
   }
   addComment(controlId: string, type: CommentType, body: string) {
@@ -154,7 +155,20 @@ export class ApiClient {
 
   // ---- users -----------------------------------------------------------------------------------
   listOrgUsers(signal?: AbortSignal) { return this.request<OrgUser[]>("GET", "/users", undefined, signal); }
-  inviteAuditorUser(email: string, role: Role) { return this.request<OrgUser>("POST", "/users", { email, role }); }
+  /** Give a built-in `role`, or a `customRoleId` (whose base role then becomes the person's role). */
+  inviteAuditorUser(email: string, role?: Role, customRoleId?: string) { return this.request<OrgUser>("POST", "/users", { email, role, customRoleId }); }
+  /** Changes a person's role and/or custom role (`customRoleId: null` removes it). The firm only, and never your own. */
+  setUserAccess(userId: string, change: { role?: Role; customRoleId?: string | null }) {
+    return this.request<{ id: string; role: Role; customRoleId: string | null }>("PATCH", `/users/${userId}/access`, change);
+  }
+
+  // ---- custom roles (organisation admin writes; the firm's staff read) -----------------------------------------
+  listRoles(signal?: AbortSignal) { return this.request<RoleList>("GET", "/roles", undefined, signal); }
+  createRole(body: { name: string; description?: string | null; baseRole: CustomRole["baseRole"]; denied: Permission[] }) { return this.request<CustomRole>("POST", "/roles", body); }
+  updateRole(roleId: string, body: { name?: string; description?: string | null; denied?: Permission[] }) { return this.request<CustomRole>("PATCH", `/roles/${roleId}`, body); }
+  deleteRole(roleId: string) { return this.request<{ deleted: true }>("DELETE", `/roles/${roleId}`); }
+  /** What the signed-in person's own custom role takes away. */
+  getMyAccess(signal?: AbortSignal) { return this.request<Access>("GET", "/me/access", undefined, signal); }
   resendInvite(userId: string) { return this.request<{ id: string }>("POST", `/users/${userId}/resend-invite`); }
 
   /** Completes an invite link (sets a first password). Public — no session exists at this point, but
@@ -212,7 +226,9 @@ export class ApiClient {
   disableUser(userId: string) { return this.request<OrgUser>("POST", `/users/${userId}/disable`); }
   reactivateUser(userId: string) { return this.request<OrgUser>("POST", `/users/${userId}/reactivate`); }
   listTenantUsers(tenantId: string, signal?: AbortSignal) { return this.request<OrgUser[]>("GET", `/tenants/${tenantId}/users`, undefined, signal); }
-  inviteTenantUser(tenantId: string, email: string, role: Role) { return this.request<OrgUser>("POST", `/tenants/${tenantId}/users`, { email, role }); }
+  inviteTenantUser(tenantId: string, email: string, role?: Role, customRoleId?: string) { return this.request<OrgUser>("POST", `/tenants/${tenantId}/users`, { email, role, customRoleId }); }
+  /** The firm's staff assigned to a client. (Organisation admins only; anyone else sees at most themselves.) */
+  listTenantAuditors(tenantId: string, signal?: AbortSignal) { return this.request<OrgUser[]>("GET", `/tenants/${tenantId}/auditors`, undefined, signal); }
   assignAuditor(tenantId: string, userId: string) { return this.request("PUT", `/tenants/${tenantId}/auditors/${userId}`); }
   unassignAuditor(tenantId: string, userId: string) { return this.request<{ removed: boolean }>("DELETE", `/tenants/${tenantId}/auditors/${userId}`); }
 

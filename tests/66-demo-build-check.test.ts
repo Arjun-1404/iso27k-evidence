@@ -15,18 +15,21 @@ const load = async () => (await import(pathToFileURL(resolve(__dirname, "../scri
 const roots: string[] = [];
 afterEach(() => { while (roots.length) rmSync(roots.pop()!, { recursive: true, force: true }); });
 
-function build(opts: { normalJs?: string; demoJs?: string; demoHtml?: string; extraDemoFiles?: Record<string, string>; skipDemo?: boolean; skipNormal?: boolean } = {}) {
+const SHARE_META = `<meta property="og:image" content="https://example.github.io/repo/share-card.png">`;
+
+function build(opts: { normalJs?: string; normalHtml?: string; noShareCardFile?: boolean; demoJs?: string; demoHtml?: string; extraDemoFiles?: Record<string, string>; skipDemo?: boolean; skipNormal?: boolean } = {}) {
   const root = mkdtempSync(join(tmpdir(), "demo-check-")); roots.push(root);
   const normalDir = join(root, "dist"); const demoDir = join(root, "dist-demo");
   if (!opts.skipNormal) {
     mkdirSync(join(normalDir, "assets"), { recursive: true });
-    writeFileSync(join(normalDir, "index.html"), `<script src="/assets/a.js"></script>`);
+    writeFileSync(join(normalDir, "index.html"), opts.normalHtml ?? `<script src="/assets/a.js"></script>`);
     writeFileSync(join(normalDir, "assets", "a.js"), opts.normalJs ?? "console.log('the real app')");
   }
   if (!opts.skipDemo) {
     mkdirSync(join(demoDir, "assets"), { recursive: true });
-    writeFileSync(join(demoDir, "index.html"), opts.demoHtml ?? `<link rel="icon" href="./favicon.svg"><script type="module" src="./assets/a.js"></script><a href="https://github.com/x/y">x</a>`);
+    writeFileSync(join(demoDir, "index.html"), opts.demoHtml ?? `${SHARE_META}<link rel="icon" href="./favicon.svg"><script type="module" src="./assets/a.js"></script><a href="https://github.com/x/y">x</a>`);
     writeFileSync(join(demoDir, "favicon.svg"), "<svg/>");
+    if (!opts.noShareCardFile) writeFileSync(join(demoDir, "share-card.png"), "png");
     writeFileSync(join(demoDir, "assets", "a.js"), opts.demoJs ?? "const a='demo.invalid',b='Harbourview Assurance',c='demo-password-123',d='iso27k-demo-state'");
     for (const [name, text] of Object.entries(opts.extraDemoFiles ?? {})) writeFileSync(join(demoDir, name), text);
   }
@@ -57,6 +60,13 @@ describe("check-demo-build", () => {
     const { checkDemoBuild } = await load();
     expect(checkDemoBuild(build({ demoHtml: `<script src="/assets/a.js"></script>` })).join("\n")).toContain("not relative");
     expect(checkDemoBuild(build({ demoHtml: `<script src="./assets/missing.js"></script>` })).join("\n")).toContain("missing");
+  });
+
+  it("the demo must have a share picture that is really in the build; the real app must not advertise one", async () => {
+    const { checkDemoBuild } = await load();
+    expect(checkDemoBuild(build({ demoHtml: `<link rel="icon" href="./favicon.svg"><script type="module" src="./assets/a.js"></script>` })).join("\n")).toContain("no share picture");
+    expect(checkDemoBuild(build({ noShareCardFile: true })).join("\n")).toContain("is not in the build");
+    expect(checkDemoBuild(build({ normalHtml: `${SHARE_META}<script src="/assets/a.js"></script>` })).join("\n")).toContain("only the demo should");
   });
 
   it("says so when either build has not been made yet", async () => {

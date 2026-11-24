@@ -205,6 +205,27 @@ describe("running it", () => {
     expect(r.stdout).toMatch(/Usage: node scripts\/init-env\.mjs/);
   });
 
+  it("is written in plain, older JavaScript, because the Docker install runs it on the computer itself, whatever Node that has", () => {
+    // Node 12 stops at the first "??" or "?." with "SyntaxError: Unexpected token '?'" before running anything (a real report from
+    // a Debian/Ubuntu machine). Keep newer operators and "node:" import prefixes out of this one file, comments included.
+    const src = readFileSync(SCRIPT, "utf8");
+    expect(src).not.toMatch(/\?\?/);
+    expect(src).not.toMatch(/\?\.(?![0-9])/);
+    expect(src).not.toMatch(/\bawait\b|\bfrom "node:/);
+  });
+
+  it("the Docker command in the README, in this script's header and in preflight all keep the new .env the user's own (--user)", () => {
+    const readme = readFileSync(resolve(__dirname, "../README.md"), "utf8");
+    const preflight = readFileSync(resolve(__dirname, "../scripts/preflight.sh"), "utf8");
+    const cmd = 'docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app node:22-slim node scripts/init-env.mjs';
+    expect(readme).toContain(cmd);
+    expect(readFileSync(SCRIPT, "utf8")).toContain(cmd);
+    expect(preflight).toContain('--user \\"\\$(id -u):\\$(id -g)\\"');
+    // the first command of the Linux (with Docker) steps is this one, so nobody has to have Node to follow the Docker route
+    const quick = readme.slice(readme.indexOf("### 4. Linux (with Docker)"));
+    expect(quick.indexOf(cmd)).toBeLessThan(quick.indexOf("docker compose build api"));
+  });
+
   it("is what `npm run setup` runs", () => {
     const pkg = JSON.parse(readFileSync(resolve(__dirname, "../package.json"), "utf8")) as { scripts: Record<string, string> };
     expect(pkg.scripts.setup).toBe("node scripts/init-env.mjs");

@@ -143,25 +143,26 @@ export function explainPgError(e, pg, who) {
 export function inspectInstall({ root, platform, arch, nodeVersion, settings, envFileExists, envPath }) {
   const out = [];
   const add = (level, text, hint) => out.push({ level, text, ...(hint ? { hint } : {}) });
+  const npm = platform === "win32" ? "npm.cmd" : "npm";   // PowerShell can refuse to run npm's script file; npm.cmd always works
 
   const major = Number(String(nodeVersion).replace(/^v/, "").split(".")[0]);
-  if (major === 22 || major === 24) add("ok", `Node.js ${nodeVersion} (22 and 24 are the tested versions)`);
-  else if (major >= 20) add("warn", `Node.js ${nodeVersion} — only 22 and 24 were tested; if something odd happens, install 22 or 24`);
-  else add("fail", `Node.js ${nodeVersion} is too old`, "Install Node.js 22 or 24 from https://nodejs.org (the LTS button), then open a new terminal.");
+  if (major >= 22) add("ok", `Node.js ${nodeVersion}`);
+  else if (major >= 20) add("warn", `Node.js ${nodeVersion} is older than the portal is written for (22 or newer); if something odd happens, install the current LTS`);
+  else add("fail", `Node.js ${nodeVersion} is too old`, "Install Node.js 22 or newer from https://nodejs.org (the LTS button), then open a new terminal.");
 
   const modules = join(root, "node_modules");
   if (!existsSync(tsxLoader(root)) || !existsSync(join(modules, "pg"))) {
-    add("fail", "The libraries (the node_modules folder) are missing", "This download normally includes them. If you got the code from GitHub, run:  npm ci --omit=dev   (needs internet access to npm).");
+    add("fail", "The libraries (the node_modules folder) are missing", `This download normally includes them. If you got the code from GitHub, run:  ${npm} ci --omit=dev   (needs internet access to npm).`);
   } else {
     const want = `${platform}-${arch}`;
     const have = existsSync(join(modules, "@esbuild")) ? readdirSync(join(modules, "@esbuild")).sort() : [];
     if (have.includes(want)) add("ok", `The libraries are here and match this computer (${want})`);
-    else if (have.length) add("fail", `The libraries were packaged for ${have.join(" / ")}, but this computer is ${want}`, `Use the download made for ${platform}, or run:  npm ci --omit=dev   (this deletes node_modules and needs internet access to npm).`);
-    else add("fail", "The libraries are incomplete (no @esbuild folder)", "Run:  npm ci --omit=dev");
+    else if (have.length) add("fail", `The libraries were packaged for ${have.join(" / ")}, but this computer is ${want}`, `Use the download made for ${platform}, or run:  ${npm} ci --omit=dev   (this deletes node_modules and needs internet access to npm).`);
+    else add("fail", "The libraries are incomplete (no @esbuild folder)", `Run:  ${npm} ci --omit=dev`);
   }
 
   if (existsSync(join(root, "frontend", "dist", "index.html"))) add("ok", "The web app is built (frontend/dist)");
-  else add("fail", "The built web app is missing (frontend/dist/index.html)", "This download normally includes it. Otherwise build it once:  cd frontend  then  npm ci  then  npm run build");
+  else add("fail", "The built web app is missing (frontend/dist/index.html)", `This download normally includes it. Otherwise build it once, from this folder (the one with package.json), one command at a time:  ${npm} ci --prefix frontend   then   ${npm} run build --prefix frontend`);
 
   if (!envFileExists) {
     add("fail", `The settings file is missing (${envPath})`, "Create it, with fresh secrets:  node scripts/init-env.mjs");

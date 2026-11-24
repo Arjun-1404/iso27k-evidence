@@ -4,14 +4,18 @@
 // The rules it enforces (who may do what, which status changes are legal, when a cycle is read-only) are the ones the
 // real server's database enforces; rules.ts holds the pure ones and the "RLS" helpers below hold the visibility ones.
 
-import type { AuditSummary, ControlSummary, Role } from "../api/types";
+import type { AuditSummary, ControlSummary, Permission, Role } from "../api/types";
 import { fail, DemoHttpError, type DemoRequest, type DemoResponse, type RouteResult } from "./http";
-import { DASHBOARD_ONLY_ROLES, OUTSTANDING, REMINDER_COOLDOWN_MS, isAuditorSide, statusTransitionOk } from "./rules";
+import { CLOSABLE_FROM, DASHBOARD_ONLY_ROLES, OUTSTANDING, REMINDER_COOLDOWN_MS, REVIEW_ROLES, isAuditorSide, statusTransitionOk } from "./rules";
 import { buildSeed, seedIdGenerator } from "./seed";
-import { forgetState, loadState, saveState, type DemoAudit, type DemoControl, type DemoState, type DemoTenant, type DemoUser, type KeyValueStore } from "./state";
+import { forgetState, loadState, saveState, type DemoAudit, type DemoControl, type DemoCustomRole, type DemoState, type DemoTenant, type DemoUser, type KeyValueStore } from "./state";
 import { authRoutes } from "./routesAuth";
 import { controlRoutes } from "./routesControls";
 import { peopleRoutes } from "./routesPeople";
+import { roleRoutes } from "./routesRoles";
+import { tourStepFor, type TourStepId } from "./tour";
+
+const NO_STEPS: readonly TourStepId[] = [];
 
 export const AUDIT_CLOSED_MESSAGE = "This audit cycle is closed, so it can no longer be changed. A lead auditor or an organisation admin can reopen it.";
 
@@ -76,6 +80,7 @@ export class DemoBackend {
   /** Upload links handed out and the bytes received for them. Held in memory only: they never reach the saved copy. */
   readonly pendingUploads = new Map<string, { controlId: string; userId: string; fileName: string; mimeType: string; sizeBytes: number; providerFileId: string; expiresAt: number; received: boolean }>();
   readonly blobs = new Map<string, Blob>();
+  private tourListeners = new Set<() => void>();
 
   constructor(opts: BackendOptions = {}) {
     this.now = opts.now ?? (() => Date.now());
@@ -83,7 +88,7 @@ export class DemoBackend {
     this.store = opts.store;
     this.seedIds = opts.newId;
     this.state = opts.initial ?? (opts.store === null ? null : loadState(opts.store)) ?? buildSeed({ now: this.now(), newId: opts.newId ?? seedIdGenerator() });
-    this.routes = [...authRoutes(), ...controlRoutes(), ...peopleRoutes()].map(compile);
+    this.routes = [...authRoutes(), ...controlRoutes(), ...peopleRoutes(), ...roleRoutes()].map(compile);
   }
 
   /** Back to the sample world, as if the page had just been opened. */
@@ -93,6 +98,27 @@ export class DemoBackend {
     this.blobs.clear();
     this.state = buildSeed({ now: this.now(), newId: this.seedIds ?? seedIdGenerator() });
     this.persist();
+    this.tourListeners.forEach((fn) => fn());
+  }
+
+  // ---- the guided tour (see tour.ts) ---------------------------------------------------------------------------------------
+  /** The tour's ticked steps. The same array until something is ticked, so a screen can watch it cheaply. */
+  readonly tourSnapshot = (): readonly TourStepId[] => this.state.tour?.done ?? NO_STEPS;
+
+  /** Calls `fn` whenever a step is ticked or the demo is reset. Returns the way to stop. */
+  readonly subscribeTour = (fn: () => void): (() => void) => {
+    this.tourListeners.add(fn);
+    return () => { this.tourListeners.delete(fn); };
+  };
+
+  /** Ticks the step a successful request completes, if it completes one that is not ticked yet. */
+  private noteTour(method: string, path: string, user: DemoUser | null): void {
+    const done = this.tourSnapshot();
+    const step = tourStepFor(method, path, user, done);
+    if (!step || done.includes(step)) return;
+    this.state.tour = { done: [...done, step] };
+    this.persist();
+    this.tourListeners.forEach((fn) => fn());
   }
 
   persist(): void {
@@ -109,7 +135,14 @@ export class DemoBackend {
   tenant(id: string): DemoTenant | undefined { return this.state.tenants.find((t) => t.id === id); }
   audit(id: string): DemoAudit | undefined { return this.state.audits.find((a) => a.id === id); }
   control(id: string): DemoControl | undefined { return this.state.controls.find((c) => c.id === id); }
+  customRole(id: string): DemoCustomRole | undefined { return this.state.customRoles.find((r) => r.id === id); }
   displayName(user: DemoUser): string { return user.fullName?.trim() || user.email; }
+
+  /** Has this person kept this ability? True unless their custom role took it away (016: app_allows). It can only narrow what a role may do. */
+  allows(user: DemoUser, permission: Permission): boolean {
+    const role = user.status === "active" && user.customRoleId ? this.customRole(user.customRoleId) : undefined;
+    return !role || !role.denied.includes(permission);
+  }
 
   // ---- who may see what (the row-level security of 001_core, in plain code) -------------------------------------------
   /** A client's own people see their client; an org admin sees every client; other auditor-side people see the ones assigned to them. */
@@ -193,8 +226,12 @@ export class DemoBackend {
    * Applies `patch` to a control the way the database would, in the same order: first "can this person change it at all"
    * (otherwise it simply isn't there for them), then the closed-cycle lock, then the role and status rules, then the
    * table's own checks. Nothing is changed unless every rule passes.
+   *
+   * `closing` is the firm closing a control with no client evidence: the review route says so once it has written the
+   * "close" decision (the database asks for that review row in the same transaction), and it makes the move to accepted
+   * legal from a state it would not otherwise be, without needing an evidence file.
    */
-  updateControl(user: DemoUser, controlId: string, patch: Partial<DemoControl>, action: string, change: unknown): { id: string } {
+  updateControl(user: DemoUser, controlId: string, patch: Partial<DemoControl>, action: string, change: unknown, opts: { closing?: boolean } = {}): { id: string } {
     const c = this.readableControl(user, controlId);
     if (!c || !CONTROL_WRITERS.includes(user.role) || !this.tenantActive(user, c.tenantId)) fail(404, "NOT_FOUND", "Control not found or not visible to you.");
     this.refuseIfClosed(c.auditId);
@@ -208,15 +245,26 @@ export class DemoBackend {
     if (tenantSide && [...settings, "lastRemindedAt" as const].some(changed)) fail(403, "FORBIDDEN_COLUMN", "tenant users can only submit evidence");
     if (user.role === "auditor" && settings.some(changed)) fail(403, "FORBIDDEN_COLUMN", "auditors cannot change applicability, requirements or due dates");
 
+    // Abilities a custom role may have taken away (016).
+    if ((changed("applicable") || changed("naJustification")) && !this.allows(user, "applicability")) fail(403, "FORBIDDEN_PERMISSION", "your role does not allow changing whether a control applies");
+    if (changed("dueDate") && !this.allows(user, "due_dates")) fail(403, "FORBIDDEN_PERMISSION", "your role does not allow changing due dates");
+    if ((changed("evidenceOverride") || changed("fileSpecOverride")) && !this.allows(user, "requirements")) fail(403, "FORBIDDEN_PERMISSION", "your role does not allow changing what evidence a control asks for");
+
     if (changed("status")) {
       if (!(c.applicable && next.applicable)) fail(409, "NOT_APPLICABLE", "status of a not-applicable control cannot change");
-      if (!statusTransitionOk(c.status, next.status, user.role)) fail(409, "INVALID_TRANSITION", `${c.status} to ${next.status} is not allowed for role ${user.role}`);
-      if ((next.status === "submitted" || next.status === "accepted") && !this.state.files.some((f) => f.controlId === c.id)) {
+      const closing = opts.closing === true && next.status === "accepted" && CLOSABLE_FROM.includes(c.status) && REVIEW_ROLES.includes(user.role);
+      if (!closing && !statusTransitionOk(c.status, next.status, user.role)) fail(409, "INVALID_TRANSITION", `${c.status} to ${next.status} is not allowed for role ${user.role}`);
+      if (REVIEW_ROLES.includes(user.role) && (next.status === "under_review" || next.status === "accepted" || next.status === "rejected") && !this.allows(user, "review")) {
+        fail(403, "FORBIDDEN_PERMISSION", "your role does not allow reviewing controls");
+      }
+      if (tenantSide && next.status === "submitted" && !this.allows(user, "upload")) fail(403, "FORBIDDEN_PERMISSION", "your role does not allow submitting evidence");
+      if ((next.status === "submitted" || next.status === "accepted") && !closing && !this.state.files.some((f) => f.controlId === c.id)) {
         fail(409, "EVIDENCE_REQUIRED", "no evidence file is recorded for this control");
       }
     }
 
     if (changed("lastRemindedAt")) {
+      if (!this.allows(user, "remind")) fail(403, "FORBIDDEN_PERMISSION", "your role does not allow sending reminders");
       if (!OUTSTANDING.includes(c.status)) fail(409, "REMINDER_NOT_ALLOWED", "evidence is not outstanding");
       if (c.lastRemindedAt && Date.parse(c.lastRemindedAt) > this.now() - REMINDER_COOLDOWN_MS) {
         fail(429, "REMINDER_RATE_LIMIT", "a reminder was already sent in the last 24 hours");
@@ -295,6 +343,7 @@ export class DemoBackend {
     }
 
     const result = await route.handle({ api: this, user: user as DemoUser, params, req });
+    this.noteTour(method, req.path, user); // only a request that succeeded gets here: a refusal throws before this line
     if (!result) return { status: 204 };
     return { status: result.status ?? 200, json: result.json, blob: result.blob, headers: result.headers };
   }

@@ -9,6 +9,7 @@ import { ControlsPage } from "./pages/ControlsPage";
 import { MyControlsPage } from "./pages/MyControlsPage";
 import { TenantsUsersPage } from "./pages/TenantsUsersPage";
 import { AuditLogPage } from "./pages/AuditLogPage";
+import { RolesPage } from "./pages/RolesPage";
 import { IntegrationsPage } from "./pages/IntegrationsPage";
 import { SecurityPage } from "./pages/SecurityPage";
 import { ServerSettingsPage } from "./pages/ServerSettingsPage";
@@ -35,6 +36,7 @@ export default function App() {
       <Route path="/my-controls" element={<RequireAuth><MyControlsPage /></RequireAuth>} />
       <Route path="/tenants" element={<RequireAuth><TenantsUsersPage /></RequireAuth>} />
       <Route path="/users" element={<RequireAuth><TenantsUsersPage /></RequireAuth>} />
+      <Route path="/roles" element={<RequireAuth><RolesPage /></RequireAuth>} />
       <Route path="/settings/security" element={<RequireAuth><SecurityPage /></RequireAuth>} />
       <Route path="/settings/integrations" element={<RequireAuth><IntegrationsPage /></RequireAuth>} />
       <Route path="/settings/server" element={<RequireAuth><ServerSettingsPage /></RequireAuth>} />

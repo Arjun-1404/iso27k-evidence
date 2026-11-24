@@ -357,7 +357,8 @@ describe("request limits on the public endpoints", () => {
 
   it("the default allowances are generous enough for a normal shared office address", async () => {
     const { app } = setup();
-    for (let i = 0; i < 20; i++) expect((await login(app, "x@nowhere.test", "whatever-pass-1234")).status).toBe(401);
+    // A different (made-up) address each time: the same one tried over and over is locked, like a real account (see the sign-in tests in 70).
+    for (let i = 0; i < 20; i++) expect((await login(app, `x${i}@nowhere.test`, "whatever-pass-1234")).status).toBe(401);
   });
 
   it("trusts X-Forwarded-For only when told how many proxies there are", async () => {

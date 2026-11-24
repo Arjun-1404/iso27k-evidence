@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { server, http, json, API_BASE } from "../test/mswServer";
 import { renderApp, AUDITOR_USER, TENANT_USER } from "../test/renderApp";
@@ -108,5 +108,93 @@ describe("DashboardPage", () => {
       await screen.findByText(/117 items/);
       expect(screen.queryByRole("region", { name: "Audit cycle closed" })).not.toBeInTheDocument();
     });
+  });
+});
+
+describe("DashboardPage: the new layout", () => {
+  const audit = [{ id: "a1", name: "ISO audit", status: "in_progress", templateVersion: "1", createdAt: "2026-01-01" }];
+  const ctl = (id: string, ref: string, over: Record<string, unknown> = {}) => ({
+    id, kind: "annex", section: "A.8 Technological controls", controlRef: ref, title: `Title of ${ref}`, effectiveEvidence: "", effectiveFileSpec: {},
+    isOverridden: false, applicable: true, naJustification: null, status: "not_started", dueDate: null, requirementChangedAt: null, fileCount: 0, ...over,
+  });
+  const controls = [ctl("c1", "A.8.1", { status: "accepted" }), ctl("c2", "A.8.2", { status: "rejected" }), ctl("c3", "A.8.3", { applicable: false })];
+  const withDashboard = {
+    ...dashboard, overdue: 4,
+    byStatus: [{ status: "accepted", count: 52 }, { status: "awaiting_evidence", count: 14 }, { status: "rejected", count: 2 }, { status: "submitted", count: 6 }],
+    bySection: [{ section: "A.8 Technological controls", applicable: 31, accepted: 9 }, { section: "A.5 Organizational controls", applicable: 37, accepted: 37 }],
+  };
+
+  function mockAuditor(list: unknown[]) {
+    server.use(
+      http.get(`${API_BASE}/tenants`, () => json([{ id: "t1", name: "Brightpath Ltd", status: "active", storageRootId: "root" }])),
+      http.get(`${API_BASE}/tenants/t1/audits`, () => json(audit)),
+      http.get(`${API_BASE}/audits/a1/dashboard`, () => json(withDashboard)),
+      http.get(`${API_BASE}/audits/a1/controls`, () => json(list)),
+    );
+  }
+
+  it("leads with the readiness figure, then what needs attention, the status bar and the section meters", async () => {
+    mockAuditor(controls);
+    renderApp(<DashboardPage />, { user: AUDITOR_USER });
+    expect(await screen.findByRole("img", { name: "49.5 percent complete: 52 of 105 applicable controls accepted" })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Needs attention" })).toHaveTextContent("4 overdue");
+    expect(screen.getByRole("region", { name: "Needs attention" })).toHaveTextContent("2 rejected, back with the client");
+    expect(screen.getByRole("region", { name: "Needs attention" })).toHaveTextContent("6 waiting for review");
+    expect(screen.getByRole("img", { name: /^Status of 74 applicable controls/ })).toBeInTheDocument();
+    expect(screen.getByRole("meter", { name: "A.5 Organizational controls: 37 of 37 accepted" })).toBeInTheDocument();
+  });
+
+  it("draws the controls grid for an auditor, and each tile opens the control on the controls page", async () => {
+    mockAuditor(controls);
+    renderApp(<DashboardPage />, { user: AUDITOR_USER });
+    const grid = await screen.findByRole("region", { name: "Controls at a glance" });
+    expect(within(grid).getAllByRole("link")).toHaveLength(3);
+    expect(within(grid).getByRole("link", { name: /A\.8\.2 .* Rejected/ })).toHaveAttribute("href", "/controls?control=c2");
+    expect(within(grid).getByRole("link", { name: /A\.8\.3 .* Not applicable/ })).toHaveAttribute("href", "/controls?control=c3");
+  });
+
+  it("for a client's contributor, tiles open My controls and a not-applicable tile opens nothing", async () => {
+    server.use(
+      http.get(`${API_BASE}/tenants/tenant-1/audits`, () => json(audit)),
+      http.get(`${API_BASE}/audits/a1/dashboard`, () => json(withDashboard)),
+      http.get(`${API_BASE}/audits/a1/controls`, () => json(controls)),
+    );
+    renderApp(<DashboardPage />, { user: TENANT_USER });
+    const grid = await screen.findByRole("region", { name: "Controls at a glance" });
+    expect(within(grid).getByRole("link", { name: /A\.8\.1/ })).toHaveAttribute("href", "/my-controls?control=c1");
+    expect(within(grid).queryByRole("link", { name: /A\.8\.3/ })).not.toBeInTheDocument();
+    expect(within(grid).getByRole("img", { name: /A\.8\.3 .* Not applicable/ })).toBeInTheDocument();
+    expect(screen.getByRole("region", { name: "Needs attention" })).toHaveTextContent("14 still need evidence"); // the client's own wording
+    expect(screen.getByRole("region", { name: "Needs attention" })).not.toHaveTextContent("waiting for review");
+  });
+
+  it("when this person is shown no controls, the numbers stand alone and no empty grid appears", async () => {
+    mockAuditor([]);
+    renderApp(<DashboardPage />, { user: AUDITOR_USER });
+    await screen.findByRole("img", { name: /percent complete/ });
+    expect(screen.queryByRole("region", { name: "Controls at a glance" })).not.toBeInTheDocument();
+    expect(screen.getByRole("meter", { name: /A\.8 Technological controls/ })).toBeInTheDocument();
+  });
+
+  it("says that a contributor sees only some of the audit's controls", async () => {
+    server.use(
+      http.get(`${API_BASE}/tenants/tenant-1/audits`, () => json(audit)),
+      http.get(`${API_BASE}/audits/a1/dashboard`, () => json(withDashboard)),
+      http.get(`${API_BASE}/audits/a1/controls`, () => json([controls[0]])),
+    );
+    renderApp(<DashboardPage />, { user: TENANT_USER });
+    expect(await screen.findByText("Showing the 1 control you can see.")).toBeInTheDocument();
+  });
+
+  it("a failed controls request does not take the dashboard down", async () => {
+    server.use(
+      http.get(`${API_BASE}/tenants`, () => json([{ id: "t1", name: "Brightpath Ltd", status: "active", storageRootId: "root" }])),
+      http.get(`${API_BASE}/tenants/t1/audits`, () => json(audit)),
+      http.get(`${API_BASE}/audits/a1/dashboard`, () => json(withDashboard)),
+      http.get(`${API_BASE}/audits/a1/controls`, () => new Response(JSON.stringify({ error: { code: "INTERNAL", message: "Unexpected error." } }), { status: 500 })),
+    );
+    renderApp(<DashboardPage />, { user: AUDITOR_USER });
+    expect(await screen.findByRole("img", { name: /percent complete/ })).toBeInTheDocument();
+    expect(screen.queryByRole("region", { name: "Controls at a glance" })).not.toBeInTheDocument();
   });
 });

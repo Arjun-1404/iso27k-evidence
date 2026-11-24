@@ -6,62 +6,59 @@ import { useAuth } from "../auth/AuthProvider";
 import { AppShell } from "../components/AppShell";
 import { AuditCyclePicker, CAN_START_CYCLE } from "../components/AuditCyclePicker";
 import { AuditCycleLock } from "../components/AuditCycleLock";
-import { useCallback } from "react";
-import type { Dashboard } from "../api/types";
+import { ReadinessRing } from "../components/dashboard/ReadinessRing";
+import { NeedsAttention } from "../components/dashboard/NeedsAttention";
+import { StatusBar } from "../components/dashboard/StatusBar";
+import { ControlHeatmap } from "../components/dashboard/ControlHeatmap";
+import { SectionMeters } from "../components/dashboard/SectionMeters";
+import { useCallback, type ReactNode } from "react";
+import type { ControlSummary, Dashboard } from "../api/types";
 
-function StatTile({ label, value, tone = "text-gray-900" }: { label: string; value: number; tone?: string }) {
+function Card({ title, children, className = "" }: { title?: string; children: ReactNode; className?: string }) {
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-4">
-      <div className="text-xs font-semibold text-gray-500">{label}</div>
-      <div className={`text-2xl font-bold mt-1 ${tone}`}>{value}</div>
-    </div>
+    <section aria-label={title} className={`rounded-xl border border-gray-200 bg-white p-5 ${className}`}>
+      {title && <h2 className="mb-3 text-sm font-semibold">{title}</h2>}
+      {children}
+    </section>
   );
 }
 
-const STATUS_LABEL: Record<string, string> = {
-  not_started: "Not started", awaiting_evidence: "Awaiting evidence", submitted: "Submitted",
-  under_review: "Under review", accepted: "Accepted", rejected: "Rejected",
-};
+function DashboardBody({ dashboard, title, auditId, auditorSide }: { dashboard: Dashboard; title: string; auditId: string; auditorSide: boolean }) {
+  const api = useApi();
+  // The tiles need the controls themselves. Some people are never shown them (a dashboard-only role gets an empty list), and
+  // for them the grid simply is not drawn; the numbers above it stand on their own.
+  const { data: controls } = useApiQuery((signal) => api.listControls(auditId, signal), [auditId]);
+  const hrefFor = (c: ControlSummary) => {
+    if (auditorSide) return `/controls?control=${c.id}`;
+    return c.applicable ? `/my-controls?control=${c.id}` : null; // a client's own list does not show what is not applicable
+  };
 
-function DashboardBody({ dashboard, title }: { dashboard: Dashboard; title: string }) {
   return (
-    <div className="p-8 max-w-5xl">
+    <div className="p-4 sm:p-8 max-w-5xl">
       <h1 className="text-xl font-semibold mb-1">{title}</h1>
       <p className="text-sm text-gray-500 mb-6">
         {dashboard.total} items · {dashboard.notApplicable} marked not applicable
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-6">
-        <StatTile label="Accepted" value={dashboard.accepted} tone="text-green-700" />
-        <StatTile label="Applicable" value={dashboard.applicable} />
-        <StatTile label="Overdue" value={dashboard.overdue} tone={dashboard.overdue > 0 ? "text-red-700" : undefined} />
-        <StatTile label="Completion" value={dashboard.completionPct} tone="text-teal-700" />
-        <StatTile label="Total" value={dashboard.total} />
+
+      <div className="grid gap-4 lg:grid-cols-[18rem_minmax(0,1fr)] mb-4">
+        <Card title="Audit readiness" className="flex flex-col">
+          <div className="flex flex-1 items-center justify-center py-2">
+            <ReadinessRing accepted={dashboard.accepted} applicable={dashboard.applicable} completionPct={dashboard.completionPct} />
+          </div>
+        </Card>
+        <div className="grid gap-4 content-start">
+          <Card title="Needs attention"><NeedsAttention dashboard={dashboard} auditorSide={auditorSide} /></Card>
+          <Card title="Where the controls stand"><StatusBar byStatus={dashboard.byStatus} notApplicable={dashboard.notApplicable} /></Card>
+        </div>
       </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-5 mb-6">
-        <h2 className="text-sm font-semibold mb-3">Status of applicable controls</h2>
-        <ul className="space-y-1 text-sm">
-          {dashboard.byStatus.map((s) => (
-            <li key={s.status} className="flex justify-between">
-              <span>{STATUS_LABEL[s.status] ?? s.status}</span>
-              <span className="font-semibold">{s.count}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="rounded-xl border border-gray-200 bg-white p-5">
-        <h2 className="text-sm font-semibold mb-3">Progress by section</h2>
-        <ul className="space-y-2 text-sm">
-          {dashboard.bySection.map((s) => (
-            <li key={s.section} className="flex items-center gap-3">
-              <span className="w-56 shrink-0 truncate">{s.section}</span>
-              <div className="flex-1 h-2 rounded-full bg-gray-100 overflow-hidden">
-                <div className="h-full bg-teal-600" style={{ width: `${s.applicable ? (100 * s.accepted) / s.applicable : 0}%` }} />
-              </div>
-              <span className="w-16 text-right text-gray-500">{s.accepted} of {s.applicable}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
+
+      {controls && controls.length > 0 && (
+        <div className="mb-4">
+          <ControlHeatmap controls={controls} hrefFor={hrefFor} visibleOfTotal={dashboard.total} />
+        </div>
+      )}
+
+      <Card title="Progress by section"><SectionMeters sections={dashboard.bySection} /></Card>
     </div>
   );
 }
@@ -108,7 +105,7 @@ export function DashboardPage() {
         <p className="p-8 text-sm text-gray-500">No audit has been set up for this tenant yet.</p>
       )}
       {audit?.status === "closed" && <div className="px-8 pt-8"><AuditCycleLock key={audit.id} audit={audit} canManage={false} /></div>}
-      {dashboard && <DashboardBody dashboard={dashboard} title={tenantName ? `${tenantName} · Dashboard` : "Dashboard"} />}
+      {dashboard && audit && <DashboardBody dashboard={dashboard} auditId={audit.id} auditorSide={isAuditorSide} title={tenantName ? `${tenantName} · Dashboard` : "Dashboard"} />}
     </AppShell>
   );
 }

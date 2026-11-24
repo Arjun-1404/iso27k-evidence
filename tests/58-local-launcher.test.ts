@@ -165,7 +165,7 @@ describe("inspecting the installation", () => {
   it("catches a Linux download opened on Windows — the libraries are for another kind of computer", () => {
     fresh(); build({ esbuild: ["linux-x64", "linux-arm64"] });
     const f = failing(M.inspectInstall(base())).join("\n");
-    expect(f).toContain("linux-arm64 / linux-x64"); expect(f).toContain("win32-x64"); expect(f).toContain("npm ci --omit=dev");
+    expect(f).toContain("linux-arm64 / linux-x64"); expect(f).toContain("win32-x64"); expect(f).toContain("npm.cmd ci --omit=dev");
   });
 
   it("knows an ARM Windows computer needs the arm64 library", () => {
@@ -184,10 +184,10 @@ describe("inspecting the installation", () => {
     expect(failing(M.inspectInstall(base())).join("\n")).toContain("frontend/dist/index.html");
   });
 
-  it("Node versions: 22 and 24 pass, 20 and 21 only warn, older fail with where to get a new one", () => {
+  it("Node versions: 22 and anything newer pass, 20 and 21 only warn, older fail with where to get a new one", () => {
     fresh(); build();
-    for (const v of ["v22.0.0", "v24.1.0"]) expect(levels(M.inspectInstall({ ...base(), nodeVersion: v })), v).not.toContain("warn");
-    for (const v of ["v20.11.0", "v21.0.0", "v25.0.0"]) { const l = levels(M.inspectInstall({ ...base(), nodeVersion: v })); expect(l, v).toContain("warn"); expect(l, v).not.toContain("fail"); }
+    for (const v of ["v22.0.0", "v24.1.0", "v26.0.0", "v30.2.1"]) expect(levels(M.inspectInstall({ ...base(), nodeVersion: v })), v).not.toContain("warn");
+    for (const v of ["v20.11.0", "v21.0.0"]) { const l = levels(M.inspectInstall({ ...base(), nodeVersion: v })); expect(l, v).toContain("warn"); expect(l, v).not.toContain("fail"); }
     expect(failing(M.inspectInstall({ ...base(), nodeVersion: "v18.20.0" })).join("\n")).toContain("nodejs.org");
   });
 
@@ -655,15 +655,20 @@ describe("commands (pretend PostgreSQL and pretend programs)", () => {
 
 describe("the written instructions match the program", () => {
   const readme = readFileSync(resolve(REPO, "README.md"), "utf8");
-  const section = readme.slice(readme.indexOf("## Windows (no Docker)"), readme.indexOf("## Server settings"));
-  const codeLines = [...section.matchAll(/```\n([\s\S]*?)```/g)].flatMap((m) => m[1].split("\n")).map((l) => l.trim()).filter(Boolean);
+  const section = readme.slice(readme.indexOf("### 3. Windows (without Docker)"), readme.indexOf("### 4. Linux (with Docker)"));
+  // Steps 1–10. Step 5 (install the libraries, build the web app) is for a copy from GitHub only, and it has to come BEFORE
+  // everything that needs them: a reader who follows the steps in order must never meet `check` or `start` first.
+  const codeBlockLines = (text: string) => [...text.matchAll(/```\n([\s\S]*?)```/g)].flatMap((m) => m[1].split("\n")).map((l) => l.trim()).filter(Boolean);
+  const allLines = codeBlockLines(section);
+  const githubLines = allLines.filter((l) => l.startsWith("npm"));
+  const codeLines = allLines.filter((l) => !l.startsWith("npm"));
 
-  it("the Windows section exists and uses only commands that work the same in PowerShell and cmd (no export, no VAR=value prefix, no sudo, no bash, no npm run)", () => {
+  it("the Windows section exists and uses only commands that work the same in PowerShell and cmd (no export, no VAR=value prefix, no sudo, no bash, no bare npm)", () => {
     expect(section.length).toBeGreaterThan(2000);
     expect(codeLines.length).toBeGreaterThanOrEqual(4);
-    for (const l of codeLines) {
-      expect(l, l).toMatch(/^(node scripts\/(init-env|local)\.mjs\b|notepad \.env$)/);
-      expect(l, l).not.toMatch(/\bexport\b|\bsudo\b|\bbash\b|\bnpm\b|^[A-Z_]+=/);
+    for (const l of allLines) {
+      expect(l, l).toMatch(/^(npm\.cmd (ci --omit=dev|ci --prefix frontend|run build --prefix frontend)$|node scripts\/(init-env|local)\.mjs\b|notepad \.env$)/);
+      expect(l, l).not.toMatch(/\bexport\b|\bsudo\b|\bbash\b|\bnpm (ci|run|install)\b|^[A-Z_]+=/);
     }
   });
 
@@ -675,32 +680,40 @@ describe("the written instructions match the program", () => {
     for (const l of codeLines.filter((x) => x.startsWith("node scripts/local.mjs"))) expect(l, l).toMatch(/^node scripts\/local\.mjs (check|start|db|admin|api|web)\b/);
   });
 
-  it("the order is the order things can work in: settings → password → check → start (one command does the rest)", () => {
-    const order = codeLines.map((l) => l.replace(/^node scripts\/(local|init-env)\.mjs ?/, (_m, f) => (f === "init-env" ? "init-env" : "")).split(/\s+/)[0]);
-    expect(order).toEqual(["init-env", "notepad", "check", "start"]);
+  it("the order is the order things can work in: install and build (GitHub copy) → settings → password → check → start", () => {
+    const order = allLines.map((l) => (l.startsWith("npm.cmd") ? "npm.cmd" : l.replace(/^node scripts\/(local|init-env)\.mjs ?/, (_m, f) => (f === "init-env" ? "init-env" : "")).split(/\s+/)[0]));
+    expect(order).toEqual(["npm.cmd", "npm.cmd", "npm.cmd", "init-env", "notepad", "check", "start"]);
+  });
+
+  it("a copy from GitHub is told to install and build first, in its own numbered step before the settings file, with npm.cmd (never bare npm: PowerShell can refuse npm's script file), in the order the launcher's check asks for", () => {
+    expect(githubLines).toEqual(["npm.cmd ci --omit=dev", "npm.cmd ci --prefix frontend", "npm.cmd run build --prefix frontend"]);   // no `cd`: a step run in the wrong folder was a real mistake
+    const stepAt = section.indexOf("**5. A copy from GitHub only: install the libraries and build the web app**");
+    expect(stepAt).toBeGreaterThan(0);
+    expect(stepAt).toBeLessThan(section.indexOf("```\nnode scripts/init-env.mjs"));                // before the settings file
+    expect(stepAt).toBeLessThan(section.indexOf("```\nnode scripts/local.mjs check"));              // and before the check that complains without it
+    expect(section).not.toContain("### If you downloaded the code from GitHub");               // no longer tucked away after the steps
+    expect(section).toMatch(/Which download do you have\?/);                                   // and the reader is asked which kind they have first
+    expect(section.indexOf("Which download do you have?")).toBeLessThan(section.indexOf("**1. Install Node.js**"));
+  });
+
+  it("the Windows steps that other steps point to keep their numbers (the password is step 7, the check is step 8)", () => {
+    expect(section).toContain("**7. Tell the portal your PostgreSQL password.**");
+    expect(section).toContain("**8. Check the computer**");
+    expect(section).toMatch(/write it down: step 7 needs it/);
+    expect(section).toMatch(/`refused the password in \.env`\*\* — step 7:/);
+  });
+
+  it("Manual setup (Linux) installs the libraries and builds the web app in step 1b, before the settings file and before the database", () => {
+    const manual = readme.slice(readme.indexOf("### 5. Linux (without Docker)"), readme.indexOf("## Your first client, end to end"));
+    const at = manual.indexOf("**1b. A copy from GitHub only: install the libraries and build the web app**");
+    expect(at).toBeGreaterThan(0);
+    expect(at).toBeLessThan(manual.indexOf("**2. Create the settings file**"));
+    expect(at).toBeLessThan(manual.indexOf("npm run db:setup"));
+    expect(manual.slice(at, manual.indexOf("**2. Create the settings file**"))).toContain("npm ci --omit=dev\nnpm ci --prefix frontend\nnpm run build --prefix frontend");
   });
 
   it("the start command, exactly as written, carries the three administrator details, and the launcher accepts them", async () => {
-    const startLine = codeLines.find((l) => l.startsWith("node scripts/local.mjs start"))!;
-    const written = [...startLine.slice("node scripts/local.mjs ".length).matchAll(/"([^"]*)"|(\S+)/g)].map((m) => m[1] ?? m[2]);
-    expect(written.slice(0, 1)).toEqual(["start"]);
-    expect(written.filter((a) => a.startsWith("--")).sort()).toEqual(["--domain", "--email", "--org"]);
-    // the same details given to the one-step command must work too
-    const args = ["admin", ...written.slice(1)];
-    const dir = mkdtempSync(join(tmpdir(), "readme-admin-"));
-    try {
-      mkdirSync(join(dir, "node_modules", "tsx", "dist", "esm"), { recursive: true }); writeFileSync(join(dir, "node_modules", "tsx", "dist", "esm", "index.mjs"), "");
-      const env = join(dir, ".env"); writeFileSync(env, "POSTGRES_PASSWORD=pw\nAPP_DB_PASSWORD=ap\n");
-      const runs: { env: Record<string, string | undefined> }[] = []; const err: string[] = [];
-      const code = await M.main([...args, "--env", env], { log: () => {}, error: (s) => err.push(s) }, {
-        root: dir, platform: process.platform, arch: process.arch, nodeVersion: "v22.0.0", env: {},
-        portIsFree: async () => true,
-        connectPg: async () => ({ query: async () => ({ rowCount: 0 }), end: async () => {} }),
-        runNode: async (_a, o) => { runs.push({ env: o.env }); return 0; },
-      });
-      expect(code, err.join("\n")).toBe(0);
-      expect(runs[0].env).toMatchObject({ ORG_NAME: "Your Firm", ORG_DOMAIN: "yourfirm.example", ADMIN_EMAIL: "you@yourfirm.example" });
-    } finally { rmSync(dir, { recursive: true, force: true }); }
+    await launcherAcceptsStartLine(codeLines.find((l) => l.startsWith("node scripts/local.mjs start"))!);
   });
 
   it("start-portal.cmd (the double-click file) goes to its own folder, runs the start command, keeps the window open, and has Windows line endings", () => {
@@ -714,13 +727,107 @@ describe("the written instructions match the program", () => {
 
   it("init-env's closing message and .env.example both point at the launcher, and the optional PostgreSQL lines in .env.example are the ones the launcher reads", () => {
     const init = readFileSync(resolve(REPO, "scripts/init-env.mjs"), "utf8");
-    expect(init).toContain("node scripts/local.mjs check"); expect(init).toContain("Windows (no Docker)"); expect(init).toContain("node scripts/local.mjs start --org");
+    expect(init).toContain("node scripts/local.mjs check"); expect(init).toContain("1. Quick installation"); expect(init).toContain("node scripts/local.mjs start --org");
     const example = readFileSync(resolve(REPO, ".env.example"), "utf8");
     const launcher = readFileSync(SCRIPT, "utf8");
     for (const name of ["POSTGRES_PORT", "POSTGRES_USER", "POSTGRES_HOST"]) {
       expect(example, name).toMatch(new RegExp(`^# ${name}=`, "m"));
       expect(launcher, name).toContain(name);
     }
+  });
+});
+
+/** The first-administrator details in a written `start` command must be ones the launcher's one-step `admin` command accepts and passes on. */
+async function launcherAcceptsStartLine(startLine: string) {
+  const written = [...startLine.slice("node scripts/local.mjs ".length).matchAll(/"([^"]*)"|(\S+)/g)].map((m) => m[1] ?? m[2]);
+  expect(written.slice(0, 1)).toEqual(["start"]);
+  expect(written.filter((a) => a.startsWith("--")).sort()).toEqual(["--domain", "--email", "--org"]);
+  const args = ["admin", ...written.slice(1)];
+  const dir = mkdtempSync(join(tmpdir(), "readme-admin-"));
+  try {
+    mkdirSync(join(dir, "node_modules", "tsx", "dist", "esm"), { recursive: true }); writeFileSync(join(dir, "node_modules", "tsx", "dist", "esm", "index.mjs"), "");
+    const env = join(dir, ".env"); writeFileSync(env, "POSTGRES_PASSWORD=pw\nAPP_DB_PASSWORD=ap\n");
+    const runs: { env: Record<string, string | undefined> }[] = []; const err: string[] = [];
+    const code = await M.main([...args, "--env", env], { log: () => {}, error: (s) => err.push(s) }, {
+      root: dir, platform: process.platform, arch: process.arch, nodeVersion: "v22.0.0", env: {},
+      portIsFree: async () => true,
+      connectPg: async () => ({ query: async () => ({ rowCount: 0 }), end: async () => {} }),
+      runNode: async (_a, o) => { runs.push({ env: o.env }); return 0; },
+    });
+    expect(code, err.join("\n")).toBe(0);
+    expect(runs[0].env).toMatchObject({ ORG_NAME: "Your Firm", ORG_DOMAIN: "yourfirm.example", ADMIN_EMAIL: "you@yourfirm.example" });
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+}
+
+describe("the 'Quick installation' section (what a stranger from GitHub follows) matches the program", () => {
+  const readme = readFileSync(resolve(REPO, "README.md"), "utf8");
+  const install = readme.slice(readme.indexOf("### 1. Quick installation"), readme.indexOf("### 2. Windows (with Docker)"));
+  const firstClient = readme.slice(readme.indexOf("## Your first client, end to end"), readme.indexOf("## The live demo"));
+  const lines = [...install.matchAll(/```\n([\s\S]*?)```/g)].flatMap((m) => m[1].split("\n")).map((l) => l.trim()).filter(Boolean);
+
+  it("exists, and says what to do on both Windows and Linux", () => {
+    expect(install.length).toBeGreaterThan(5000);
+    expect(install).toMatch(/\*Windows/); expect(install).toMatch(/\*Linux/);
+  });
+
+  it("every `node scripts/…` command names a script that exists and a launcher command the launcher knows, in the order that can work", () => {
+    const nodeLines = lines.filter((l) => l.startsWith("node scripts/"));
+    for (const l of nodeLines) expect(existsSync(resolve(REPO, l.split(/\s+/)[1])), l).toBe(true);
+    for (const l of nodeLines.filter((x) => x.startsWith("node scripts/local.mjs"))) expect(l, l).toMatch(/^node scripts\/local\.mjs (check|start|db|admin|api|web)\b/);
+    const at = (prefix: string) => lines.findIndex((l) => l.startsWith(prefix));
+    expect(at("node scripts/init-env.mjs")).toBeGreaterThan(at("npm.cmd ci --omit=dev"));
+    expect(at("node scripts/local.mjs check")).toBeGreaterThan(at("node scripts/init-env.mjs"));
+    expect(at("node scripts/local.mjs start")).toBeGreaterThan(at("node scripts/local.mjs check"));
+  });
+
+  it("the install and build commands are exactly the ones the launcher's check asks for: npm.cmd on Windows, plain npm on Linux", () => {
+    expect(lines.filter((l) => /\bnpm/.test(l))).toEqual([
+      "npm.cmd ci --omit=dev", "npm.cmd ci --prefix frontend", "npm.cmd run build --prefix frontend",
+      "npm ci --omit=dev", "npm ci --prefix frontend", "npm run build --prefix frontend",
+    ]);
+    expect(lines.filter((l) => /^cd\b|\(cd /.test(l)), "no step should need a change of folder").toEqual([]);
+    // the launcher's own hints (what `check` says when something is missing) name the same commands, on each kind of computer
+    const missing = (platform: string) => { const dir = mkdtempSync(join(tmpdir(), "hint-")); try { return M.inspectInstall({ root: dir, platform, arch: "x64", nodeVersion: "v22.0.0", settings: {}, envFileExists: false, envPath: join(dir, ".env") }).map((i) => i.hint ?? "").join("\n"); } finally { rmSync(dir, { recursive: true, force: true }); } };
+    expect(missing("win32")).toContain("npm.cmd ci --omit=dev"); expect(missing("win32")).toContain("npm.cmd ci --prefix frontend"); expect(missing("win32")).toContain("npm.cmd run build --prefix frontend");
+    expect(missing("linux")).toContain("npm ci --omit=dev"); expect(missing("linux")).toContain("npm ci --prefix frontend"); expect(missing("linux")).toContain("npm run build --prefix frontend");
+    expect(missing("linux")).not.toContain("npm.cmd");
+  });
+
+  it("the start command, exactly as written, is accepted by the launcher", async () => {
+    await launcherAcceptsStartLine(lines.find((l) => l.startsWith("node scripts/local.mjs start"))!);
+  });
+
+  it("the first-client steps name screens and buttons the web app really has, and the roles it really offers", () => {
+    const ui = (file: string) => readFileSync(resolve(REPO, "frontend/src", file), "utf8");
+    const tenants = ui("pages/TenantsUsersPage.tsx"), people = ui("components/TenantPeoplePanel.tsx"), auditors = ui("components/TenantAuditorsPanel.tsx");
+    const nav = ui("components/AppShell.tsx"), labels = ui("components/roleLabels.ts");
+    // the buttons and menu entries the steps tell you to press
+    expect(tenants).toContain(">People</button>"); expect(tenants).toContain(">Auditors</button>");
+    expect(people).toMatch(/Invite to \{tenant\.name\}/); expect(people).toContain(">Access</button>");
+    expect(auditors).toMatch(/Assign to \{tenant\.name\}/); expect(auditors).toContain(">Remove</button>");
+    for (const item of ["Tenants", "Users", "Roles", "Integrations"]) expect(nav, item).toContain(`label: "${item}"`);
+    for (const word of ["**People**", "**Auditors**", "**Invite to**", "**Assign to**", "**Access**"]) expect(firstClient, word).toContain(word);
+    // nothing in this section calls the API by hand any more
+    expect(install + firstClient).not.toMatch(/\$(?:API|api)\//); expect(install + firstClient).not.toContain("Invoke-RestMethod");
+    // every role of a client's person is named in the README as the web app names it
+    const roles = [...readFileSync(resolve(REPO, "src/services/users.ts"), "utf8").match(/TENANT_ROLES = \[([^\]]+)\]/)![1].matchAll(/"(\w+)"/g)].map((m) => m[1]);
+    expect(roles.length).toBeGreaterThan(0);
+    for (const role of roles) {
+      const label = labels.match(new RegExp(`${role}: "([^"]+)"`))?.[1];
+      expect(label, role).toBeTruthy();
+      expect(firstClient, role).toContain(`**${label}**`);
+    }
+  });
+});
+
+describe("README links", () => {
+  it("every link to a heading in the same page points at a heading that exists", () => {
+    const readme = readFileSync(resolve(REPO, "README.md"), "utf8");
+    const slug = (h: string) => h.toLowerCase().replace(/[^\w\s-]/g, "").replace(/\s/g, "-");
+    const slugs = new Set(readme.split("\n").filter((l) => /^#{1,4} /.test(l)).map((l) => slug(l.replace(/^#+\s*/, "").trim())));
+    const links = [...readme.matchAll(/\]\(#([^)]+)\)/g)].map((m) => m[1]);
+    expect(links.length).toBeGreaterThan(10);
+    for (const l of links) expect(slugs.has(l), l).toBe(true);
   });
 });
 
@@ -786,7 +893,7 @@ describe("the whole route against a real PostgreSQL with a password (like the on
     as(join(BIN, `initdb${EXE}`), ["-D", data, "-U", "postgres", "--auth=scram-sha-256", `--pwfile=${pwfile}`, "-E", "UTF8"]);
     as(join(BIN, `pg_ctl${EXE}`), ["-D", data, "-o", `-p ${PORT} -k ${tmp} -c fsync=off -c listen_addresses=127.0.0.1`, "-l", join(tmp, "pg.log"), "-w", "start"]);
     apiPort = 3300 + Math.floor(Math.random() * 500);
-    const settings = (pw: string) => [`POSTGRES_PASSWORD="${pw}"`, `APP_DB_PASSWORD=${APP_PASSWORD}`, "JWT_SECRET=" + "j".repeat(40), "SECRET_ENCRYPTION_KEY=" + "ab".repeat(32), `POSTGRES_PORT=${PORT}`, "APP_BASE_URL=http://localhost:5173"].join("\r\n") + "\r\n";
+    const settings = (pw: string) => [`POSTGRES_PASSWORD="${pw}"`, `APP_DB_PASSWORD=${APP_PASSWORD}`, "JWT_SECRET=" + "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70", "SECRET_ENCRYPTION_KEY=" + "ab".repeat(32), `POSTGRES_PORT=${PORT}`, "APP_BASE_URL=http://localhost:5173"].join("\r\n") + "\r\n";
     envFile = join(tmp, "good.env"); writeFileSync(envFile, "\uFEFF" + settings(PG_PASSWORD));   // as Notepad may save it
     badEnv = join(tmp, "bad.env"); writeFileSync(badEnv, settings("not-the-password"));
   }, 120_000);
@@ -961,7 +1068,7 @@ describe("start for real: PostgreSQL with a password, the real API and web serve
 
     apiPort = await freePort(); webPort = await freePort();
     envFile = join(root, ".env");
-    writeFileSync(envFile, [`POSTGRES_PASSWORD="${PG_PASSWORD}"`, "APP_DB_PASSWORD=" + "z".repeat(24), "JWT_SECRET=" + "j".repeat(40), "SECRET_ENCRYPTION_KEY=" + "cd".repeat(32), `POSTGRES_PORT=${PORT}`, `APP_BASE_URL=http://localhost:${webPort}`].join("\r\n") + "\r\n");
+    writeFileSync(envFile, [`POSTGRES_PASSWORD="${PG_PASSWORD}"`, "APP_DB_PASSWORD=" + "z".repeat(24), "JWT_SECRET=" + "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70", "SECRET_ENCRYPTION_KEY=" + "cd".repeat(32), `POSTGRES_PORT=${PORT}`, `APP_BASE_URL=http://localhost:${webPort}`].join("\r\n") + "\r\n");
   }, 120_000);
 
   afterAll(() => {

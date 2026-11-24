@@ -6,6 +6,8 @@
  *     password. Someone who runs this project for real must never be carrying the demo along.
  *   - the DEMO (frontend/dist-demo) does contain the demo, and works when put in any folder of a website (every file it
  *     refers to is found relative to the page, as GitHub Pages needs for https://<user>.github.io/<repo>/).
+ *   - the DEMO has a share picture (og:image) that really is in the build, for when its link is pasted into LinkedIn or
+ *     a chat; the real app has none, since it is not a public page.
  *
  *   node scripts/check-demo-build.mjs
  */
@@ -33,6 +35,7 @@ export function checkDemoBuild({ normalDir, demoDir }) {
   if (!existsSync(join(normalDir, "index.html"))) {
     problems.push(`The real app has not been built (no ${join(normalDir, "index.html")}). Run "npm run build" first.`);
   } else {
+    if (/property="og:image"/.test(readText(join(normalDir, "index.html")))) problems.push("The real app's page has a share picture (og:image); only the demo should.");
     for (const f of files(normalDir)) {
       if (!/\.(js|css|html|svg|json|map)$/.test(f)) continue;
       const text = readText(f);
@@ -53,6 +56,11 @@ export function checkDemoBuild({ normalDir, demoDir }) {
       if (!target.startsWith("./")) problems.push(`The demo's page refers to "${target}", which is not relative to the page.`);
       else if (!existsSync(join(demoDir, target))) problems.push(`The demo's page refers to "${target}", which is missing.`);
     }
+    // The picture a pasted link shows. Sites that read it want its full address, so the page names it in full; the file
+    // itself must be in the build under that last part of the address.
+    const shareImage = html.match(/<meta[^>]*property="og:image"[^>]*content="([^"]+)"/)?.[1];
+    if (!shareImage) problems.push("The demo's page has no share picture (og:image).");
+    else if (!existsSync(join(demoDir, shareImage.split("/").pop() ?? ""))) problems.push(`The demo's share picture "${shareImage}" is not in the build.`);
     const alltext = [...files(demoDir)].filter((f) => /\.js$/.test(f)).map(readText).join("\n");
     for (const marker of DEMO_MARKERS) if (!alltext.includes(marker)) problems.push(`The demo does not contain "${marker}": it is not the demo build.`);
     // A hash-based address keeps every page inside index.html, so a static host needs no "not found" page for it.

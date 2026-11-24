@@ -1,7 +1,8 @@
 // What the pretend server remembers. Everything lives in this one plain object, which is what makes the demo easy to
 // reset (build a fresh one) and easy to keep for the length of a tab (it is plain JSON).
 
-import type { ChoosableStorage, ControlStatus, FileSpec, IntegrityStatus, MfaPolicy, Role, ScanStatus } from "../api/types";
+import type { BaseRole, ChoosableStorage, ControlStatus, FileSpec, IntegrityStatus, MfaPolicy, Permission, Role, ScanStatus } from "../api/types";
+import type { TourStepId } from "./tour";
 
 export interface DemoOrg {
   id: string;
@@ -38,6 +39,8 @@ export interface DemoUser {
   email: string;
   fullName: string | null;
   role: Role;
+  /** The firm's custom role (a built-in role with some abilities taken away), if the person has one. Its base role is `role`. */
+  customRoleId?: string | null;
   status: "invited" | "active" | "disabled";
   tenantId: string | null;
   password: string;
@@ -111,9 +114,18 @@ export interface DemoReview {
   controlId: string;
   tenantId: string;
   reviewerId: string;
-  decision: "accept" | "reject";
+  decision: "accept" | "reject" | "close";
   reason: string | null;
   createdAt: string;
+}
+
+/** A role of the firm's own: a built-in role with some abilities taken away (migration 016). */
+export interface DemoCustomRole {
+  id: string;
+  name: string;
+  description: string | null;
+  baseRole: BaseRole;
+  denied: Permission[];
 }
 
 export interface DemoLogEntry {
@@ -131,13 +143,14 @@ export interface DemoTemplate { id: string; framework: string; version: string; 
 
 export interface DemoState {
   /** Bump when the shape changes, so a tab holding an older shape starts fresh instead of breaking. */
-  version: 1;
+  version: 2;
   org: DemoOrg;
   /** Which storages the organisation has switched on (the demo only ever offers this server's disk). */
   storageConnections: { id: string; provider: ChoosableStorage; label: string; status: "active" | "revoked" | "error" }[];
   templates: DemoTemplate[];
   tenants: DemoTenant[];
   users: DemoUser[];
+  customRoles: DemoCustomRole[];
   auditorAssignments: { userId: string; tenantId: string }[];
   audits: DemoAudit[];
   controls: DemoControl[];
@@ -147,9 +160,11 @@ export interface DemoState {
   reviews: DemoReview[];
   log: DemoLogEntry[];
   nextLogSeq: number;
+  /** The guided tour's ticked steps. Absent until the first one: a tab holding an older copy of the state still loads. */
+  tour?: { done: TourStepId[] };
 }
 
-export const STATE_VERSION = 1 as const;
+export const STATE_VERSION = 2 as const;
 
 /** Where the tab's copy is kept. Wrapped in try/catch everywhere: private windows and blocked site data make it throw. */
 export const STORAGE_KEY = "iso27k-demo-state";

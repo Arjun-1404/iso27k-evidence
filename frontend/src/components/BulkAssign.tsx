@@ -40,7 +40,7 @@ export function BulkAssign({ auditId, tenantId, controls }: { auditId: string; t
   }
 
   if (people.data && candidates.length === 0) {
-    return <p className="text-sm text-gray-500 mb-6">To hand controls to the client's people, first invite them under <strong>Users</strong>.</p>;
+    return <p className="text-sm text-gray-500 mb-6">To hand controls to the client's people, first invite them: open the <strong>Tenants</strong> page and choose <strong>People</strong> next to this client.</p>;
   }
   return (
     <section aria-label="Assign controls" className="rounded-xl border border-gray-200 bg-white p-4 mb-6">

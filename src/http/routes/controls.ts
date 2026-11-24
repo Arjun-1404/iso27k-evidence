@@ -17,7 +17,9 @@ const confirmSchema = z.object({ providerFileId: z.string().min(1) });
 const requirementSchema = z.object({ evidenceText: z.string().min(1).max(4000).optional(), fileSpec: fileSpecSchema.optional(), resetToDefault: z.boolean().optional() });
 const applicabilitySchema = z.object({ applicable: z.boolean(), naJustification: z.string().min(3).max(1000).optional() });
 const dueDateSchema = z.object({ dueDate: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).nullable() });
-const reviewSchema = z.object({ decision: z.enum(["accept", "reject"]), reason: z.string().min(3).max(1000).optional() });
+// Rejecting and closing (the firm accepting a control with no client evidence) both need a written reason.
+const reviewSchema = z.object({ decision: z.enum(["accept", "reject", "close"]), reason: z.string().trim().min(3).max(1000).optional() })
+  .refine((b) => b.decision === "accept" || !!b.reason, { message: "A reason is required to reject evidence or to close a control.", path: ["reason"] });
 const commentSchema = z.object({ type: z.enum(["comment", "major", "minor", "ofi", "observation"]).default("comment"), body: z.string().min(1).max(4000) });
 const assignSchema = z.object({ userId: z.string().uuid() });
 const bulkAssignSchema = z.object({ userId: z.string().uuid(), controlIds: z.array(z.string().uuid()).min(1).max(users.MAX_BULK_ASSIGN) });

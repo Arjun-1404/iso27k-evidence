@@ -7,11 +7,16 @@ import { AuthProvider } from "./auth/AuthProvider";
 import { ApiProvider } from "./api/ApiProvider";
 import { TenantProvider } from "./api/TenantProvider";
 import { PlatformOwnerProvider } from "./api/PlatformOwnerProvider";
+import { AccessProvider } from "./api/AccessProvider";
 import { BuiltInAuthClient } from "./auth/builtInAuthClient";
 import { DemoModeProvider, type DemoMode } from "./demoContext";
+import { browserCanShowColours, showNewerBrowserNotice } from "./browserSupport";
 import type { ReactNode } from "react";
 
 async function start() {
+  // An old browser would show a half-blank page (the colours in the stylesheet are ones it cannot read); say so instead.
+  if (!browserCanShowColours()) showNewerBrowserNotice();
+
   let apiBaseUrl: string = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000";
   let demo: { mode: DemoMode; banner: ReactNode } | null = null;
 
@@ -39,12 +44,14 @@ async function start() {
         <AuthProvider client={authClient}>
           <ApiProvider baseUrl={apiBaseUrl} authClient={authClient}>
             <PlatformOwnerProvider>
-              <TenantProvider>
-                <DemoModeProvider value={demo?.mode ?? null}>
-                  {demo?.banner}
-                  <App />
-                </DemoModeProvider>
-              </TenantProvider>
+              <AccessProvider>
+                <TenantProvider>
+                  <DemoModeProvider value={demo?.mode ?? null}>
+                    {demo?.banner}
+                    <App />
+                  </DemoModeProvider>
+                </TenantProvider>
+              </AccessProvider>
             </PlatformOwnerProvider>
           </ApiProvider>
         </AuthProvider>

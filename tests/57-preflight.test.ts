@@ -33,6 +33,8 @@ case "$SCEN:$host:$v4" in
   onlynpmmirror:registry.npmmirror.com:*) printf 200;;
   onlynpmmirror:registry-1.docker.io:*) printf 200;;
   onlynpmmirror:*) bad;;
+  hubblocked:registry-1.docker.io:*) bad;;
+  hubblocked:*) printf 200;;
   allblocked:registry-1.docker.io:*) printf 200;;
   allblocked:*) bad;;
 esac
@@ -85,6 +87,31 @@ describe("preflight.sh", () => {
     expect(code).toBe(1);
     expect(out).toMatch(/No mirror works either/);
     expect(out).not.toContain("NPM_REGISTRY=");
+  });
+
+  it("when Docker Hub cannot be reached (npm is fine), warns without failing and points at the mirror fix", () => {
+    const { code, out } = run("hubblocked");
+    expect(out).toMatch(/\[warn\] Docker Hub cannot be reached: .*wrong version number/);
+    expect(out).toContain("docker pull node:22-slim");
+    expect(out).toContain("https://mirror.gcr.io");
+    expect(out).toContain("/etc/docker/daemon.json");
+    expect(out).not.toContain("[FAIL]");
+    expect(code).toBe(0);
+  });
+
+  it("on an old Node (12), says it is too old for the portal but not needed for the Docker route, and gives the Docker command", () => {
+    // a pretend `node` that answers only `node -v`, placed ahead of the real one
+    const old = mkdtempSync(join(tmpdir(), "preflight-oldnode-"));
+    try {
+      writeFileSync(join(old, "node"), "#!/usr/bin/env bash\necho v12.22.12\n");
+      chmodSync(join(old, "node"), 0o755);
+      const r = spawnSync("bash", [SCRIPT], { encoding: "utf8", env: { ...process.env, SCEN: "ok", PATH: `${old}:${shim}:${process.env.PATH}` } });
+      const out = (r.stdout ?? "") + (r.stderr ?? "");
+      expect(out).toMatch(/\[warn\] Node\.js v12\.22\.12 is too old for the portal \(it needs 22 or newer\)/);
+      expect(out).toContain("you do not need Node on this machine");
+      expect(out).toContain('docker run --rm --user "$(id -u):$(id -g)" -v "$PWD":/app -w /app node:22-slim node scripts/init-env.mjs');
+      expect(out).not.toContain("[FAIL]");
+    } finally { rmSync(old, { recursive: true, force: true }); }
   });
 
   it("explains a Docker permission problem in plain words", () => {

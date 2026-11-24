@@ -14,6 +14,8 @@ const RAISE_CODE_TO_STATUS: Record<string, number> = {
   IMMUTABLE_COLUMN: 400,
   FORBIDDEN_COLUMN: 403,
   FORBIDDEN_ROLE: 403,
+  FORBIDDEN_PERMISSION: 403,
+  INVALID_CUSTOM_ROLE: 400,
   NOT_APPLICABLE: 409,
   INVALID_TRANSITION: 409,
   EVIDENCE_REQUIRED: 409,
@@ -35,7 +37,7 @@ const RAISE_CODE_TO_STATUS: Record<string, number> = {
 
 const CONSTRAINT_TO_MESSAGE: Record<string, string> = {
   na_needs_justification: "A justification is required when marking a control not applicable.",
-  reject_needs_reason: "A reason is required when rejecting evidence.",
+  reject_needs_reason: "A reason is required when rejecting evidence or closing a control.",
   clauses_always_applicable: "Clauses 4 to 10 are mandatory and cannot be marked not applicable.",
   comments_body_check: "The comment must be between 1 and 4000 characters.",
   users_scope: "Tenant users must have a tenant-side role, and auditor-side staff must not belong to a tenant.",
@@ -43,6 +45,10 @@ const CONSTRAINT_TO_MESSAGE: Record<string, string> = {
   orgs_name_check: "The organisation name must be between 1 and 200 characters.",
   orgs_mfa_policy_check: "The two-step sign-in policy must be off, staff or everyone.",
   tenants_name_check: "The tenant name must be between 1 and 200 characters.",
+  custom_roles_name_check: "The role's name must be between 1 and 60 characters.",
+  custom_roles_description_check: "The role's description can be at most 500 characters.",
+  custom_roles_base_check: "A custom role can only be based on a lead auditor, auditor, client lead or contributor.",
+  custom_roles_denied_fit_base: "One of the abilities chosen can't be taken away from that kind of role.",
 };
 
 /**

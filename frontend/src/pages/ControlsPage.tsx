@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useApi } from "../api/ApiProvider";
 import { ApiError } from "../api/client";
 import { useApiQuery } from "../api/useApiQuery";
+import { useLinkedControl } from "../api/useLinkedControl";
 import { useCurrentAudit } from "../api/useCurrentAudit";
 import { useSelectedTenant } from "../api/TenantProvider";
 import { useAuth } from "../auth/AuthProvider";
@@ -10,6 +11,8 @@ import { StatusBadge } from "../components/StatusBadge";
 import { RequirementEditor } from "../components/RequirementEditor";
 import { ControlDetailDrawer } from "../components/ControlDetailDrawer";
 import { BulkAssign } from "../components/BulkAssign";
+import { ApplicabilityControl } from "../components/ApplicabilityControl";
+import { useAccess } from "../api/AccessProvider";
 import { AuditCyclePicker, CAN_START_CYCLE } from "../components/AuditCyclePicker";
 import { AuditCycleLock, CAN_CLOSE_CYCLE } from "../components/AuditCycleLock";
 import type { ControlSummary, FileCategory } from "../api/types";
@@ -22,15 +25,17 @@ const ASSIGN_ROLES = new Set(["org_admin", "lead_auditor"]);
 function ActionCell({ control, canRemind, canReview, onOpen, onRemind }: {
   control: ControlSummary; canRemind: boolean; canReview: boolean; onOpen: () => void; onRemind: () => void;
 }) {
-  if (!control.applicable) return <span className="text-gray-300">–</span>;
+  if (!control.applicable) return <button onClick={onOpen} aria-label={`View ${control.controlRef}`} className="text-xs text-gray-400">View</button>;
   if (control.status === "accepted") return <span className="text-green-700 text-xs font-semibold">✓ Done</span>;
   const needsEvidence = control.status === "not_started" || control.status === "awaiting_evidence" || control.status === "rejected";
   const canDecide = canReview && (control.status === "submitted" || control.status === "under_review");
   return (
-    <div className="flex gap-1.5">
+    <div className="flex flex-wrap gap-1.5">
       {canDecide && <button onClick={onOpen} className="rounded-md bg-teal-50 text-teal-700 border border-teal-200 px-2 py-1 text-xs font-semibold">Review</button>}
       {canRemind && needsEvidence && <button onClick={onRemind} className="rounded-md border border-gray-300 px-2 py-1 text-xs font-semibold">Remind</button>}
-      {!canDecide && !(canRemind && needsEvidence) && <button onClick={onOpen} className="text-xs text-gray-400">View</button>}
+      {/* The firm can close what the client never had to provide evidence for: this opens the control's details, where the reason is asked. */}
+      {canReview && needsEvidence && <button onClick={onOpen} aria-label={`Close ${control.controlRef} without client evidence`} className="rounded-md border border-teal-300 text-teal-800 px-2 py-1 text-xs font-semibold">Close…</button>}
+      {!canDecide && !(canRemind && needsEvidence) && !(canReview && needsEvidence) && <button onClick={onOpen} className="text-xs text-gray-400">View</button>}
     </div>
   );
 }
@@ -45,17 +50,26 @@ export function ControlsPage() {
     [audit?.id],
   );
   const [editing, setEditing] = useState<ControlSummary | null>(null);
-  const [detail, setDetail] = useState<ControlSummary | null>(null);
+  // The details panel follows the latest list, so a change made inside it (applicability, due date) shows at once.
+  const [detailId, setDetailId] = useState<string | null>(null);
+  const detail = detailId ? (controls ?? []).find((c) => c.id === detailId) ?? null : null;
+  const setDetail = (c: ControlSummary | null) => setDetailId(c ? c.id : null);
+  useLinkedControl(controls, setDetail); // the dashboard's tiles link here with ?control=<id>
   const [remindedIds, setRemindedIds] = useState<Set<string>>(new Set());
 
   const role = user?.role ?? "";
   // A closed audit cycle can be looked at but not changed: every way of changing something is taken away.
   const closed = audit?.status === "closed";
-  const canEditRequirement = AUDITOR_WRITE_ROLES.has(role) && !closed;
-  const canRemind = REMIND_ROLES.has(role) && !closed;
-  const canReview = REVIEW_ROLES.has(role) && !closed;
-  const canAssign = ASSIGN_ROLES.has(role) && !closed;
+  // What the person's role allows, less anything their custom role takes away (the database enforces both; this hides the buttons).
+  const { can } = useAccess();
+  const canEditRequirement = AUDITOR_WRITE_ROLES.has(role) && !closed && can("requirements");
+  const canSetApplicability = AUDITOR_WRITE_ROLES.has(role) && !closed && can("applicability");
+  const canSetDueDate = AUDITOR_WRITE_ROLES.has(role) && !closed && can("due_dates");
+  const canRemind = REMIND_ROLES.has(role) && !closed && can("remind");
+  const canReview = REVIEW_ROLES.has(role) && !closed && can("review");
+  const canAssign = ASSIGN_ROLES.has(role) && !closed && can("assign_controls");
 
+  const today = new Date().toISOString().slice(0, 10);
   const [remindError, setRemindError] = useState<string | null>(null);
   async function remind(control: ControlSummary) {
     setRemindError(null);
@@ -97,7 +111,7 @@ export function ControlsPage() {
         <p className="text-sm text-gray-500 mb-6">{audit?.name ?? "Loading…"}</p>
 
         {audit && (
-          <AuditCycleLock key={`lock-${audit.id}`} audit={audit} canManage={CAN_CLOSE_CYCLE.has(role)}
+          <AuditCycleLock key={`lock-${audit.id}`} audit={audit} canManage={CAN_CLOSE_CYCLE.has(role) && can("close_cycle")}
             notAccepted={(controls ?? []).filter((c) => c.applicable && c.status !== "accepted").length}
             onChanged={() => refetchAudits()} />
         )}
@@ -109,13 +123,14 @@ export function ControlsPage() {
 
         {controls && (
           <div className="overflow-x-auto rounded-xl">
-          <table className="w-full min-w-[44rem] text-sm border-separate border-spacing-0 rounded-xl overflow-hidden border border-gray-200 bg-white">
+          <table className="w-full min-w-[48rem] text-sm border-separate border-spacing-0 rounded-xl overflow-hidden border border-gray-200 bg-white">
             <thead className="bg-gray-50 text-xs text-gray-500">
               <tr>
                 <th className="text-left font-semibold px-4 py-2">ID</th>
                 <th className="text-left font-semibold px-4 py-2">Control</th>
                 <th className="text-left font-semibold px-4 py-2">Evidence required</th>
                 <th className="text-left font-semibold px-4 py-2">Applicable</th>
+                <th className="text-left font-semibold px-4 py-2">Due</th>
                 <th className="text-left font-semibold px-4 py-2">Files</th>
                 <th className="text-left font-semibold px-4 py-2">Status</th>
                 <th className="text-left font-semibold px-4 py-2">Actions</th>
@@ -133,7 +148,10 @@ export function ControlsPage() {
                     )}
                   </td>
                   <td className="px-4 py-2">
-                    <span className={`text-xs font-semibold ${c.applicable ? "text-green-700" : "text-gray-400"}`}>{c.applicable ? "Yes" : "No"}</span>
+                    <ApplicabilityControl control={c} editable={canSetApplicability} onChanged={refetch} compact />
+                  </td>
+                  <td className="px-4 py-2 text-xs text-gray-600 whitespace-nowrap">
+                    {c.applicable && c.dueDate ? <span className={c.status !== "accepted" && c.dueDate < today ? "font-semibold text-red-700" : ""}>{c.dueDate}</span> : "–"}
                   </td>
                   <td className="px-4 py-2 text-gray-500">{c.applicable ? `${c.fileCount} file${c.fileCount === 1 ? "" : "s"}` : "–"}</td>
                   <td className="px-4 py-2"><StatusBadge status={c.status} na={!c.applicable} /></td>
@@ -171,7 +189,8 @@ export function ControlsPage() {
         />
       )}
       {detail && (
-        <ControlDetailDrawer control={detail} canReview={canReview} readOnly={closed} assignTenantId={ASSIGN_ROLES.has(role) ? selectedTenantId : null} onClose={() => setDetail(null)} onChanged={refetch} />
+        <ControlDetailDrawer control={detail} canReview={canReview} canSetApplicability={canSetApplicability} canSetDueDate={canSetDueDate} readOnly={closed}
+          assignTenantId={ASSIGN_ROLES.has(role) && can("assign_controls") ? selectedTenantId : null} onClose={() => setDetail(null)} onChanged={refetch} />
       )}
     </AppShell>
   );

@@ -52,7 +52,7 @@ export function ControlAssignment({ control, tenantId, readOnly = false }: {
       </ul>
       {error && <p role="alert" className="text-sm text-red-600 mb-2">{error}</p>}
       {people.error && <p role="alert" className="text-sm text-red-600 mb-2">{people.error}</p>}
-      {!readOnly && people.data && candidates.length === 0 && <p className="text-xs text-gray-400">{assigned.size > 0 ? "Everyone who can be assigned already is." : "There is no one to assign yet. Invite the client's people under Users."}</p>}
+      {!readOnly && people.data && candidates.length === 0 && <p className="text-xs text-gray-400">{assigned.size > 0 ? "Everyone who can be assigned already is." : "There is no one to assign yet. Invite the client's people from the Tenants page (People)."}</p>}
       {!readOnly && candidates.length > 0 && (
         <div className="flex gap-2">
           <label htmlFor={`assign-${control.id}`} className="sr-only">Person to assign</label>

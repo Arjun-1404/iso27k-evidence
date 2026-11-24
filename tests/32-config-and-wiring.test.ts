@@ -19,7 +19,7 @@ const MANAGED = ["DATABASE_URL", "JWT_SECRET", "SMTP_HOST", "SMTP_PORT", "SMTP_S
   "CLAMD_HOST", "CLAMD_PORT", "CLAMD_TIMEOUT_SECONDS", "CLAMD_MAX_FILE_MB", "TRUST_PROXY"];
 function env(vars: Record<string, string> = {}) {
   for (const k of MANAGED) delete process.env[k];
-  Object.assign(process.env, { DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "j" }, vars);
+  Object.assign(process.env, { DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70c4a58f3e" }, vars);
 }
 afterEach(() => { for (const k of MANAGED) delete process.env[k]; Object.assign(process.env, SAVED); });
 

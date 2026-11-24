@@ -62,6 +62,12 @@ describe("the sign-in page", () => {
     expect(await screen.findByRole("heading", { name: "My controls" }, { timeout: 5000 })).toBeInTheDocument();
   });
 
+  it("the sign-in page does not focus the email field, so a short window still opens at the one-click panel", async () => {
+    openDemo();
+    await screen.findByRole("button", { name: /Lead auditor/ });
+    expect(screen.getByLabelText("Work email")).not.toHaveFocus(); // focusing it scrolls the page past the panel on a laptop-sized window
+  });
+
   it("five wrong tries lock only that account; the others carry on working", async () => {
     openDemo();
     for (let i = 0; i < 5; i++) {
@@ -81,11 +87,14 @@ describe("the sign-in page", () => {
   });
 });
 
+/** The dashboard is on screen once its readiness ring is drawn (the ring is the page's headline figure). */
+const dashboardLoaded = () => screen.findByRole("img", { name: /percent complete/ }, { timeout: 5000 });
+
 describe("a visitor trying each person", () => {
   it("the lead auditor lands on the dashboard of the live audit: 117 controls, 48.2% complete", async () => {
     openDemo();
     await signInAs(/Lead auditor/);
-    expect(await screen.findByText("Completion", {}, { timeout: 5000 })).toBeInTheDocument();
+    expect(await dashboardLoaded()).toBeInTheDocument();
     expect(await screen.findByText("48.2")).toBeInTheDocument();
     expect(screen.getByText(/117 items · 5 marked not applicable/)).toBeInTheDocument();
     expect(screen.getAllByText(/surveillance audit 2026/).length).toBeGreaterThan(0);
@@ -94,7 +103,7 @@ describe("a visitor trying each person", () => {
   it("the organisation admin can see all three clients, including the archived one, and the audit log", async () => {
     openDemo();
     await signInAs(/Organisation admin/);
-    await screen.findByText("Completion", {}, { timeout: 5000 });
+    await dashboardLoaded();
     await userEvent.click(screen.getByRole("link", { name: "Tenants" }));
     expect((await screen.findAllByText("Old Mill Foods", {}, { timeout: 5000 })).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Corran Logistics").length).toBeGreaterThan(0);
@@ -115,7 +124,7 @@ describe("a visitor trying each person", () => {
   it("signing out returns to the sign-in page with the demo panel still there", async () => {
     openDemo();
     await signInAs(/Auditor ·/);
-    await screen.findByText("Completion", {}, { timeout: 5000 });
+    await dashboardLoaded();
     await userEvent.click(screen.getByRole("button", { name: "Sign out" }));
     expect(await screen.findByRole("button", { name: /Lead auditor/ })).toBeInTheDocument();
   });
@@ -125,7 +134,7 @@ describe("doing the real work through the screens", () => {
   it("the lead auditor reviews a submitted control: Review, then Accept, and the table shows it accepted", async () => {
     openDemo();
     await signInAs(/Lead auditor/);
-    await screen.findByText("Completion", {}, { timeout: 5000 });
+    await dashboardLoaded();
     await userEvent.click(screen.getByRole("link", { name: "Controls" }));
     const cell = await screen.findByText("A.8.8", {}, { timeout: 5000 });
     const row = cell.closest("tr")!;
@@ -142,7 +151,7 @@ describe("doing the real work through the screens", () => {
   it("closing the audit cycle turns the controls page read-only", async () => {
     openDemo();
     await signInAs(/Lead auditor/);
-    await screen.findByText("Completion", {}, { timeout: 5000 });
+    await dashboardLoaded();
     await userEvent.click(screen.getByRole("link", { name: "Controls" }));
     await screen.findByText("A.8.8", {}, { timeout: 5000 });
     await userEvent.click(screen.getByRole("button", { name: "Close audit cycle" }));
@@ -156,7 +165,7 @@ describe("Reset demo", () => {
   it("puts the sample world back, forgets who was signed in, and reloads", async () => {
     openDemo();
     await signInAs(/Organisation admin/);
-    await screen.findByText("Completion", {}, { timeout: 5000 });
+    await dashboardLoaded();
     demo.backend.state.tenants.push({ id: "extra", name: "Added by visitor", status: "active", storageRootId: null, allowedDomains: ["x.example"] });
     localStorage.setItem("selectedTenantId", "extra");
     localStorage.setItem("selectedAudit:extra", "x");

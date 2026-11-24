@@ -5,6 +5,7 @@ import { hashPassword, verifyPassword, checkPasswordStrength } from "../auth/pas
 import { signSessionToken } from "../auth/jwt.ts";
 import { hashInviteToken } from "../auth/inviteToken.ts";
 import { signMfaToken } from "../auth/mfaToken.ts";
+import { phantomLockout, spendPasswordCheckTime } from "../auth/phantomLockout.ts";
 
 export interface LoginResult { token: string; userId: string; role: string; tenantId: string | null }
 
@@ -15,24 +16,28 @@ export type LoginOutcome = LoginResult | MfaChallenge;
 export const isMfaChallenge = (o: LoginOutcome): o is MfaChallenge => "mfaRequired" in o;
 
 const GENERIC_LOGIN_ERROR = "Incorrect email or password.";
+const LOCKED_MESSAGE = "Too many failed attempts. Please try again in a few minutes.";
 
 /**
  * Verifies an email/password pair and issues a session token — or, if the account has two-step sign-in on, a
  * challenge to be completed with a code instead (and NOT counted as a successful sign-in yet: the failure
  * counter is only cleared when the second step succeeds). Deliberately gives the same generic
  * error for "no such account", "wrong password", and "account has no password set" (an account meant
- * for external SSO only) — telling those apart would let an attacker enumerate valid emails. A locked
- * account gets its own message; that one's an accepted, common trade-off (GitHub and others do the
- * same), not an oversight.
+ * for external SSO only) — telling those apart would let an attacker enumerate valid emails. For the same reason an address
+ * with no usable account takes as long to answer as a real one and locks after the same number of wrong passwords
+ * (see auth/phantomLockout.ts), so neither the clock nor the "too many attempts" message gives an account away.
  */
 export async function login(pool: Pool, jwtSecret: string, email: string, password: string): Promise<LoginOutcome> {
   const row = await withoutUser(pool, (c) => c.query("SELECT * FROM auth_lookup_by_email($1)", [email]).then((r) => r.rows[0]));
 
   if (!row || !row.password_hash || row.status !== "active") {
+    if (phantomLockout.isLocked(email)) throw new AppError(LOCKED_MESSAGE, 423, "ACCOUNT_LOCKED");
+    await spendPasswordCheckTime(password);
+    phantomLockout.recordFailure(email);
     throw new AppError(GENERIC_LOGIN_ERROR, 401, "INVALID_CREDENTIALS");
   }
   if (row.locked_until && new Date(row.locked_until).getTime() > Date.now()) {
-    throw new AppError("Too many failed attempts. Please try again in a few minutes.", 423, "ACCOUNT_LOCKED");
+    throw new AppError(LOCKED_MESSAGE, 423, "ACCOUNT_LOCKED");
   }
 
   const valid = await verifyPassword(password, row.password_hash);
@@ -70,7 +75,7 @@ export async function confirmPassword(pool: Pool, userId: string, password: stri
     throw new AppError("This account signs in through your organisation's single sign-on, so its password and two-step sign-in are managed there.", 409, "NO_LOCAL_PASSWORD");
   }
   if (row.locked_until && new Date(row.locked_until).getTime() > Date.now()) {
-    throw new AppError("Too many failed attempts. Please try again in a few minutes.", 423, "ACCOUNT_LOCKED");
+    throw new AppError(LOCKED_MESSAGE, 423, "ACCOUNT_LOCKED");
   }
   if (!(await verifyPassword(password, row.password_hash))) {
     await withoutUser(pool, (c) => c.query("SELECT auth_record_login_failure($1)", [userId]));

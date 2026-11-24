@@ -113,10 +113,10 @@ describe("BulkAssign", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("with no one to assign to, points at the Users page instead of showing an unusable form", async () => {
+  it("with no one to assign to, points at the Tenants page (People) instead of showing an unusable form", async () => {
     mockPeople([VIEWER]);
     renderIt();
-    expect(await screen.findByText(/first invite them under/)).toBeInTheDocument();
+    expect(await screen.findByText(/first invite them: open the/)).toHaveTextContent("Tenants page and choose People next to this client");
     expect(screen.queryByLabelText("Person")).not.toBeInTheDocument();
   });
 

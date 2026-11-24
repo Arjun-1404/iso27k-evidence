@@ -30,6 +30,19 @@ const TYPES = {
 };
 
 /**
+ * Sent with every answer. The Content-Security-Policy is the same text as in frontend/nginx/security-headers.conf (the
+ * Docker route); a test keeps them identical. Scripts and styles may come only from the app itself and nothing can frame it.
+ */
+export const SECURITY_HEADERS = {
+  "Content-Security-Policy": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' http: https:; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+  "X-Content-Type-Options": "nosniff",
+  "X-Frame-Options": "DENY",
+  "Referrer-Policy": "no-referrer",
+  "Permissions-Policy": "camera=(), microphone=(), geolocation=(), payment=()",
+  "Cross-Origin-Opener-Policy": "same-origin",
+};
+
+/**
  * Paths that mean something special to Windows rather than naming a file: a colon (a drive, `file.txt:stream`), or a
  * device name such as con, nul, aux, prn, com1, lpt1 — with or without an extension. The web app has no such files, so
  * these are always "not found"; refusing them here keeps the file system from being asked at all.
@@ -42,7 +55,7 @@ export function isWindowsSpecialPath(path) {
 export function createWebServer(root) {
   const base = resolve(root);
   const reply = (res, status, headers = {}, body) => {
-    res.writeHead(status, { "X-Content-Type-Options": "nosniff", ...headers });
+    res.writeHead(status, { ...SECURITY_HEADERS, ...headers });
     res.end(body);
   };
   return createServer(async (req, res) => {
@@ -87,7 +100,7 @@ function isMain() {
 if (isMain()) {
   const root = resolve(dirname(fileURLToPath(import.meta.url)), "../frontend/dist");
   if (!existsSync(join(root, "index.html"))) {
-    console.error("The built web app is missing (frontend/dist/index.html).\nBuild it once with:  cd frontend && npm ci && npm run build");
+    console.error("The built web app is missing (frontend/dist/index.html).\nBuild it once, from the folder that has package.json, with:  npm ci --prefix frontend   then   npm run build --prefix frontend");
     process.exit(1);
   }
   const port = Number(process.env.WEB_PORT ?? 5173);

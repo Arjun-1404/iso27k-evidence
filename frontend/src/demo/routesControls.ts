@@ -80,6 +80,7 @@ export function controlRoutes(): Route[] {
         const a = api.audit(params.auditId);
         if (!a || !api.canReadAudit(user, a)) fail(404, "NOT_FOUND", AUDIT_NOT_FOUND);
         if (!CYCLE_MANAGERS.includes(user.role)) fail(403, "FORBIDDEN_ROLE", "Only a lead auditor or an organisation admin can close or reopen an audit cycle.");
+        if (!api.allows(user, "close_cycle")) fail(403, "FORBIDDEN_PERMISSION", "Your role does not allow closing or reopening an audit cycle.");
         if (!api.tenantActive(user, a!.tenantId)) fail(409, "TENANT_INACTIVE", "This client is archived, so its audits can't be changed. Restore the client first.");
         if (a!.status === "closed") fail(409, "AUDIT_ALREADY_CLOSED", "This audit cycle is already closed.");
         const mine = api.state.controls.filter((c) => c.auditId === a!.id && c.applicable);
@@ -97,6 +98,7 @@ export function controlRoutes(): Route[] {
         const a = api.audit(params.auditId);
         if (!a || !api.canReadAudit(user, a)) fail(404, "NOT_FOUND", AUDIT_NOT_FOUND);
         if (!CYCLE_MANAGERS.includes(user.role)) fail(403, "FORBIDDEN_ROLE", "Only a lead auditor or an organisation admin can close or reopen an audit cycle.");
+        if (!api.allows(user, "close_cycle")) fail(403, "FORBIDDEN_PERMISSION", "Your role does not allow closing or reopening an audit cycle.");
         if (!api.tenantActive(user, a!.tenantId)) fail(409, "TENANT_INACTIVE", "This client is archived, so its audits can't be changed. Restore the client first.");
         if (a!.status !== "closed") fail(409, "AUDIT_NOT_CLOSED", "This audit cycle isn't closed.");
         const why = reason.trim();
@@ -234,7 +236,7 @@ export function controlRoutes(): Route[] {
         if (!pending) fail(422, "FILE_NOT_IN_FOLDER", "That file isn't in this control's evidence folder, so it was not recorded.");
         const [token, p] = pending!;
         if (!p.received) fail(409, "UPLOAD_INCOMPLETE", "The file has not finished uploading. Choose it again.");
-        if (!UPLOADERS.includes(user.role) || !api.tenantActive(user, c.tenantId)) FORBIDDEN();
+        if (!UPLOADERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || !api.allows(user, "upload")) FORBIDDEN();
 
         const file: DemoFile = {
           id: api.newId(), controlId: c.id, tenantId: c.tenantId, providerFileId, fileName: p.fileName, sizeBytes: p.sizeBytes, mimeType: p.mimeType,
@@ -294,16 +296,31 @@ export function controlRoutes(): Route[] {
       method: "POST", path: "/controls/:id/reviews",
       handle: ({ api, user, params, req }) => {
         const b = asObject(req.body);
-        const decision = enumField(b, "decision", ["accept", "reject"] as const);
-        const reason = textField(b, "reason", { min: 3, max: 1000, optional: true });
+        const decision = enumField(b, "decision", ["accept", "reject", "close"] as const);
+        const raw = textField(b, "reason", { min: 0, max: 5000, optional: true });
+        const reason = raw?.trim();
+        if (reason !== undefined && (reason.length < 3 || reason.length > 1000)) {
+          fail(400, "VALIDATION", `reason: ${reason.length < 3 ? "Too small: expected string to have >=3 characters" : "Too big: expected string to have <=1000 characters"}`);
+        }
+        // Rejecting and closing (the firm accepting a control with no client evidence) both need a written reason.
+        if (decision !== "accept" && !reason) fail(400, "VALIDATION", "reason: A reason is required to reject evidence or to close a control.");
         const c = api.requireControl(user, params.id);
+        // Plain-language reasons a control can't be closed, looked at before anything is written (services/review.ts).
+        if (decision === "close") {
+          if (!c.applicable) fail(409, "NOT_APPLICABLE", "This control is marked not applicable, so there is nothing to close.");
+          if (c.status === "accepted") fail(409, "ALREADY_ACCEPTED", "This control is already accepted.");
+          if (c.status === "submitted") fail(409, "NEEDS_REVIEW", "The client has submitted evidence for this control. Review it and accept or reject it instead.");
+        }
         api.refuseIfClosed(c.auditId);
-        if (!REVIEWERS.includes(user.role) || !api.tenantActive(user, c.tenantId)) FORBIDDEN();
-        if (decision === "reject" && (reason ?? "").trim().length < 3) fail(400, "reject_needs_reason", "A reason is required when rejecting evidence.");
-        const status = decision === "accept" ? "accepted" : "rejected";
+        if (!REVIEWERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || !api.allows(user, "review")) FORBIDDEN();
+        const status = decision === "reject" ? "rejected" : "accepted";
         // The decision and the status change are one step: if the status can't move, no decision is recorded.
-        api.updateControl(user, c.id, { status }, `control.${decision}`, { status, reason: reason ?? null });
+        api.updateControl(user, c.id, { status }, `control.${decision}`, { status, reason: reason ?? null }, { closing: decision === "close" });
         api.state.reviews.push({ id: api.newId(), controlId: c.id, tenantId: c.tenantId, reviewerId: user.id, decision, reason: reason ?? null, createdAt: api.iso() });
+        // Shown in the control's comment thread, so the client's people can see why it was closed (only if this person may comment).
+        if (decision === "close" && api.allows(user, "comment")) {
+          api.state.comments.push({ id: api.newId(), controlId: c.id, tenantId: c.tenantId, authorId: user.id, type: "comment", body: `Closed by the audit firm without client evidence. Reason: ${reason}`, createdAt: api.iso() });
+        }
         return { status: 201, json: { id: c.id, status } };
       },
     },
@@ -317,7 +334,7 @@ export function controlRoutes(): Route[] {
         const body = textField(b, "body", { max: 4000 });
         const c = api.requireControl(user, params.id);
         api.refuseIfClosed(c.auditId);
-        if (!COMMENTERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || (type !== "comment" && !isAuditorSide(user.role))) FORBIDDEN();
+        if (!COMMENTERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || (type !== "comment" && !isAuditorSide(user.role)) || !api.allows(user, "comment")) FORBIDDEN();
         const row = { id: api.newId(), controlId: c.id, tenantId: c.tenantId, authorId: user.id, type, body, createdAt: api.iso() };
         api.state.comments.push(row);
         api.log(user, "control.comment", c.tenantId, "audit_control", c.id, { type });
@@ -344,7 +361,7 @@ export function controlRoutes(): Route[] {
         const c = api.requireControl(user, params.id);
         api.requireAssignable(user, targetId, c.tenantId);
         api.refuseIfClosed(c.auditId);
-        if (!ASSIGNERS.includes(user.role) || !api.tenantActive(user, c.tenantId)) FORBIDDEN();
+        if (!ASSIGNERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || !api.allows(user, "assign_controls")) FORBIDDEN();
         if (!api.state.assignments.some((a) => a.controlId === c.id && a.userId === targetId)) {
           api.state.assignments.push({ controlId: c.id, userId: targetId });
           api.log(user, "control.assigned", c.tenantId, "audit_control", c.id, { userId: targetId });
@@ -377,7 +394,7 @@ export function controlRoutes(): Route[] {
         const tenantId = found[0].tenantId; // an audit belongs to one client, so they all share it
         api.requireAssignable(user, targetId, tenantId);
         api.refuseIfClosed(params.auditId);
-        if (!ASSIGNERS.includes(user.role) || !api.tenantActive(user, tenantId)) FORBIDDEN();
+        if (!ASSIGNERS.includes(user.role) || !api.tenantActive(user, tenantId) || !api.allows(user, "assign_controls")) FORBIDDEN();
         let assigned = 0;
         for (const c of found) {
           if (api.state.assignments.some((a) => a.controlId === c.id && a.userId === targetId)) continue;
@@ -394,7 +411,7 @@ export function controlRoutes(): Route[] {
         const row = api.state.assignments.find((a) => a.controlId === params.id && a.userId === params.userId);
         const c = api.control(params.id);
         // Someone who may not remove it simply finds nothing to remove.
-        if (!row || !c || !api.canSeeTenant(user, c.tenantId) || !ASSIGNERS.includes(user.role) || !api.tenantActive(user, c.tenantId)) return { json: { removed: false } };
+        if (!row || !c || !api.canSeeTenant(user, c.tenantId) || !ASSIGNERS.includes(user.role) || !api.tenantActive(user, c.tenantId) || !api.allows(user, "assign_controls")) return { json: { removed: false } };
         api.refuseIfClosed(c.auditId);
         api.state.assignments.splice(api.state.assignments.indexOf(row), 1);
         api.log(user, "control.unassigned", c.tenantId, "audit_control", c.id, { userId: params.userId });

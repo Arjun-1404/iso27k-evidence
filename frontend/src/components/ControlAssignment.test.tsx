@@ -154,7 +154,7 @@ describe("ControlAssignment", () => {
   it("with no one to assign, tells the user how to get people in", async () => {
     mockPeople([]);
     renderIt();
-    expect(await screen.findByText(/Invite the client's people under Users/)).toBeInTheDocument();
+    expect(await screen.findByText(/Invite the client's people from the Tenants page \(People\)/)).toBeInTheDocument();
     expect(screen.queryByLabelText("Person to assign")).not.toBeInTheDocument();
   });
 

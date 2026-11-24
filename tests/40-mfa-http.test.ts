@@ -683,7 +683,7 @@ describe("an administrator resetting someone else's two-step sign-in", () => {
     const mine = seen.body.find((x: { id: string }) => x.id === u.id);
     expect(mine.mfaEnabled).toBe(true);
     expect(seen.body.find((x: { id: string }) => x.id === w.lead).mfaEnabled).toBe(false);
-    for (const row of seen.body) expect(Object.keys(row).sort()).toEqual(["email", "fullName", "id", "mfaEnabled", "role", "status"]);
+    for (const row of seen.body) expect(Object.keys(row).sort()).toEqual(["customRoleId", "customRoleName", "email", "fullName", "id", "mfaEnabled", "role", "status"]);
 
     const leadToken = await plainSession(app, `lead@audit-a-${w.tag}.test`);
     const theirs = await get(app, leadToken, "/users");

@@ -1,5 +1,7 @@
 import { Client } from "pg";
 import { ensureAppRole, migrate } from "./migrate.ts";
+import { assertNotPlaceholderPassword, passwordInDatabaseUrl } from "../secretsCheck.ts";
+import { databaseHint } from "./failureHints.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -8,7 +10,11 @@ function required(name: string): string {
 }
 
 async function main() {
-  const client = new Client({ connectionString: required("DATABASE_URL") });
+  const databaseUrl = required("DATABASE_URL");
+  // Before touching the database: don't set it up with the passwords that are published in .env.example.
+  assertNotPlaceholderPassword("The database password (POSTGRES_PASSWORD)", passwordInDatabaseUrl(databaseUrl));
+  assertNotPlaceholderPassword("APP_DB_PASSWORD", process.env.APP_DB_PASSWORD);
+  const client = new Client({ connectionString: databaseUrl });
   await client.connect();
   try {
     await ensureAppRole(client, process.env.APP_DB_PASSWORD);
@@ -22,5 +28,7 @@ async function main() {
 
 main().catch((e) => {
   console.error("Migration failed:", (e as Error).message);
+  const hint = databaseHint(e);
+  if (hint) console.error(`\n${hint}`);
   process.exit(1);
 });

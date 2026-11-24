@@ -6,7 +6,7 @@ const SAVED = { ...process.env };
 const MANAGED = ["DATABASE_URL", "JWT_SECRET", "LOCAL_STORAGE_DIR", "STORAGE_ALLOW_PRIVATE_ADDRESSES"];
 function env(vars: Record<string, string> = {}) {
   for (const k of MANAGED) delete process.env[k];
-  Object.assign(process.env, { DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "j" }, vars);
+  Object.assign(process.env, { DATABASE_URL: "postgres://x@localhost/x", JWT_SECRET: "0f3c9a7e51d84b26a9e07c15bd3f48a2e6d91b70c4a58f3e" }, vars);
 }
 afterEach(() => { for (const k of MANAGED) delete process.env[k]; Object.assign(process.env, SAVED); });
 

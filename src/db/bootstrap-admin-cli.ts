@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import { generateInviteToken } from "../auth/inviteToken.ts";
+import { databaseHint } from "./failureHints.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -58,5 +59,15 @@ async function main() {
 
 main().catch((e) => {
   console.error("Bootstrap failed:", (e as Error).message);
+  const hint = databaseHint(e);
+  if (hint) console.error(`\n${hint}`);
+  // 42501 = "insufficient privilege". The usual cause: DATABASE_URL still names the restricted portal_app role (set for starting the
+  // API) instead of the database owner. That role may read these tables but not create rows in them, by design.
+  if ((e as { code?: string }).code === "42501") {
+    console.error("\nThis command must connect as the database owner (the `postgres` user), not as the restricted `portal_app` role that the");
+    console.error("running portal uses. Nothing was created. Point DATABASE_URL at the owner, then run it again, for example:");
+    console.error('  export DATABASE_URL="postgres://postgres:<the POSTGRES_PASSWORD from .env>@127.0.0.1:5432/evidenceportal"');
+    console.error("(In Docker, `docker compose run … migrate npm run db:bootstrap-admin` already does this.)");
+  }
   process.exit(1);
 });

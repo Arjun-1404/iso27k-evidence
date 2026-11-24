@@ -25,11 +25,15 @@ head_ "Programs"
 if have node; then
   v=$(node -v 2>/dev/null); major=${v#v}; major=${major%%.*}
   case "$major" in
-    22|24) ok "Node.js $v (22 and 24 are the tested versions)" ;;
-    *)     warn "Node.js $v — only 22 and 24 were tested; newer or older may work, but if something odd happens, try 22 or 24" ;;
+    [0-9]|1[0-9]|2[0-1])
+      warn "Node.js $v is too old for the portal (it needs 22 or newer)."
+      note "Docker route: you do not need Node on this machine. Make the settings file through Docker instead of npm run setup:"
+      note "  docker run --rm --user \"\$(id -u):\$(id -g)\" -v \"\$PWD\":/app -w /app node:22-slim node scripts/init-env.mjs"
+      note "No-Docker route: install Node 22 first (README, \"Before you start: what to install\")." ;;
+    *)     ok "Node.js $v" ;;
   esac
 else
-  bad "Node.js is not installed. Install version 22 or 24 (see the README, \"Manual setup\", step 1)."
+  bad "Node.js is not installed. Install Node.js 22 or newer (see the README, \"Before you start: what to install\")."
 fi
 
 DOCKER_OK=0
@@ -56,7 +60,7 @@ if have psql || have pg_lsclusters; then
   ok "PostgreSQL tools found ($(psql --version 2>/dev/null | head -1))"
   have pg_lsclusters && pg_lsclusters 2>/dev/null | sed 's/^/         /'
 else
-  note "PostgreSQL is not installed — fine for the Docker route; the no-Docker route needs it (README, \"Manual setup\", step 1)."
+  note "PostgreSQL is not installed — fine for the Docker route; the no-Docker route needs it (README, \"Before you start: what to install\")."
 fi
 
 head_ "This machine"
@@ -125,7 +129,11 @@ else
   fi
   good "$Y_DEF" && ok "registry.yarnpkg.com (mirror) is reachable" || note "registry.yarnpkg.com (mirror): $Y_DEF"
   good "$M_DEF" && ok "registry.npmmirror.com (mirror) is reachable" || note "registry.npmmirror.com (mirror): $M_DEF"
-  if good "$H_DEF"; then ok "Docker Hub is reachable (where Docker images come from)"; else warn "Docker Hub cannot be reached: $H_DEF — the Docker route needs it for the database and web server images."; fi
+  if good "$H_DEF"; then ok "Docker Hub is reachable (where Docker images come from)"; else
+    warn "Docker Hub cannot be reached: $H_DEF — the Docker route needs it for the database and web server images."
+    note "Try:  docker pull node:22-slim  once more; then a phone hotspot or VPN for the one-time download; then a mirror: put"
+    note "  {\"registry-mirrors\": [\"https://mirror.gcr.io\"]}  in /etc/docker/daemon.json and restart Docker. README, \"If Docker stops with TLS handshake timeout\"."
+  fi
 
   # Does a container reach the internet too? Only tried when Docker works and the image is already here (no big download for a test).
   if [ "$DOCKER_OK" -eq 1 ]; then
@@ -153,4 +161,4 @@ elif [ $WARN -gt 0 ]; then
 else
   printf '  All good.\n'
 fi
-printf '  Next: README, "Quick start (Docker Compose)" or "Manual setup (no Docker)".\n'
+printf '  Next: README, "Installation": "4. Linux (with Docker)" or "5. Linux (without Docker)".\n'

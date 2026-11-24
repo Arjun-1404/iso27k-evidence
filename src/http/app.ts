@@ -3,6 +3,7 @@ import type { Pool } from "pg";
 import { authMiddleware } from "./middleware/auth.ts";
 import { enforceMfaPolicy } from "./middleware/mfaPolicy.ts";
 import { corsMiddleware } from "./middleware/cors.ts";
+import { securityHeaders } from "./middleware/securityHeaders.ts";
 import { warnIfProxyUnconfigured } from "./middleware/rateLimit.ts";
 import { camelCaseJson } from "./middleware/camelCase.ts";
 import type { TokenVerifier } from "../auth/types.ts";
@@ -12,10 +13,11 @@ import type { Scanner } from "../scan/types.ts";
 import type { EmailSender } from "../email/types.ts";
 import type { SecretStore } from "../auth/secretStore.ts";
 import type { GoogleOAuth } from "../storage/googleOAuth.ts";
-import { AppError } from "../errors.ts";
+import { AppError, mapDbError } from "../errors.ts";
 import { controlsRouter } from "./routes/controls.ts";
 import { orgsRouter } from "./routes/orgs.ts";
 import { usersRouter } from "./routes/users.ts";
+import { rolesRouter } from "./routes/roles.ts";
 import { authRouter } from "./routes/auth.ts";
 import { mfaRouter } from "./routes/mfa.ts";
 import { accountRouter } from "./routes/account.ts";
@@ -93,6 +95,8 @@ export function createApp(deps: AppDeps): Express {
   }
   const app = express();
   app.set("trust proxy", deps.trustProxy ?? 0);
+  app.disable("x-powered-by");              // don't announce which framework (and so which known weaknesses) to look for
+  app.use(securityHeaders());               // first of all, so every answer carries them — errors and downloads included
   app.use(warnIfProxyUnconfigured());
   // First, before body parsing and auth: a browser's preflight OPTIONS request carries no bearer token,
   // so it must be answered before authMiddleware ever sees it.
@@ -117,6 +121,7 @@ export function createApp(deps: AppDeps): Express {
   app.use(orgsRouter(deps));
   app.use(storageRouter(deps));
   app.use(usersRouter(deps));
+  app.use(rolesRouter(deps));
   app.use(mfaRouter(deps));
   app.use(accountRouter(deps));
   app.use(googleStartRouter(deps));
@@ -124,13 +129,37 @@ export function createApp(deps: AppDeps): Express {
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-    if (err instanceof AppError) {
-      res.status(err.status).json({ error: { code: err.code, message: err.message } });
-    } else {
-      console.error(err);
-      res.status(500).json({ error: { code: "INTERNAL", message: "Unexpected error." } });
+    const known = err instanceof AppError ? err : requestFault(err) ?? databaseFault(err);
+    if (known) {
+      res.status(known.status).json({ error: { code: known.code, message: known.message } });
+      return;
     }
+    console.error(err);
+    res.status(500).json({ error: { code: "INTERNAL", message: "Unexpected error." } });
   });
 
   return app;
+}
+
+/**
+ * A problem with the request itself, found by the body reader before any route ran (malformed JSON, a body over the
+ * size limit, an unsupported encoding): the caller's mistake, so a 4xx with a fixed message — never a 500, and never
+ * the parser's own text (which can quote part of what was sent).
+ */
+function requestFault(err: unknown): AppError | null {
+  const e = err as { status?: unknown; type?: unknown } | null;
+  if (!e || typeof e !== "object" || typeof e.status !== "number" || e.status < 400 || e.status > 499) return null;
+  switch (e.type) {
+    case "entity.too.large": return new AppError("That request is too large.", 413, "PAYLOAD_TOO_LARGE");
+    case "entity.parse.failed": return new AppError("The request body is not valid JSON.", 400, "BAD_REQUEST");
+    case "encoding.unsupported": case "charset.unsupported": return new AppError("That request's encoding is not supported.", 415, "UNSUPPORTED_MEDIA_TYPE");
+    default: return new AppError("The request could not be read.", e.status, "BAD_REQUEST");
+  }
+}
+
+/** A raw database error that a service didn't translate itself (a path id that isn't an id, a refused row, …) still gets its
+ *  proper 4xx here rather than a 500; anything unrecognised stays a 500, which is the caller's cue that it is ours to fix. */
+function databaseFault(err: unknown): AppError | null {
+  const mapped = mapDbError(err);
+  return mapped.status === 500 ? null : mapped;
 }

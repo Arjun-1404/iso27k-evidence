@@ -1,5 +1,6 @@
 import { Client } from "pg";
 import { setPlatformOwner } from "./platformOwner.ts";
+import { databaseHint } from "./failureHints.ts";
 
 function required(name: string): string {
   const v = process.env[name];
@@ -26,5 +27,7 @@ async function main() {
 
 main().catch((e) => {
   console.error("Failed:", (e as Error).message);
+  const hint = databaseHint(e);
+  if (hint) console.error(`\n${hint}`);
   process.exit(1);
 });

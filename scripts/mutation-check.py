@@ -797,9 +797,39 @@ SOURCE_MUTATIONS = [
   ("src/config.ts", "LOCAL_STORAGE_DIR may be a relative path [storage-options]", "if (!isAbsolute) throw", "if (false) throw", ["tests/65-storage-config-and-headers.test.ts"]),
   ("src/config.ts", "LOCAL_STORAGE_DIR may be the top of a drive [storage-options]", "if (path.parse(dir).root === dir || path.win32.parse(dir).root === dir) throw", "if (false) throw", ["tests/65-storage-config-and-headers.test.ts"]),
   ("scripts/local.mjs", "the default evidence folder is inside the portal's folder, which a new version replaces [storage-options]", 'join(deps.home ?? os.homedir(), "EvidencePortal", "files")', 'join(deps.root, "evidence-files")', ["tests/58-local-launcher.test.ts"]),
+
+  # --- the security review's fixes [hardening] ---
+  ("src/http/middleware/securityHeaders.ts", "the API stops sending X-Frame-Options [hardening]", '    res.setHeader("X-Frame-Options", "DENY");\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/middleware/securityHeaders.ts", "API answers may be cached [hardening]", '    res.setHeader("Cache-Control", "no-store");\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/middleware/securityHeaders.ts", "the API stops sending its Content-Security-Policy [hardening]", '    res.setHeader("Content-Security-Policy", "default-src \'none\'; frame-ancestors \'none\'");\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/middleware/securityHeaders.ts", "HSTS is sent even on plain http [hardening]", "if (req.secure) res.setHeader", "if (true) res.setHeader", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/middleware/securityHeaders.ts", "HSTS is never sent [hardening]", "if (req.secure) res.setHeader", "if (false) res.setHeader", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/app.ts", "the API announces it is Express [hardening]", '  app.disable("x-powered-by");', "", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/app.ts", "the security headers are not applied [hardening]", "  app.use(securityHeaders());", "", ["tests/70-security-hardening.test.ts"]),
+  ("src/http/app.ts", "an oversized body is a 500 [hardening]", 'return new AppError("That request is too large.", 413,', 'return new AppError("That request is too large.", 500,', ["tests/70-security-hardening.test.ts"]),
+  ("src/http/app.ts", "malformed JSON echoes the parser's own text [hardening]", 'return new AppError("The request body is not valid JSON.", 400,', 'return new AppError(String((err as Error).message), 400,', ["tests/70-security-hardening.test.ts"]),
+  ("src/http/app.ts", "a database error the service did not translate is a 500 [hardening]", "return mapped.status === 500 ? null : mapped;", "return null;", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/jwt.ts", "session tokens signed with another algorithm are accepted [hardening]", '{ issuer: ISSUER, algorithms: ["HS256"] }', "{ issuer: ISSUER }", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/password.ts", "a common word with digits is an acceptable password [hardening]", "const common = isCommon(lettersOnly) || isCommon(unLeeted);", "const common = false;", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/password.ts", "look-alike characters are not undone [hardening]", "const common = isCommon(lettersOnly) || isCommon(unLeeted);", "const common = isCommon(lettersOnly);", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/password.ts", "a password is only counted in characters, not bytes [hardening]", "Buffer.byteLength(plain, \"utf8\") > MAX_PASSWORD_BYTES", "plain.length > MAX_PASSWORD_BYTES", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/password.ts", "a password of a few repeated characters is accepted [hardening]", "if (new Set(lower).size < 5)", "if (false)", ["tests/70-security-hardening.test.ts"]),
+  ("src/services/auth.ts", "an address with no account is answered faster than a real one [hardening]", "    await spendPasswordCheckTime(password);\n", "", ["tests/70-security-hardening.test.ts"]),
+  ("src/services/auth.ts", "an address with no account is never locked [hardening]", "    phantomLockout.recordFailure(email);\n", "", ["tests/70-security-hardening.test.ts"]),
+  ("src/auth/phantomLockout.ts", "an address with no account is locked after a different number of attempts [hardening]", "export const LOCK_AFTER_FAILURES = 5;", "export const LOCK_AFTER_FAILURES = 6;", ["tests/70-security-hardening.test.ts"]),
+  ("src/config.ts", "the example JWT_SECRET is accepted [hardening]", "  assertUsableJwtSecret(jwtSecret);\n", "", ["tests/70-security-hardening.test.ts"]),
+  ("src/config.ts", "the example database password is accepted [hardening]", '  assertNotPlaceholderPassword("The password in DATABASE_URL", passwordInDatabaseUrl(databaseUrl));\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("src/secretsCheck.ts", "a short JWT_SECRET is accepted [hardening]", "if (value.length < 32) throw", "if (false) throw", ["tests/70-security-hardening.test.ts"]),
+  ("src/db/migrate-cli.ts", "the database is set up with the example APP_DB_PASSWORD [hardening]", '  assertNotPlaceholderPassword("APP_DB_PASSWORD", process.env.APP_DB_PASSWORD);\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("scripts/serve-web.mjs", "the no-Docker web server stops sending X-Frame-Options [hardening]", '  "X-Frame-Options": "DENY",\n', "", ["tests/70-security-hardening.test.ts"]),
+  ("scripts/serve-web.mjs", "the no-Docker web server allows inline scripts [hardening]", "script-src 'self';", "script-src 'self' 'unsafe-inline';", ["tests/70-security-hardening.test.ts"]),
+  ("src/db/migrate-cli.ts", "a refused database password is shown without the explanation [db-hint]", "  if (hint) console.error(`\\n${hint}`);\n", "", ["tests/49-platform-owner-scripts.test.ts"]),
+  ("src/db/failureHints.ts", "the explanation for a refused database password is never given [db-hint]", 'code === "28P01"', 'code === "00000"', ["tests/49-platform-owner-scripts.test.ts"]),
+  ("src/db/bootstrap-admin-cli.ts", "bootstrap-admin shows a refused database password without the explanation [db-hint]", "  if (hint) console.error(`\\n${hint}`);\n", "", ["tests/49-platform-owner-scripts.test.ts"]),
 ]
 
-PROJECT_ITEMS = ["src", "tests", "db", "scripts", ".github", "package.json", "tsconfig.json", "vitest.config.ts", ".env.example", "docker-compose.yml", "Dockerfile", "README.md", "start-portal.cmd", ".gitattributes"]
+PROJECT_ITEMS = ["src", "tests", "db", "scripts", ".github", "package.json", "tsconfig.json", "vitest.config.ts", ".env.example", "docker-compose.yml", "Dockerfile", "README.md", "start-portal.cmd", ".gitattributes",
+                 "SECURITY.md", ".dockerignore", "frontend/.dockerignore", "frontend/Dockerfile", "frontend/Dockerfile.prebuilt", "frontend/nginx"]
 
 # A breakage is caught the moment ANY test fails, so a mutated run can stop at the first failure instead of finishing
 # the whole suite. (A breakage that survives still runs everything: nothing fails, so nothing stops it.) The baseline
@@ -831,6 +861,7 @@ def run_in_copy(target_file, new_content, tests):
     os.chmod(d, 0o755)
     try:
         for item in PROJECT_ITEMS:
+            os.makedirs(os.path.dirname(os.path.join(d, item)), exist_ok=True)   # a few items live in a folder (frontend/...) that is not copied whole
             if os.path.isdir(item): shutil.copytree(item, os.path.join(d, item))
             elif os.path.exists(item): shutil.copy(item, os.path.join(d, item))
         os.symlink(os.path.abspath("node_modules"), os.path.join(d, "node_modules"))
